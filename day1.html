@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 01 — AI 是怎麼「理解」你的？ | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #111009;
+    --surface: #1c1a15;
+    --surface2: #232018;
+    --border: #2e2b22;
+    --ink: #f0ece4;
+    --ink-dim: #8a8375;
+    --ink-faint: #4a4740;
+    --accent: #d4521f;
+    --accent-warm: #e8935a;
+    --gold: #c9a84c;
+    --green: #4a7c59;
+    --green-light: #7ab893;
+    --red: #b53a2f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* GRAIN */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── TOP NAV ─── */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink-dim);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back-arrow { font-size: 14px; }
+
+  .nav-center {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+  }
+
+  .nav-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .nav-progress-bar {
+    width: 120px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .nav-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.4s ease;
+    border-radius: 2px;
+  }
+
+  /* ─── HERO BANNER ─── */
+  .lesson-hero {
+    border-bottom: 1px solid var(--border);
+    padding: 72px 48px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lesson-hero::before {
+    content: '01';
+    position: absolute;
+    right: -20px;
+    bottom: -40px;
+    font-family: 'Playfair Display', serif;
+    font-size: 280px;
+    font-weight: 900;
+    color: var(--surface2);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .lesson-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .meta-day {
+    background: var(--accent);
+    color: var(--ink);
+    padding: 5px 14px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .meta-time {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--ink-dim);
+  }
+
+  .meta-time::before { content: '—  '; }
+
+  .lesson-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+  }
+
+  .lesson-title em {
+    font-style: italic;
+    color: var(--accent-warm);
+  }
+
+  .lesson-lead {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ink-dim);
+    max-width: 640px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 40px;
+  }
+
+  .lesson-objectives {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .objective-tag {
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink-dim);
+  }
+
+  .objective-tag.highlight {
+    border-color: var(--accent);
+    color: var(--accent-warm);
+  }
+
+  /* ─── LAYOUT ─── */
+  .lesson-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  .lesson-main {
+    border-right: 1px solid var(--border);
+    padding: 0;
+  }
+
+  .lesson-sidebar {
+    padding: 40px 28px;
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+    overflow-y: auto;
+  }
+
+  /* ─── SECTION BLOCKS ─── */
+  .lesson-section {
+    border-bottom: 1px solid var(--border);
+    padding: 48px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .lesson-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-eyebrow::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .section-body {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.95;
+    color: var(--ink-dim);
+  }
+
+  .section-body p { margin-bottom: 16px; }
+  .section-body p:last-child { margin-bottom: 0; }
+
+  .section-body strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ─── CONCEPT CARDS ─── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  .concept-card {
+    background: var(--surface);
+    padding: 28px;
+  }
+
+  .concept-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .concept-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .concept-desc {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+    font-family: 'Noto Serif TC', serif;
+  }
+
+  /* ─── ANALOGY BOX ─── */
+  .analogy-box {
+    background: var(--surface2);
+    border-left: 3px solid var(--gold);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+
+  .analogy-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .analogy-text {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  /* ─── INTERACTIVE TOKEN DEMO ─── */
+  .token-demo {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin: 28px 0;
+  }
+
+  .demo-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .demo-label::after {
+    content: 'Interactive';
+    background: var(--accent);
+    color: var(--ink);
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+  }
+
+  .token-input-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .token-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 14px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    resize: none;
+    height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .token-input:focus { border-color: var(--accent); }
+
+  .token-input::placeholder { color: var(--ink-faint); }
+
+  .token-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 48px;
+    padding: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .token-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent-warm);
+    border-radius: 2px;
+    animation: chipIn 0.2s ease;
+  }
+
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .token-stats {
+    display: flex;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+
+  .token-stat-num {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ─── COMPARISON TABLE ─── */
+  .comparison-table {
+    border: 1px solid var(--border);
+    margin: 28px 0;
+    overflow: hidden;
+  }
+
+  .comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .comparison-row:last-child { border-bottom: none; }
+
+  .comparison-header {
+    background: var(--surface);
+  }
+
+  .comparison-cell {
+    padding: 18px 22px;
+    font-size: 13px;
+    line-height: 1.6;
+    border-right: 1px solid var(--border);
+  }
+
+  .comparison-cell:last-child { border-right: none; }
+
+  .cell-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 6px;
+  }
+
+  .cell-bad { color: #b05050; }
+  .cell-good { color: var(--green-light); }
+
+  .cell-header-bad { background: rgba(176,80,80,0.1); }
+  .cell-header-good { background: rgba(74,124,89,0.1); }
+
+  .cell-header-bad .cell-label { color: #b05050; }
+  .cell-header-good .cell-label { color: var(--green-light); }
+
+  /* ─── INTERACTIVE EXPERIMENT ─── */
+  .experiment-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin: 28px 0;
+  }
+
+  .exp-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .exp-label::after {
+    content: 'Try it';
+    background: var(--green);
+    color: var(--ink);
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+  }
+
+  .exp-prompt-variants {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .variant-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--ink-dim);
+    padding: 12px 18px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1.5;
+  }
+
+  .variant-btn:hover {
+    border-color: var(--accent);
+    color: var(--ink);
+    background: var(--surface2);
+  }
+
+  .variant-btn.active {
+    border-color: var(--accent);
+    background: var(--surface2);
+    color: var(--accent-warm);
+  }
+
+  .variant-btn .variant-num {
+    color: var(--accent);
+    margin-right: 10px;
+    font-size: 10px;
+  }
+
+  .exp-output {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    min-height: 80px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--ink-dim);
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+  }
+
+  .exp-output.has-content {
+    border-left-color: var(--green);
+    color: var(--ink);
+  }
+
+  .exp-analysis {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+
+  .exp-analysis.has-content { color: var(--green-light); }
+
+  /* ─── PROMPT TEMPLATE ─── */
+  .prompt-template {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    margin: 28px 0;
+  }
+
+  .prompt-template-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+  }
+
+  .prompt-template-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--ink-dim);
+    padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .copy-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent-warm);
+  }
+
+  .copy-btn.copied {
+    border-color: var(--green);
+    color: var(--green-light);
+  }
+
+  .prompt-template-body {
+    padding: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--accent-warm);
+    white-space: pre-wrap;
+  }
+
+  .prompt-comment { color: var(--ink-faint); }
+  .prompt-key { color: var(--gold); }
+  .prompt-value { color: var(--green-light); }
+
+  /* ─── KEY INSIGHT ─── */
+  .key-insight {
+    background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin: 28px 0;
+    position: relative;
+  }
+
+  .insight-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    opacity: 0.3;
+    position: absolute;
+    top: 12px;
+    right: 20px;
+  }
+
+  .insight-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .insight-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 600px;
+  }
+
+  /* ─── CONTEXT WINDOW VIZ ─── */
+  .context-viz {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 28px;
+    margin: 28px 0;
+  }
+
+  .context-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 16px;
+  }
+
+  .context-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .context-bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 48px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .context-bar-name {
+    font-size: 11px;
+    color: var(--ink-dim);
+    text-align: right;
+    letter-spacing: 0.05em;
+  }
+
+  .context-bar-track {
+    height: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .context-bar-fill {
+    height: 100%;
+    transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .context-bar-fill.user { background: rgba(212,82,31,0.4); border-right: 2px solid var(--accent); }
+  .context-bar-fill.system { background: rgba(201,168,76,0.4); border-right: 2px solid var(--gold); }
+  .context-bar-fill.output { background: rgba(74,124,89,0.4); border-right: 2px solid var(--green-light); }
+  .context-bar-fill.gpt4 { background: rgba(138,131,117,0.3); border-right: 2px solid var(--ink-dim); }
+
+  .context-bar-num {
+    font-size: 11px;
+    color: var(--ink-dim);
+    text-align: right;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar-section {
+    margin-bottom: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-section:last-child { border-bottom: none; }
+
+  .sidebar-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+
+  /* TABLE OF CONTENTS */
+  .toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--ink-dim);
+    transition: color 0.15s;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .toc-item:last-child { border-bottom: none; }
+  .toc-item:hover { color: var(--ink); }
+  .toc-item.active { color: var(--accent-warm); }
+
+  .toc-num {
+    font-size: 10px;
+    color: var(--ink-faint);
+    min-width: 18px;
+  }
+
+  /* VOCAB GLOSSARY */
+  .vocab-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vocab-item:last-child { border-bottom: none; }
+
+  .vocab-term {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .vocab-def {
+    font-size: 11px;
+    color: var(--ink-dim);
+    line-height: 1.5;
+    font-family: 'Noto Serif TC', serif;
+  }
+
+  /* TODAY'S TASK */
+  .task-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  .task-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  .task-desc {
+    font-size: 11px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+    font-family: 'Noto Serif TC', serif;
+  }
+
+  .task-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  .task-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .task-checkbox.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .task-check-label {
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* NEXT DAY CTA */
+  .next-cta {
+    background: var(--accent);
+    color: var(--ink);
+    padding: 14px 18px;
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+  .next-cta:hover { opacity: 0.88; }
+
+  /* ─── BOTTOM NAV ─── */
+  .lesson-nav {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 28px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-lesson-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink-dim);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+  }
+  .nav-lesson-btn:hover { color: var(--ink); border-color: var(--ink-dim); }
+
+  .nav-lesson-btn.primary {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+  .nav-lesson-btn.primary:hover { opacity: 0.88; }
+
+  .nav-lesson-center {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── COMPLETE BUTTON ─── */
+  .complete-section {
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    text-align: center;
+  }
+
+  .complete-btn {
+    background: transparent;
+    border: 2px solid var(--green);
+    color: var(--green-light);
+    padding: 18px 56px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .complete-btn:hover {
+    background: var(--green);
+    color: var(--ink);
+  }
+
+  .complete-btn.done {
+    background: var(--green);
+    color: var(--ink);
+  }
+
+  .complete-sub {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="prompt-course.html" class="nav-back">
+    <span class="nav-back-arrow">←</span>
+    回到課程
+  </a>
+  <div class="nav-center">Prompt Mastery</div>
+  <div class="nav-progress">
+    <span>Day 01 / 20</span>
+    <div class="nav-progress-bar">
+      <div class="nav-progress-fill" id="scrollProgress"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="lesson-hero">
+  <div class="lesson-meta">
+    <span class="meta-day">Day 01</span>
+    <span class="meta-time">45 分鐘</span>
+  </div>
+  <h1 class="lesson-title">AI 是怎麼<br><em>「理解」</em>你的？</h1>
+  <p class="lesson-lead">在學第一個 prompt 技巧之前，你需要先理解 AI 眼中的世界是什麼樣子。建立這個心智模型，是讓你從「碰運氣問 AI」進化到「精準引導 AI」的關鍵一步。</p>
+  <div class="lesson-objectives">
+    <span class="objective-tag highlight">理解 Token 的概念</span>
+    <span class="objective-tag highlight">掌握 Context Window</span>
+    <span class="objective-tag highlight">建立 AI 心智模型</span>
+    <span class="objective-tag">完成觀察日記</span>
+  </div>
+</div>
+
+<!-- BODY + SIDEBAR -->
+<div class="lesson-body">
+
+  <!-- MAIN CONTENT -->
+  <main class="lesson-main">
+
+    <!-- SECTION 1 -->
+    <div class="lesson-section" id="sec1">
+      <div class="section-eyebrow">Section 1</div>
+      <h2 class="section-heading">AI 不讀句子，它讀「Token」</h2>
+      <div class="section-body">
+        <p>當你輸入一段文字，AI 不是像人類一樣逐字閱讀的。它首先把你的文字切割成一個個叫做 <strong>Token</strong> 的小片段。Token 可以是一個完整的英文單字、一個中文字，或是標點符號 — 但並不是每個字都剛好對應一個 Token。</p>
+        <p>理解這件事，能幫你在三個地方更精準：在有字數限制時知道如何計算；理解為什麼有些回應在接近長度上限時會突然截斷；以及知道為什麼「簡潔但完整」的 prompt 往往比「囉嗦但模糊」的更有效。</p>
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-label">思維類比</div>
+        <div class="analogy-text">想像你把一首歌的歌詞剪成一小片一小片放進袋子裡。AI 接收到的不是「一首歌」，而是「一袋詞片」。它很擅長從這些詞片中找出模式和規律，但如果你給它的「詞片」很模糊，它重建出來的意思就可能跑偏。</div>
+      </div>
+
+      <!-- INTERACTIVE TOKEN DEMO -->
+      <div class="token-demo">
+        <div class="demo-label">Token 計算器</div>
+        <textarea class="token-input" id="tokenInput" placeholder="在這裡輸入任何文字，即時看到 token 的切割方式...">今天天氣很好，我想去公園散步。</textarea>
+        <div class="token-display" id="tokenDisplay"></div>
+        <div class="token-stats">
+          <span>Token 數量：<span class="token-stat-num" id="tokenCount">0</span></span>
+          <span>字元數量：<span class="token-stat-num" id="charCount">0</span></span>
+          <span>Token / 字元：<span class="token-stat-num" id="tokenRatio">-</span></span>
+        </div>
+      </div>
+
+      <div class="key-insight">
+        <div class="insight-mark">"</div>
+        <div class="insight-label">核心認知</div>
+        <div class="insight-text">英文大約 1 個 token = 4 個字母；中文大約 1 個 token = 1.5 個字。這意味著用中文問問題比用英文消耗更多的 token 資源。</div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="lesson-section" id="sec2">
+      <div class="section-eyebrow">Section 2</div>
+      <h2 class="section-heading">Context Window：AI 的短期記憶</h2>
+      <div class="section-body">
+        <p>每個 AI 模型都有一個 <strong>Context Window</strong>（上下文視窗），這是它一次能「看見」的最大 token 數量。想像成一條傳送帶 — 只有在傳送帶上的內容，AI 才能參考。超出這個範圍的對話，AI 就「忘記」了。</p>
+        <p>這解釋了為什麼在一個很長的對話到後期，AI 可能會「忘記」你在最開始說的事情。也解釋了為什麼 System Prompt（你給 AI 的角色設定）要盡量精簡：它會一直佔用 context window 的空間。</p>
+      </div>
+
+      <!-- CONTEXT WINDOW VISUALIZATION -->
+      <div class="context-viz">
+        <div class="context-label">不同模型的 Context Window 大小比較（千 tokens）</div>
+        <div class="context-bar-container" id="contextBars">
+          <div class="context-bar-row">
+            <div class="context-bar-name">Claude 3.5</div>
+            <div class="context-bar-track"><div class="context-bar-fill user" data-width="100" style="width:0%"></div></div>
+            <div class="context-bar-num">200k</div>
+          </div>
+          <div class="context-bar-row">
+            <div class="context-bar-name">GPT-4o</div>
+            <div class="context-bar-track"><div class="context-bar-fill system" data-width="64" style="width:0%"></div></div>
+            <div class="context-bar-num">128k</div>
+          </div>
+          <div class="context-bar-row">
+            <div class="context-bar-name">Gemini 1.5</div>
+            <div class="context-bar-track"><div class="context-bar-fill gpt4" data-width="100" style="width:0%"></div></div>
+            <div class="context-bar-num">1M+</div>
+          </div>
+          <div class="context-bar-row">
+            <div class="context-bar-name">你的 prompt</div>
+            <div class="context-bar-track"><div class="context-bar-fill output" data-width="2" style="width:0%"></div></div>
+            <div class="context-bar-num">~0.5k</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-label">Context 不足時</div>
+          <div class="concept-title">AI 開始「亂想像」</div>
+          <div class="concept-desc">當你給的資訊不夠具體，AI 會用它訓練時學到的「統計平均值」來填補空白。這就是為什麼不加脈絡的問題常常得到通用但無用的答案。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-label">Context 充分時</div>
+          <div class="concept-title">AI 在「範圍內尋找」</div>
+          <div class="concept-desc">給 AI 充分的上下文，它就像一個在特定文件集合中搜尋的系統，答案的來源更可控、更精準，幻覺（hallucination）也會大幅減少。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="lesson-section" id="sec3">
+      <div class="section-eyebrow">Section 3</div>
+      <h2 class="section-heading">措辭如何影響輸出：同一件事，五種問法</h2>
+      <div class="section-body">
+        <p>現在來看最關鍵的一課：<strong>同樣的問題，不同的措辭，可以得到完全不同品質的答案</strong>。這不是因為 AI 在「揣摩你的意思」，而是因為你的措辭本身就改變了問題的邊界和方向。</p>
+        <p>以下是五種問同一件事的方式，從最模糊到最精準。點選每個版本，觀察 AI 可能如何回應它。</p>
+      </div>
+
+      <div class="experiment-section">
+        <div class="exp-label">互動實驗</div>
+        <div class="exp-prompt-variants">
+          <button class="variant-btn" onclick="showVariant(0)">
+            <span class="variant-num">V1</span>幫我寫一些關於咖啡的東西
+          </button>
+          <button class="variant-btn" onclick="showVariant(1)">
+            <span class="variant-num">V2</span>幫我寫一篇咖啡的文章
+          </button>
+          <button class="variant-btn" onclick="showVariant(2)">
+            <span class="variant-num">V3</span>用輕鬆的語氣寫一篇關於早晨喝咖啡習慣的短文（200字）
+          </button>
+          <button class="variant-btn" onclick="showVariant(3)">
+            <span class="variant-num">V4</span>你是一位生活風格 blogger，請以第一人稱寫一篇關於「早晨第一杯咖啡」的短文，語氣溫暖有趣，約200字，最後一句以問句結束邀請讀者互動
+          </button>
+          <button class="variant-btn" onclick="showVariant(4)">
+            <span class="variant-num">V5</span>你是一位生活風格 blogger，讀者群為25-35歲都會女性。請以第一人稱寫關於「晨間咖啡儀式感」的 IG 貼文，包含：開場鉤子（抓住注意力）、個人故事（2-3句）、咖啡帶來的感受（1-2句）、互動問題。語氣：溫暖、真實、略帶文青感。字數：180-220字
+          </button>
+        </div>
+        <div class="exp-output" id="expOutput">點選上方任一版本，查看 AI 可能的回應方向...</div>
+        <div class="exp-analysis" id="expAnalysis"></div>
+      </div>
+
+      <!-- COMPARISON TABLE -->
+      <div class="comparison-table">
+        <div class="comparison-row comparison-header">
+          <div class="comparison-cell cell-header-bad">
+            <div class="cell-label">模糊的 Prompt</div>
+          </div>
+          <div class="comparison-cell cell-header-good">
+            <div class="cell-label">精準的 Prompt</div>
+          </div>
+        </div>
+        <div class="comparison-row">
+          <div class="comparison-cell">
+            <div class="cell-bad">幫我寫一篇文章</div>
+          </div>
+          <div class="comparison-cell">
+            <div class="cell-good">你是一位旅遊 blogger，為30-40歲的上班族讀者寫一篇關於「週末一日遊清邁」的行程分享，語氣輕鬆有個人風格，800字，包含3個必去景點和2個餐廳推薦</div>
+          </div>
+        </div>
+        <div class="comparison-row">
+          <div class="comparison-cell">
+            <div class="cell-bad">怎麼投資？</div>
+          </div>
+          <div class="comparison-cell">
+            <div class="cell-good">我是一個月薪5萬的28歲上班族，有15萬台幣積蓄，風險承受度低，希望5年後有50萬的購屋頭期款。有哪些低風險的理財選項適合我？請用條列式說明每個選項的特點和適合的人</div>
+          </div>
+        </div>
+        <div class="comparison-row">
+          <div class="comparison-cell">
+            <div class="cell-bad">幫我寫 Email</div>
+          </div>
+          <div class="comparison-cell">
+            <div class="cell-good">幫我寫一封英文 Email 給我的日本客戶 Tanaka San，禮貌地問他上次提案的進度，我們已經等了2週沒消息。語氣：專業但不失溫度。長度：100字以內。不使用過於正式的商業詞彙</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="lesson-section" id="sec4">
+      <div class="section-eyebrow">Section 4</div>
+      <h2 class="section-heading">今天的 Prompt 範本：觀察實驗框架</h2>
+      <div class="section-body">
+        <p>理論說完了，現在該動手了。今天的練習很簡單：用同一個主題，試驗 5 種不同的問法，記錄哪種方式給你最好的答案。這個「觀察日記」的練習，是建立 prompt 直覺最有效的方法。</p>
+      </div>
+
+      <div class="prompt-template">
+        <div class="prompt-template-header">
+          <span class="prompt-template-label">今日 Prompt 範本 — 觀察實驗框架</span>
+          <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">複製</button>
+        </div>
+        <div class="prompt-template-body" id="promptBody"><span class="prompt-comment">// 觀察實驗：同一主題的五種問法</span>
+
+<span class="prompt-key">實驗主題：</span><span class="prompt-value">[選擇一個你想了解的主題，例如「如何提高工作效率」]</span>
+
+<span class="prompt-comment">// 版本 1：最模糊</span>
+<span class="prompt-value">[直接問主題]</span>
+
+<span class="prompt-comment">// 版本 2：加上格式要求</span>
+給我<span class="prompt-value">[主題]</span>的建議，用條列式呈現
+
+<span class="prompt-comment">// 版本 3：加上角色和對象</span>
+你是一位<span class="prompt-value">[相關專家]</span>，請給<span class="prompt-value">[你的背景描述]</span>關於<span class="prompt-value">[主題]</span>的建議
+
+<span class="prompt-comment">// 版本 4：加上情境和限制</span>
+你是一位<span class="prompt-value">[專家]</span>，我是<span class="prompt-value">[你的情況]</span>，
+目前遇到的問題是<span class="prompt-value">[具體問題]</span>，
+請給我<span class="prompt-value">[數量]</span>個實際可執行的建議，
+每個建議附帶一個具體的第一步行動
+
+<span class="prompt-comment">// 版本 5：完整精準版</span>
+你是一位有<span class="prompt-value">[年數]</span>年經驗的<span class="prompt-value">[專家]</span>。
+我是<span class="prompt-value">[詳細背景]</span>，
+在<span class="prompt-value">[具體情境]</span>下想要<span class="prompt-value">[目標]</span>。
+目前我已經試過<span class="prompt-value">[已嘗試的方法]</span>但效果不佳。
+請給我：
+1. 分析我的問題根源（2-3句）
+2. 最重要的3個改進方向（有優先順序）
+3. 每個方向的第一個可執行步驟
+4. 預期在<span class="prompt-value">[時間框架]</span>內能看到什麼改變
+格式：標題+條列，不使用術語</div>
+      </div>
+
+      <div class="key-insight">
+        <div class="insight-mark">"</div>
+        <div class="insight-label">今日要點</div>
+        <div class="insight-text">你給 AI 的資訊越具體，它需要「猜測」的空間就越小，輸出的品質就越高。這不是 AI 的問題，是資訊傳遞的問題。</div>
+      </div>
+    </div>
+
+    <!-- TODAY'S PRACTICE -->
+    <div class="lesson-section" id="sec5">
+      <div class="section-eyebrow">Today's Practice</div>
+      <h2 class="section-heading">今日任務：建立你的第一份 Prompt 觀察日記</h2>
+      <div class="section-body">
+        <p>選擇一個你真正想解決的問題或想了解的主題，用上方的範本框架，試驗五個不同版本的 prompt。把每個版本的輸出記錄下來，觀察並回答以下問題：</p>
+      </div>
+
+      <div class="experiment-section" style="margin:24px 0;">
+        <div class="exp-label" style="color: var(--gold);">反思問題</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="background:var(--bg);border:1px solid var(--border);padding:14px 18px;font-size:13px;color:var(--ink-dim);font-family:'Noto Serif TC',serif;line-height:1.7;">
+            哪個版本的答案讓你覺得「這個 AI 真的懂我想要什麼」？它和其他版本最大的差別是什麼？
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);padding:14px 18px;font-size:13px;color:var(--ink-dim);font-family:'Noto Serif TC',serif;line-height:1.7;">
+            有沒有某個版本的答案讓你覺得「這根本沒回答我的問題」？你覺得 AI 為什麼會那樣回應？
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);padding:14px 18px;font-size:13px;color:var(--ink-dim);font-family:'Noto Serif TC',serif;line-height:1.7;">
+            如果讓你設計第六個版本，你會在 V5 的基礎上再加什麼？
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLETE BUTTON -->
+    <div class="complete-section">
+      <button class="complete-btn" id="completeBtn" onclick="markComplete()">
+        標記今日完成
+      </button>
+      <div class="complete-sub" id="completeNote">完成後前往 Day 02：Prompt 的解剖學</div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="lesson-sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">目錄</div>
+      <nav class="toc-list">
+        <a class="toc-item active" href="#sec1" onclick="highlightToc(0)">
+          <span class="toc-num">01</span>
+          Token 是什麼
+        </a>
+        <a class="toc-item" href="#sec2" onclick="highlightToc(1)">
+          <span class="toc-num">02</span>
+          Context Window
+        </a>
+        <a class="toc-item" href="#sec3" onclick="highlightToc(2)">
+          <span class="toc-num">03</span>
+          措辭的影響力
+        </a>
+        <a class="toc-item" href="#sec4" onclick="highlightToc(3)">
+          <span class="toc-num">04</span>
+          今日 Prompt 範本
+        </a>
+        <a class="toc-item" href="#sec5" onclick="highlightToc(4)">
+          <span class="toc-num">05</span>
+          今日任務
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">關鍵詞彙</div>
+      <div class="vocab-item">
+        <div class="vocab-term">Token</div>
+        <div class="vocab-def">AI 處理文字的最小單位。英文約 4 個字母 = 1 token，中文約 1-2 個字 = 1 token。</div>
+      </div>
+      <div class="vocab-item">
+        <div class="vocab-term">Context Window</div>
+        <div class="vocab-def">AI 一次能處理的最大 token 數量，等同於它的「短期工作記憶」。</div>
+      </div>
+      <div class="vocab-item">
+        <div class="vocab-term">Hallucination</div>
+        <div class="vocab-def">AI 在資訊不足時「自己補腦」，生成聽起來合理但實際上錯誤的內容。</div>
+      </div>
+      <div class="vocab-item">
+        <div class="vocab-term">System Prompt</div>
+        <div class="vocab-def">在對話開始前給 AI 的基礎設定，決定它的角色、行為規則和輸出風格。</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">今日任務清單</div>
+      <div class="task-box">
+        <div class="task-title">五版本 Prompt 實驗</div>
+        <div class="task-desc">用同一主題試驗5種不同問法，記錄每個版本的輸出結果</div>
+        <div class="task-check" onclick="toggleTask(0)">
+          <div class="task-checkbox" id="task-0">✓</div>
+          <span class="task-check-label">完成五個版本的測試</span>
+        </div>
+      </div>
+      <div class="task-box">
+        <div class="task-title">觀察日記</div>
+        <div class="task-desc">回答三個反思問題，記錄你的發現</div>
+        <div class="task-check" onclick="toggleTask(1)">
+          <div class="task-checkbox" id="task-1">✓</div>
+          <span class="task-check-label">寫下你的觀察筆記</span>
+        </div>
+      </div>
+      <div class="task-box">
+        <div class="task-title">設計 V6</div>
+        <div class="task-desc">在 V5 的基礎上創造你自己的改進版本</div>
+        <div class="task-check" onclick="toggleTask(2)">
+          <div class="task-checkbox" id="task-2">✓</div>
+          <span class="task-check-label">完成你的 V6 版本</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">下一堂課</div>
+      <div style="font-size:11px;color:var(--ink-dim);line-height:1.6;margin-bottom:14px;font-family:'Noto Serif TC',serif;">
+        Day 02：Prompt 的解剖學 — 深入拆解四元素框架，比較好 vs 差的 prompt 差距
+      </div>
+      <a href="#" class="next-cta">Day 02 — 解剖學</a>
+    </div>
+
+  </aside>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="lesson-nav">
+  <a href="prompt-course.html" class="nav-lesson-btn">
+    ← 返回課程總覽
+  </a>
+  <div class="nav-lesson-center">
+    Day 01 of 20
+  </div>
+  <a href="#" class="nav-lesson-btn primary">
+    Day 02：解剖學 →
+  </a>
+</div>
+
+<script>
+// ─── SCROLL PROGRESS ───
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const scrolled = doc.scrollTop;
+  const total = doc.scrollHeight - doc.clientHeight;
+  const pct = total > 0 ? (scrolled / total) * 100 : 0;
+  document.getElementById('scrollProgress').style.width = pct + '%';
+});
+
+// ─── SECTION REVEAL ───
+const sections = document.querySelectorAll('.lesson-section');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+sections.forEach(s => observer.observe(s));
+
+// ─── CONTEXT BAR ANIMATION ───
+const barObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const fills = e.target.querySelectorAll('.context-bar-fill');
+      fills.forEach(f => {
+        setTimeout(() => { f.style.width = f.dataset.width + '%'; }, 200);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+const ctxViz = document.querySelector('.context-viz');
+if (ctxViz) barObserver.observe(ctxViz);
+
+// ─── TOKEN COUNTER ───
+function tokenize(text) {
+  const tokens = [];
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    const code = ch.charCodeAt(0);
+    if (code > 0x4E00 && code < 0x9FFF) { tokens.push(ch); i++; }
+    else if (/\s/.test(ch)) {
+      let ws = '';
+      while (i < text.length && /\s/.test(text[i])) { ws += text[i]; i++; }
+      tokens.push(ws);
+    }
+    else if (/[a-zA-Z]/.test(ch)) {
+      let word = '';
+      while (i < text.length && /[a-zA-Z']/.test(text[i])) { word += text[i]; i++; }
+      const chunks = [];
+      for (let j = 0; j < word.length; j += 4) chunks.push(word.slice(j, j+4));
+      chunks.forEach(c => tokens.push(c));
+    }
+    else { tokens.push(ch); i++; }
+  }
+  return tokens.filter(t => t.trim() !== '');
+}
+
+const colors = ['#3a2415','#1a2a1a','#15202a','#2a1a2a','#2a2215'];
+
+function updateTokens() {
+  const text = document.getElementById('tokenInput').value;
+  const tokens = tokenize(text);
+  const disp = document.getElementById('tokenDisplay');
+  disp.innerHTML = '';
+  tokens.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'token-chip';
+    chip.textContent = t;
+    chip.style.background = colors[i % colors.length];
+    disp.appendChild(chip);
+  });
+  document.getElementById('tokenCount').textContent = tokens.length;
+  document.getElementById('charCount').textContent = text.length;
+  document.getElementById('tokenRatio').textContent = text.length > 0 ? (text.length / Math.max(tokens.length,1)).toFixed(1) : '-';
+}
+
+document.getElementById('tokenInput').addEventListener('input', updateTokens);
+setTimeout(updateTokens, 100);
+
+// ─── VARIANT EXPERIMENT ───
+const variants = [
+  { output: "咖啡是世界上最受歡迎的飲品之一，起源於衣索比亞。主要品種包括阿拉比卡和羅布斯塔。咖啡因能提神醒腦。", analysis: "V1 分析：問題太模糊，AI 只能給出百科式的通用回答，無法判斷你需要什麼。" },
+  { output: "咖啡的歷史與文化：咖啡起源於15世紀的衣索比亞…（接下來是一篇結構完整但通用的文章）", analysis: "V2 分析：加了「文章」這個格式提示，但主題仍太廣。AI 不知道你要的是什麼角度的文章。" },
+  { output: "早晨的第一杯咖啡，是許多人開始一天的方式。不管是在家沖泡的手沖，還是便利商店的美式，那個熟悉的香氣和苦澀，讓大腦慢慢從睡眠模式切換回工作模式。", analysis: "V3 分析：加了語氣和長度限制，輸出開始有方向感。但角色和讀者群仍不明確，文章比較像範文。" },
+  { output: "每天早上，我的第一件事不是拿手機，而是走到廚房，打開我那台老爺爺級的磨豆機。磨豆的聲音是我的起床音樂 — 比任何鬧鐘都有效。今天喝的是衣索比亞耶加雪菲，花香調，想讓週一早晨有點不一樣的感覺。你們早晨的第一件事是什麼呢？", analysis: "V4 分析：有角色設定和結尾互動要求，文章開始有個人感和生命力，接近 IG 真實貼文的質感。" },
+  { output: "你有沒有發現，早晨泡咖啡的那10分鐘，是一天中難得屬於自己的時間？\n\n我是從兩年前開始迷上手沖的。那時候剛換新工作，壓力很大，一個同事送了我一個手沖壺，說「試試看，泡咖啡的過程本身就是療癒。」他說得對。現在每天早晨，那些等水溫的片刻、聞著咖啡悶蒸的香氣，都成了我最珍貴的晨間儀式。\n\n不是因為咖啡讓我清醒，而是那個「給自己5分鐘」的感覺，讓一整天開始不一樣。\n\n你的早晨有什麼小儀式嗎？分享給我🙂", analysis: "V5 分析：完整的角色、受眾、結構和風格指定，輸出像一篇真實的 IG 貼文，有開場鉤子、故事、感受和互動。這才是精準 prompt 的威力。" }
+];
+
+function showVariant(idx) {
+  document.querySelectorAll('.variant-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  const v = variants[idx];
+  const output = document.getElementById('expOutput');
+  const analysis = document.getElementById('expAnalysis');
+  output.textContent = v.output;
+  output.classList.add('has-content');
+  analysis.textContent = v.analysis;
+  analysis.classList.add('has-content');
+}
+
+// ─── COPY PROMPT ───
+function copyPrompt() {
+  const text = document.getElementById('promptBody').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '已複製';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── TOC HIGHLIGHT ───
+function highlightToc(idx) {
+  document.querySelectorAll('.toc-item').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+}
+
+// ─── TASK CHECKBOXES ───
+const taskStates = [false, false, false];
+function toggleTask(i) {
+  taskStates[i] = !taskStates[i];
+  document.getElementById(`task-${i}`).classList.toggle('checked', taskStates[i]);
+}
+
+// ─── COMPLETE ───
+function markComplete() {
+  const btn = document.getElementById('completeBtn');
+  const note = document.getElementById('completeNote');
+  btn.classList.add('done');
+  btn.textContent = 'Day 01 完成！';
+  note.textContent = '已記錄完成。繼續前往 Day 02 →';
+}
+</script>
+</body>
+</html>
