@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 07 - 智慧 Email 與商業文件 | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #f5f2ed;
+    --cream: #e8e3da;
+    --ink: #1a1814;
+    --warm-mid: #8b7355;
+    --accent: #c9431f;
+    --accent-light: #e8a882;
+    --text-dim: #6b6358;
+  }
+
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+  
+  html { 
+    scroll-behavior: smooth; 
+  }
+  
+  body { 
+    background: var(--white); 
+    color: var(--ink); 
+    font-family: 'IBM Plex Mono', monospace; 
+    line-height: 1.6; 
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  .header {
+    border-bottom: 2px solid var(--ink);
+    padding: 16px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    z-index: 100;
+  }
+
+  .back-link {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { 
+    color: var(--accent); 
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .day-badge {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .hero {
+    padding: 80px 48px;
+    border-bottom: 2px solid var(--ink);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .lesson-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .lesson-meta span::before {
+    content: '//';
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  .lesson-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .lesson-subtitle {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 800px;
+  }
+
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+
+  .section {
+    margin-bottom: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .prose {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.9;
+    margin-bottom: 24px;
+  }
+
+  .prose strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .prose em {
+    font-style: italic;
+    color: var(--warm-mid);
+  }
+
+  .code-block {
+    background: var(--ink);
+    color: var(--accent-light);
+    padding: 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .code-block-header {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin: 32px 0;
+  }
+
+  .comparison-item {
+    border: 2px solid var(--ink);
+    padding: 24px;
+  }
+
+  .comparison-item.bad {
+    border-color: var(--text-dim);
+    opacity: 0.7;
+  }
+
+  .comparison-item.good {
+    border-color: var(--accent);
+  }
+
+  .comparison-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .comparison-item.bad .comparison-label {
+    color: var(--text-dim);
+  }
+
+  .comparison-item.good .comparison-label {
+    color: var(--accent);
+  }
+
+  .comparison-text {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .highlight-box {
+    background: var(--cream);
+    padding: 32px;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .highlight-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .step-list {
+    margin: 32px 0;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .step-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 48px;
+    line-height: 1;
+  }
+
+  .step-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .step-content strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .email-card {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .email-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--cream);
+  }
+
+  .email-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .email-tag {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--cream);
+    padding: 6px 14px;
+  }
+
+  .email-field {
+    margin-bottom: 16px;
+  }
+
+  .email-field-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .email-field-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+    background: var(--cream);
+    padding: 12px;
+  }
+
+  .tone-slider {
+    background: var(--cream);
+    padding: 24px;
+    margin: 32px 0;
+  }
+
+  .tone-label {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .tone-scale {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .tone-marker {
+    flex: 1;
+    height: 8px;
+    background: var(--white);
+    border: 1px solid var(--ink);
+    position: relative;
+  }
+
+  .tone-marker.active {
+    background: var(--accent);
+  }
+
+  .tone-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .checklist {
+    background: var(--cream);
+    padding: 28px;
+    margin: 32px 0;
+  }
+
+  .checklist-item {
+    display: flex;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 14px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .checklist-item::before {
+    content: '✓';
+    color: var(--accent);
+    font-weight: 900;
+    font-size: 18px;
+  }
+
+  .practice-box {
+    background: var(--ink);
+    color: var(--white);
+    padding: 48px;
+    margin: 64px 0;
+  }
+
+  .practice-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+  }
+
+  .practice-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+
+  .practice-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.8;
+    opacity: 0.9;
+    margin-bottom: 20px;
+  }
+
+  .quote-box {
+    background: var(--cream);
+    padding: 40px;
+    margin: 40px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .quote-author {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .info-box {
+    background: var(--white);
+    border: 2px solid var(--accent);
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .info-box-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .info-box-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 32px 0;
+  }
+
+  .template-card {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 28px;
+  }
+
+  .template-type {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .template-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .template-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .template-use {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+  }
+
+  .scenario-card {
+    background: var(--cream);
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .scenario-header {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .scenario-situation {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: var(--white);
+    border-left: 3px solid var(--accent);
+  }
+
+  .scenario-analysis {
+    margin-top: 20px;
+  }
+
+  .scenario-analysis-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .warning-box {
+    background: var(--ink);
+    color: var(--white);
+    padding: 32px;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .warning-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent-light);
+  }
+
+  .warning-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.8;
+    opacity: 0.9;
+  }
+
+  .context-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0;
+    background: var(--white);
+  }
+
+  .context-matrix th {
+    background: var(--ink);
+    color: var(--white);
+    padding: 16px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .context-matrix td {
+    padding: 16px;
+    border-bottom: 1px solid var(--cream);
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .context-matrix tr:hover {
+    background: var(--cream);
+  }
+
+  .lesson-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 48px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+
+  .nav-link:hover {
+    color: var(--accent);
+  }
+
+  .nav-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .footer {
+    border-top: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--white);
+    padding: 32px 48px;
+    text-align: center;
+  }
+
+  .footer-text {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+  }
+
+  @media (max-width: 768px) {
+    .header { 
+      padding: 16px 24px; 
+      flex-direction: column; 
+      gap: 8px; 
+    }
+    
+    .hero { 
+      padding: 48px 24px; 
+    }
+    
+    .content { 
+      padding: 32px 24px; 
+    }
+    
+    .comparison,
+    .template-grid { 
+      grid-template-columns: 1fr; 
+    }
+    
+    .practice-box { 
+      padding: 32px 24px; 
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+  <div class="header-title">Prompt Mastery</div>
+  <div class="day-badge">Day 07 / 20</div>
+</header>
+
+<section class="hero">
+  <div class="lesson-meta">
+    <span>Week 2</span>
+    <span>50 分鐘</span>
+    <span>實戰應用</span>
+  </div>
+  <h1 class="lesson-title">讓 AI 幫你寫<br>Email 與報告</h1>
+  <p class="lesson-subtitle">
+    商業文件寫作是 AI 最能節省時間的應用場景。從主旨到結語，設計高品質的商業文件 prompt，節省 80% 的文字時間。今天學習如何傳遞「情境」讓 AI 理解潛在的人際關係和溝通目標，以及如何設定「語氣刻度盤」在正式和非正式之間精準調節。
+  </p>
+</section>
+
+<main class="content">
+  
+  <!-- 第一部分：為什麼 Email 寫作這麼難？ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <h2 class="section-title">為什麼商業 Email 寫作這麼耗時？</h2>
+    </div>
+    
+    <div class="prose">
+      你有沒有過這種經驗：盯著空白的 Email 視窗，想了十分鐘還不知道該怎麼開頭？或者寫完一封信，反覆修改五次，還是覺得語氣不對？
+    </div>
+
+    <div class="prose">
+      <strong>商業 Email 難寫，不是因為內容複雜，而是因為需要同時處理三個層次：</strong>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <strong>資訊層：要說什麼事</strong><br>
+          事實、數據、要求、提案——這是 Email 的「內容」。這部分通常不難，你知道要傳達什麼資訊。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <strong>關係層：跟誰說</strong><br>
+          對方是老闆、客戶、同事、還是陌生人？你們的關係是熟悉還是正式？有沒有權力差異？這決定了語氣和措辭。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <strong>目的層：希望對方做什麼</strong><br>
+          你希望對方同意、拒絕、提供資訊、還是只是知道？不同目的需要不同的溝通策略。
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <div class="quote-text">
+        "寫 Email 不難，寫出恰到好處的 Email 很難。"
+      </div>
+      <div class="quote-author">
+        每個商業溝通者的心聲
+      </div>
+    </div>
+
+    <div class="prose">
+      傳統的「請幫我寫一封 Email」prompt 無法處理這三個層次，因為 AI 不知道你和收件人的關係、不理解你的溝通目的、不清楚情境的微妙之處。<strong>所以今天的重點是：如何把這些隱性資訊明確傳遞給 AI。</strong>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">❌ 模糊的 Email Prompt</div>
+        <div class="comparison-text">
+          「幫我寫一封 Email 給客戶，說明專案延期了。」<br><br>
+          <strong>問題：</strong><br>
+          • 不知道客戶關係（新客戶?老客戶?難搞的客戶?）<br>
+          • 不知道延期原因（我們的錯?不可抗力?）<br>
+          • 不知道溝通目標（道歉?說明?尋求理解?）<br>
+          • 不知道後續計劃<br><br>
+          結果：AI 只能寫出制式、冷冰冰、沒人情味的通知信。
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 完整的 Email Prompt</div>
+        <div class="comparison-text">
+          「寫給長期合作客戶的延期說明信：<br><br>
+          <strong>情境：</strong>合作 3 年的重要客戶，關係良好但對時程敏感<br>
+          <strong>原因：</strong>第三方供應商延遲交貨（非我們的錯）<br>
+          <strong>影響：</strong>預計延遲 2 週<br>
+          <strong>目的：</strong>讓客戶理解、維持信任、提供補償方案<br>
+          <strong>語氣：</strong>專業但誠懇，承擔責任但不過度道歉<br><br>
+          結果：AI 能寫出同理客戶、說明清楚、提供解決方案的高品質 Email。
+        </div>
+      </div>
+    </comparison>
+
+    <div class="highlight-box">
+      <div class="highlight-title">核心洞察</div>
+      <div class="prose">
+        <strong>好的 Email prompt 不只是「說要寫什麼」，而是「讓 AI 理解情境」。</strong>當 AI 知道你和收件人的關係、溝通的目的、情境的敏感度，它才能寫出真正符合需求的 Email。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第二部分：情境輸入框架 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <h2 class="section-title">情境輸入框架：六個關鍵要素</h2>
+    </div>
+
+    <div class="prose">
+      要讓 AI 寫出好的商業 Email，你需要提供六個關鍵情境要素。這個框架適用於任何商業溝通場景。
+    </div>
+
+    <div class="code-block-header">完整 Email 生成 Prompt 範本</div>
+    <div class="code-block">【情境資訊】
+我的身份：[你的職位、角色]
+收件人：[對方姓名、職位、公司]
+我們的關係：[相識時間、合作狀況、關係品質]
+Email 目的：[你想達成什麼]
+背景情況：[相關的前因後果、重要細節]
+
+【溝通目標】（按優先順序）
+1. [主要目標 — 你最希望達成什麼]
+2. [次要目標 — 如果可以順便達成]
+3. [要避免的誤解 — 絕對不要讓對方以為...]
+
+【語氣設定】
+□ 非常正式  □ 正式  ■ 專業友好  □ 輕鬆  □ 親密
+
+【特殊要求】
+- [任何特殊注意事項，如：截止時間、文化差異、敏感話題]
+
+【期望輸出】
+1. 主旨行（2 個選項）
+2. Email 正文
+3. 簡短說明你選擇這個措辭的原因</div>
+
+    <div class="prose">
+      讓我們逐一拆解這六個要素為什麼重要。
+    </div>
+
+    <table class="context-matrix">
+      <thead>
+        <tr>
+          <th>要素</th>
+          <th>為什麼重要</th>
+          <th>如何描述</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>身份與關係</strong></td>
+          <td>決定權力距離和親密程度，影響稱呼、語氣、正式程度</td>
+          <td>「我是專案經理，對方是合作 2 年的客戶窗口，關係融洽」</td>
+        </tr>
+        <tr>
+          <td><strong>Email 目的</strong></td>
+          <td>決定整封信的結構和重點，影響開頭和結尾</td>
+          <td>「主要目的：說明延期；次要目的：維持信任；避免：對方覺得我們不負責任」</td>
+        </tr>
+        <tr>
+          <td><strong>背景情況</strong></td>
+          <td>提供上下文，讓 AI 理解為什麼要寫這封信</td>
+          <td>「上次會議承諾本週五交件，但第三方供應商突然延遲」</td>
+        </tr>
+        <tr>
+          <td><strong>語氣設定</strong></td>
+          <td>最直接影響用詞和句式，決定 Email 的「感覺」</td>
+          <td>使用滑桿標示：非常正式 ←→ 親密</td>
+        </tr>
+        <tr>
+          <td><strong>特殊要求</strong></td>
+          <td>處理文化差異、時間壓力、敏感話題等特殊情境</td>
+          <td>「收件人是日本客戶，重視禮節；需在今天下班前發出」</td>
+        </tr>
+        <tr>
+          <td><strong>期望輸出</strong></td>
+          <td>明確告訴 AI 要生成什麼格式，避免誤解</td>
+          <td>「需要主旨、正文、以及 2-3 個替代措辭選項」</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 第三部分：語氣刻度盤 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <h2 class="section-title">語氣刻度盤：精準控制溝通風格</h2>
+    </div>
+
+    <div class="prose">
+      語氣是商業 Email 最微妙也最重要的部分。太正式顯得生疏，太隨意顯得不專業。<strong>「語氣刻度盤」是一個簡單但強大的工具，讓你精準控制 Email 的正式程度。</strong>
+    </div>
+
+    <div class="tone-slider">
+      <div class="tone-label">語氣刻度盤示範</div>
+      <div class="tone-scale">
+        <div class="tone-marker"></div>
+        <div class="tone-marker"></div>
+        <div class="tone-marker active"></div>
+        <div class="tone-marker"></div>
+        <div class="tone-marker"></div>
+      </div>
+      <div class="tone-labels">
+        <span>非常正式</span>
+        <span>正式</span>
+        <span>專業友好</span>
+        <span>輕鬆</span>
+        <span>親密</span>
+      </div>
+    </div>
+
+    <div class="prose">
+      <strong>五個語氣等級的實際差異：</strong>
+    </div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">等級 1：非常正式</div>
+        <div class="email-tag">法律、高階主管</div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">開頭</div>
+        <div class="email-field-content">
+          「敬啟者：」或「尊敬的 XXX 先生/女士：」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">請求方式</div>
+        <div class="email-field-content">
+          「敬請惠予考慮」、「懇請撥冗」、「謹此奉上」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">結尾</div>
+        <div class="email-field-content">
+          「此致敬禮」、「順頌時祺」
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">適用場景</div>
+        <div class="email-field-content">
+          初次接觸的高階主管、法律文件、正式提案、投訴信
+        </div>
+      </div>
+    </div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">等級 2：正式</div>
+        <div class="email-tag">一般商業往來</div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">開頭</div>
+        <div class="email-field-content">
+          「XXX 您好：」、「Dear Mr./Ms. XXX,」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">請求方式</div>
+        <div class="email-field-content">
+          「煩請協助」、「懇請您」、「若方便的話」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">結尾</div>
+        <div class="email-field-content">
+          「謝謝您的協助」、「期待您的回覆」
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">適用場景</div>
+        <div class="email-field-content">
+          新客戶、正式合作提案、重要會議邀請
+        </div>
+      </div>
+    </div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">等級 3：專業友好</div>
+        <div class="email-tag">最常用等級</div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">開頭</div>
+        <div class="email-field-content">
+          「Hi XXX,」、「XXX 你好，」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">請求方式</div>
+        <div class="email-field-content">
+          「麻煩你」、「可以幫我」、「想跟你確認」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">結尾</div>
+        <div class="email-field-content">
+          「謝謝！」、「感謝協助」、「有問題隨時跟我說」
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">適用場景</div>
+        <div class="email-field-content">
+          熟悉的客戶、同部門同事、日常工作溝通（80%的商業Email用這個等級）
+        </div>
+      </div>
+    </div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">等級 4：輕鬆</div>
+        <div class="email-tag">熟人溝通</div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">開頭</div>
+        <div class="email-field-content">
+          「Hey XXX,」、「XXX，」（直接叫名字）
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">請求方式</div>
+        <div class="email-field-content">
+          「可以幫個忙嗎」、「想問一下」、「順便提一下」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">結尾</div>
+        <div class="email-field-content">
+          「Thanks!」、「先這樣」、「回頭聊」
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">適用場景</div>
+        <div class="email-field-content">
+          熟識的同事、非正式討論、內部團隊溝通
+        </div>
+      </div>
+    </div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">等級 5：親密</div>
+        <div class="email-tag">非正式/私人</div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">開頭</div>
+        <div class="email-field-content">
+          「欸」、「喂」、或直接進入主題
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">請求方式</div>
+        <div class="email-field-content">
+          「幫我一下」、「看一下」、「有空嗎」
+        </div>
+      </div>
+      
+      <div class="email-field">
+        <div class="email-field-label">結尾</div>
+        <div class="email-field-content">
+          「掰」、「晚點說」、emoji 😊
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">適用場景</div>
+        <div class="email-field-content">
+          非常熟的同事、朋友、內部即時通訊（但不適合正式 Email）
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <div class="warning-title">⚠️ 語氣選擇的黃金法則</div>
+      <div class="warning-content">
+        <strong>不確定時，往正式一級靠。</strong><br><br>
+        用太正式的語氣最多顯得客氣，用太隨意的語氣可能顯得不尊重。如果你猜不準對方期待的語氣，選擇比你預期稍微正式一點的等級永遠比較安全。<br><br>
+        <strong>第二條法則：觀察對方的語氣。</strong><br><br>
+        如果對方寫給你的 Email 用「Hi」開頭，你回信也用「Hi」；如果對方用「您好」，你也用「您好」。鏡像對方的語氣是最保險的策略。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第四部分：八種常見 Email 場景範本 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <h2 class="section-title">八種常見商業 Email 場景範本</h2>
+    </div>
+
+    <div class="prose">
+      以下是八種最常見的商業 Email 場景，每種都有對應的 prompt 範本。你可以直接套用，或根據需求調整。
+    </div>
+
+    <div class="template-grid">
+      <div class="template-card">
+        <div class="template-type">場景 1</div>
+        <div class="template-name">請求協助/資訊</div>
+        <div class="template-desc">
+          需要對方提供資料、回答問題、或幫個忙時使用。關鍵是清楚說明你需要什麼、為什麼需要、什麼時候需要。
+        </div>
+        <div class="template-use">使用頻率：★★★★★</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 2</div>
+        <div class="template-name">道歉與補救</div>
+        <div class="template-desc">
+          出錯時的溝通。重點是承認錯誤、解釋原因（不找藉口）、提供補救方案、防止再發生。
+        </div>
+        <div class="template-use">使用頻率：★★★★☆</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 3</div>
+        <div class="template-name">提案與說服</div>
+        <div class="template-desc">
+          推銷想法或方案。結構：問題 → 解決方案 → 好處 → 行動召喚。重點是站在對方角度說明價值。
+        </div>
+        <div class="template-use">使用頻率：★★★★☆</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 4</div>
+        <div class="template-name">拒絕與婉拒</div>
+        <div class="template-desc">
+          說「不」但維持關係。策略：感謝 → 說明原因 → 提供替代方案（如果可能）→ 保持門戶開放。
+        </div>
+        <div class="template-use">使用頻率：★★★☆☆</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 5</div>
+        <div class="template-name">跟進與提醒</div>
+        <div class="template-desc">
+          對方沒回應時的 follow-up。要溫和堅定，提供新資訊或價值，避免只是「催」。
+        </div>
+        <div class="template-use">使用頻率：★★★★★</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 6</div>
+        <div class="template-name">感謝與致謝</div>
+        <div class="template-desc">
+          表達感謝。具體說明對方幫了什麼、這對你有什麼意義，比泛泛的「謝謝」有力得多。
+        </div>
+        <div class="template-use">使用頻率：★★★★☆</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 7</div>
+        <div class="template-name">壞消息傳遞</div>
+        <div class="template-desc">
+          傳達延期、漲價、取消等負面消息。順序：緩衝 → 消息 → 原因 → 影響 → 補救/替代方案。
+        </div>
+        <div class="template-use">使用頻率：★★★☆☆</div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-type">場景 8</div>
+        <div class="template-name">意見不同/推回</div>
+        <div class="template-desc">
+          禮貌地表達不同意見。方法：認同部分 → 提出疑慮 → 說明理由 → 建議替代方案。
+        </div>
+        <div class="template-use">使用頻率：★★★☆☆</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      讓我們深入看其中三個最常用的場景完整範本。
+    </div>
+  </section>
+
+  <!-- 第五部分：完整場景範本 1 - 請求協助 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <h2 class="section-title">場景深度解析 1：請求協助</h2>
+    </div>
+
+    <div class="scenario-card">
+      <div class="scenario-header">實際情境</div>
+      <div class="scenario-situation">
+        你是專案經理，需要設計部門在三天內提供新版視覺設計，但你知道他們手上專案很多。你需要寫一封既不會讓人覺得你在施壓，又能讓他們理解緊急性的 Email。
+      </div>
+    </div>
+
+    <div class="code-block-header">請求協助 Prompt 範本</div>
+    <div class="code-block">【情境資訊】
+我的身份：產品專案經理
+收件人：設計部門主管 Amy（同公司，合作 1 年，關係良好）
+我們的關係：跨部門合作夥伴，互相支持，但各有工作壓力
+Email 目的：請求在週四前提供新版設計
+背景情況：客戶突然要求提前 demo，原定下週的設計需要提前完成
+
+【溝通目標】
+1. 讓 Amy 理解緊急性，願意優先處理
+2. 表達感謝和理解（知道她很忙）
+3. 避免：讓她覺得我不尊重她的時間安排
+
+【語氣設定】
+■ 專業友好（我們是熟識的同事，但這是正式請求）
+
+【特殊要求】
+- 提供清楚的時間框架和具體需求
+- 表達如果真的無法配合，願意討論替代方案
+- 語氣要感激而非理所當然
+
+【期望輸出】
+1. 主旨行（簡短但表達緊急性）
+2. Email 正文（150-200 字）
+3. 可能的替代開場白（2 個選項）</div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">AI 生成範例</div>
+        <div class="email-tag">基於上述 Prompt</div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">主旨</div>
+        <div class="email-field-content">
+          急件｜週四前設計需求 - 客戶提前 demo
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">正文</div>
+        <div class="email-field-content">
+          Hi Amy,<br><br>
+          
+          希望你一切順利！我知道你們設計團隊現在手上專案很多，真的不好意思還要麻煩你。<br><br>
+          
+          客戶那邊突然要求把 demo 提前到這週五，這表示我們原本下週才需要的新版設計，得在<strong>週四下班前</strong>完成。主要是首頁和產品頁的視覺更新，mockup 我會在今天下午 3 點前給你。<br><br>
+          
+          我完全理解這個時程很趕。如果真的無法在週四完成，我們可以討論先做一個簡化版，或者我這邊想辦法跟客戶爭取多一天時間。<br><br>
+          
+          可以的話，今天內讓我知道是否 OK？非常感謝你總是這麼罩！🙏<br><br>
+          
+          Best,<br>
+          [你的名字]
+        </div>
+      </div>
+
+      <div class="scenario-analysis">
+        <div class="scenario-analysis-title">為什麼這封信有效？</div>
+        <div class="checklist">
+          <div class="checklist-item">開頭先同理對方的處境（「知道你們很忙」）</div>
+          <div class="checklist-item">清楚說明緊急性的原因（客戶要求，非我們的錯）</div>
+          <div class="checklist-item">提供具體時間和需求（週四、首頁+產品頁）</div>
+          <div class="checklist-item">給對方台階下（提供替代方案）</div>
+          <div class="checklist-item">表達感激和尊重（「總是這麼罩」）</div>
+          <div class="checklist-item">要求明確回應（「今天內讓我知道」）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block-header">替代開場白選項</div>
+    <div class="code-block">選項 A（更直接）：
+「Amy，有個緊急狀況需要你幫忙。客戶突然要求週五 demo，我們需要提前完成設計。」
+
+選項 B（更客氣）：
+「Amy，真的很不好意思打擾你。有個突發狀況，不知道你那邊能不能幫忙救個火？」
+
+選擇建議：
+原版（「希望你一切順利」）最平衡 — 友善但不拖泥帶水
+選項 A 適合：真的非常緊急，需要立即抓住注意力
+選項 B 適合：對方可能會覺得這個請求很為難，需要更多鋪墊</div>
+  </section>
+
+  <!-- 第六部分：場景深度解析 2 - 道歉與補救 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">06</div>
+      <h2 class="section-title">場景深度解析 2：道歉與補救</h2>
+    </div>
+
+    <div class="scenario-card">
+      <div class="scenario-header">實際情境</div>
+      <div class="scenario-situation">
+        你答應客戶週三交付報告，但因為資料錯誤需要重做，要延到週五。客戶是重要長期合作夥伴，對時程很敏感。你需要道歉、說明原因、提供補救方案。
+      </div>
+    </div>
+
+    <div class="code-block-header">道歉與補救 Prompt 範本</div>
+    <div class="code-block">【情境資訊】
+我的身份：顧問公司專案負責人
+收件人：客戶方專案經理 David（合作 2 年，重要客戶，關係專業但友好）
+我們的關係：長期合作夥伴，彼此信任，但對方對時程要求嚴格
+Email 目的：說明延期、誠懇道歉、提供補救方案
+背景情況：
+- 原定週三交付月度分析報告
+- 發現關鍵資料有誤，需要重新分析
+- 預計延遲到週五
+- 這是我們的疏失
+
+【溝通目標】
+1. 誠懇道歉，承擔責任（不找藉口）
+2. 說明延期原因和新時程
+3. 提供補救方案，降低對客戶的影響
+4. 維持信任關係
+5. 避免：過度道歉顯得不專業，或輕描淡寫顯得不負責
+
+【語氣設定】
+■ 專業友好（誠懇但不卑微，負責但不情緒化）
+
+【特殊要求】
+- 主動說明我們會如何避免未來再發生
+- 提供具體補償（如：額外的分析報告或優先處理）
+- 讓對方知道我們重視這次失誤
+
+【期望輸出】
+1. 主旨（需要立即引起注意但不驚嚇）
+2. Email 正文（200-250 字）
+3. 可選的結尾方式（2 個選項）</div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">AI 生成範例</div>
+        <div class="email-tag">基於上述 Prompt</div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">主旨</div>
+        <div class="email-field-content">
+          月度報告時程更新 - 誠摯歉意
+        </div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">正文</div>
+        <div class="email-field-content">
+          Hi David,<br><br>
+          
+          我必須為一個不好的消息向你道歉。<br><br>
+          
+          原定今天交付的月度分析報告需要延遲到<strong>週五</strong>。在最後檢查時，我們發現第三方資料源有一個系統性錯誤，影響了過去三週的數據。為了確保給你的分析是準確可靠的，我們決定重新跑一次完整分析。<br><br>
+          
+          這完全是我們內部品質檢查不夠嚴謹造成的，我們深感抱歉。<br><br>
+          
+          <strong>補救措施：</strong><br>
+          1. 週五中午前一定交付（比原定時程只延遲 2 天）<br>
+          2. 這次報告我們會額外增加「趨勢預測」章節（原本下個月才提供）<br>
+          3. 我們已經調整內部檢查流程，確保不會再發生類似狀況<br><br>
+          
+          如果這個延遲會影響到你的時程，請告訴我，我會盡力配合調整。再次為這次延誤致歉，也感謝你的理解。<br><br>
+          
+          Best regards,<br>
+          [你的名字]
+        </div>
+      </div>
+
+      <div class="scenario-analysis">
+        <div class="scenario-analysis-title">這封道歉信的關鍵要素</div>
+        <div class="checklist">
+          <div class="checklist-item">直接承認錯誤，不迴避責任（「我們內部品質檢查不夠嚴謹」）</div>
+          <div class="checklist-item">說明原因，但不當作藉口（「資料錯誤」是事實，但仍承擔責任）</div>
+          <div class="checklist-item">提供明確的新時程（週五中午）</div>
+          <div class="checklist-item">主動提供補償（額外的趨勢預測章節）</div>
+          <div class="checklist-item">說明防止再發生的措施（調整檢查流程）</div>
+          <div class="checklist-item">詢問對客戶的影響，表達願意配合</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <div class="warning-title">道歉信的常見錯誤</div>
+      <div class="warning-content">
+        <strong>錯誤 1：過度道歉</strong><br>
+        ❌「真的非常非常抱歉，我們感到萬分愧疚，這完全是我們的錯...」<br>
+        問題：聽起來不專業，反而降低信任感<br><br>
+        
+        <strong>錯誤 2：找藉口</strong><br>
+        ❌「因為第三方資料源的問題，所以我們也沒辦法...」<br>
+        問題：推卸責任，讓對方覺得你不負責<br><br>
+        
+        <strong>錯誤 3：沒有補救方案</strong><br>
+        ❌「真的很抱歉，會盡快給你。」<br>
+        問題：只道歉不行動，沒有實質幫助<br><br>
+        
+        <strong>正確做法：</strong><br>
+        ✓ 簡短但誠懇的道歉（一次就夠）<br>
+        ✓ 承認錯誤，但說明背景（不是藉口）<br>
+        ✓ 具體的補救方案和時程<br>
+        ✓ 防止再發生的措施
+      </div>
+    </div>
+  </section>
+
+  <!-- 第七部分：場景深度解析 3 - 拒絕與婉拒 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">07</div>
+      <h2 class="section-title">場景深度解析 3：拒絕與婉拒</h2>
+    </div>
+
+    <div class="scenario-card">
+      <div class="scenario-header">實際情境</div>
+      <div class="scenario-situation">
+        一個潛在客戶邀請你做免費諮詢，但你的時間有限，不可能為每個詢問都提供免費服務。你需要禮貌拒絕，但又不想完全關上合作的門。
+      </div>
+    </div>
+
+    <div class="code-block-header">拒絕與婉拒 Prompt 範本</div>
+    <div class="code-block">【情境資訊】
+我的身份：獨立顧問
+收件人：潛在客戶 Lisa（透過 LinkedIn 聯繫，初次接觸）
+我們的關係：陌生人，但對方看起來是認真的潛在客戶
+Email 目的：婉拒免費諮詢，但保持合作可能性
+背景情況：
+- 對方詢問能否約 1 小時免費諮詢
+- 我的免費諮詢名額已滿
+- 但我願意提供付費諮詢或其他方式協助
+
+【溝通目標】
+1. 禮貌但明確地拒絕免費諮詢
+2. 提供替代方案（付費諮詢、資源推薦）
+3. 保持專業形象和未來合作可能性
+4. 避免：讓對方覺得被敷衍或不重視
+
+【語氣設定】
+■ 專業友好（專業但不冷淡，拒絕但不傲慢）
+
+【特殊要求】
+- 感謝對方的興趣
+- 簡短說明為什麼無法提供（不需要長篇大論）
+- 提供實質的替代選項
+- 保持門戶開放
+
+【期望輸出】
+1. Email 正文（150-180 字）
+2. 兩種語氣選項（較直接 vs 較委婉）</div>
+
+    <div class="email-card">
+      <div class="email-header">
+        <div class="email-title">AI 生成範例（平衡版）</div>
+        <div class="email-tag">專業友好</div>
+      </div>
+
+      <div class="email-field">
+        <div class="email-field-label">正文</div>
+        <div class="email-field-content">
+          Hi Lisa,<br><br>
+          
+          感謝你對我工作的關注，也很高興認識你！<br><br>
+          
+          關於免費諮詢，我目前的時程比較滿，已經沒有空檔可以提供免費諮詢。不過我想提供幾個選項，看看能不能幫到你：<br><br>
+          
+          <strong>選項 1：</strong>付費諮詢（1 小時 $XXX），我們可以深入討論你的具體需求<br>
+          <strong>選項 2：</strong>我寫了一份「新創品牌策略指南」（免費下載），裡面涵蓋了大部分常見問題<br>
+          <strong>選項 3：</strong>如果你的專案符合我的研究方向，我們可以討論合作可能性<br><br>
+          
+          如果這些選項都不適合，也完全沒關係！祝你的專案順利，未來有機會再合作。<br><br>
+          
+          Best,<br>
+          [你的名字]
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">較直接版本</div>
+        <div class="comparison-text">
+          <strong>適用：</strong>時間真的很寶貴，需要快速過濾非認真客戶<br><br>
+          
+          Hi Lisa,<br><br>
+          
+          謝謝你的訊息。我目前不提供免費諮詢，但很樂意以正式專案方式合作。如果有興趣，我們可以安排付費諮詢（1小時 $XXX）來討論你的需求。<br><br>
+          
+          另外，我的網站上有一些免費資源可能對你有幫助。<br><br>
+          
+          Best,<br>
+          [你的名字]
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">較委婉版本</div>
+        <div class="comparison-text">
+          <strong>適用：</strong>對方看起來是高價值潛在客戶，值得多花點心思維護關係<br><br>
+          
+          Hi Lisa,<br><br>
+          
+          謝謝你的來信，我對你的專案很感興趣！<br><br>
+          
+          坦白說，最近諮詢需求比較多，我的免費諮詢名額已經滿了。但我真的不想錯過和你聊聊的機會，所以想提供幾個替代方案...<br><br>
+          
+          [後續同平衡版]<br><br>
+          
+          如果這些都不適合，我完全理解。但真的很希望未來有機會合作，你的專案聽起來很有意思！<br><br>
+          
+          Best,<br>
+          [你的名字]
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">婉拒的三明治法則</div>
+      <div class="prose">
+        <strong>上層麵包：</strong>真誠的感謝和認可（「感謝你的關注」「你的專案很有意思」）<br>
+        <strong>中間夾層：</strong>明確的拒絕（「目前沒有空檔」「不提供免費諮詢」）<br>
+        <strong>下層麵包：</strong>替代方案或未來可能性（「但我可以...」「未來有機會...」）<br><br>
+        
+        這個結構讓拒絕聽起來不那麼刺耳，同時保持誠實和專業。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第八部分：Email 寫作的隱藏技巧 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">08</div>
+      <h2 class="section-title">Email 寫作的五個隱藏技巧</h2>
+    </div>
+
+    <div class="prose">
+      除了基本的情境輸入和語氣設定，還有一些進階技巧能讓你的 Email 更有效。
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <strong>主旨行的藝術</strong><br>
+          好的主旨行要在 5-8 個字內說清楚：類別 + 內容 + 緊急度<br><br>
+          ❌ 差：「關於專案」（太模糊）<br>
+          ❌ 差：「緊急！！！需要你立即回覆關於 Q3 專案時程調整的重要事項」（太長）<br>
+          ✓ 好：「Q3 專案｜時程調整確認」<br>
+          ✓ 好：「急件｜週五前需回覆 - 預算」<br><br>
+          
+          <strong>Prompt 技巧：</strong>要求 AI 提供 2-3 個主旨選項，選最簡潔有力的。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <strong>首句決定是否被讀</strong><br>
+          Email 的第一句話決定對方會不會繼續往下讀。忙碌的人收到信，只掃描第一句。<br><br>
+          ❌ 差：「希望這封信找到你的時候你一切安好...」（廢話）<br>
+          ❌ 差：「我是 XXX 公司的 XXX...」（除非對方不認識你，否則是浪費時間）<br>
+          ✓ 好：「關於明天的會議，有兩個重點需要確認。」（直接進入重點）<br>
+          ✓ 好：「好消息！客戶同意延長合約。」（立即吸引注意）<br><br>
+          
+          <strong>Prompt 技巧：</strong>在 prompt 中明確要求「第一句話要立即切入重點」。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <strong>善用「如果...那麼」結構</strong><br>
+          當你需要對方採取行動，但不想顯得命令或施壓時，用條件句來軟化語氣。<br><br>
+          ❌ 直接：「請在週五前回覆。」<br>
+          ✓ 軟化：「如果方便的話，週五前能讓我知道嗎？」<br>
+          ✓ 軟化：「如果你同意這個方向，我們就可以開始下一步。」<br><br>
+          
+          這個技巧讓對方感覺有選擇權，即使實際上你需要明確答案。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">04</div>
+        <div class="step-content">
+          <strong>預設最好的意圖</strong><br>
+          當對方沒回應或出錯時，假設是「忙碌」或「疏忽」而非「故意」或「不在乎」。這個假設會反映在你的措辭上。<br><br>
+          ❌ 帶責備：「你還沒回覆我的信，是不是忘了？」<br>
+          ✓ 預設善意：「我知道你一定很忙，想確認一下上次的信你有收到嗎？」<br><br>
+          
+          <strong>Prompt 技巧：</strong>在情境描述中加上「假設對方是因為忙碌而非故意」。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">05</div>
+        <div class="step-content">
+          <strong>明確的行動召喚（CTA）</strong><br>
+          Email 結尾要清楚告訴對方「下一步做什麼」。模糊的結尾會導致沒有回應。<br><br>
+          ❌ 模糊：「期待你的回覆。」（什麼時候？回覆什麼？）<br>
+          ✓ 明確：「可以在週三前讓我知道你偏好哪個方案嗎？」<br>
+          ✓ 明確：「如果你同意，請回覆確認，我就開始準備合約。」<br><br>
+          
+          好的 CTA 包含：誰、做什麼、什麼時候、怎麼做。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第九部分：報告寫作 Prompt -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">09</div>
+      <h2 class="section-title">商業報告寫作 Prompt</h2>
+    </div>
+
+    <div class="prose">
+      除了 Email，商業報告也是常見的文件寫作任務。報告的 prompt 設計邏輯和 Email 類似，但重點不同。
+    </div>
+
+    <div class="code-block-header">報告寫作 Prompt 範本</div>
+    <div class="code-block">【報告基本資訊】
+報告類型：[月度分析/專案總結/市場研究/提案報告]
+目標讀者：[高階主管/客戶/團隊成員]
+讀者關心的重點：[營收/風險/進度/建議]
+報告目的：[提供資訊/說服決策/記錄進度]
+
+【內容要求】
+時間範圍：[例如：2026 年 1 月]
+涵蓋主題：[列出 3-5 個主要主題]
+資料來源：[我會提供的數據或資訊]
+深度要求：[高層概覽/深入分析/兼具]
+
+【格式要求】
+總長度：[字數或頁數]
+結構：[執行摘要 + 主體 + 建議 或其他]
+視覺元素：[是否需要表格、圖表]
+語氣：[正式/專業/簡潔]
+
+【特殊要求】
+- [任何特定的格式或樣式要求]
+- [必須包含或避免的內容]
+- [截止時間或優先級]
+
+【輸出格式】
+1. 執行摘要（200 字以內）
+2. 章節大綱（含各章節重點）
+3. 完整報告內容
+4. 建議的視覺化呈現方式</div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">報告 vs Email 的關鍵差異</div>
+      <div class="prose">
+        <strong>Email：</strong><br>
+        • 重點：快速傳達訊息，促成行動<br>
+        • 語氣：對話式，個人化<br>
+        • 結構：線性，從頭讀到尾<br>
+        • 長度：越短越好（通常 &lt; 300 字）<br><br>
+        
+        <strong>報告：</strong><br>
+        • 重點：完整呈現資訊，支持決策<br>
+        • 語氣：客觀、專業、權威<br>
+        • 結構：可跳讀（執行摘要、章節標題）<br>
+        • 長度：取決於需求（通常 > 1000 字）
+      </div>
+    </div>
+  </section>
+
+  <!-- 實作練習 -->
+  <div class="practice-box">
+    <div class="practice-label">今日 Side Project</div>
+    <h2 class="practice-title">建立你的 Email 範本庫</h2>
+    
+    <div class="practice-desc">
+      建立一個完整的「智慧 Email 草稿機」，涵蓋 5 種最常見的 Email 場景，每種都有對應的 prompt 範本，讓你 5 分鐘內就能生成高品質 Email。
+    </div>
+
+    <div class="practice-desc">
+      <strong>第一步：識別你的高頻場景</strong><br>
+      回顧過去一個月的 Email，找出你最常寫的 5 種類型：<br>
+      • 請求協助/資訊<br>
+      • 專案更新/進度報告<br>
+      • 會議邀請/確認<br>
+      • 跟進/提醒<br>
+      • 感謝/致謝<br>
+      • 道歉/說明<br>
+      • 提案/說服<br>
+      • 拒絕/婉拒<br><br>
+      
+      從中選 5 個你最常用的。<br><br>
+      
+      <strong>第二步：為每個場景設計 Prompt 範本</strong><br>
+      使用今天學到的「六要素框架」：<br>
+      1. 情境資訊（身份、對象、關係、背景）<br>
+      2. 溝通目標（主要、次要、避免）<br>
+      3. 語氣設定（1-5 等級）<br>
+      4. 特殊要求<br>
+      5. 期望輸出<br><br>
+      
+      設計成「填空題」格式，每次用只需要填入具體資訊。<br><br>
+      
+      <strong>第三步：測試與優化</strong><br>
+      對每個範本：<br>
+      • 找 3 個真實場景測試<br>
+      • 評估 AI 生成的 Email 品質<br>
+      • 記錄哪些措辭特別好，哪些需要調整<br>
+      • 優化 prompt，直到滿意為止<br><br>
+      
+      <strong>第四步：建立快速取用系統</strong><br>
+      把你的 5 個範本整理成：<br>
+      • Notion 頁面（推薦）<br>
+      • Google Doc<br>
+      • Obsidian note<br>
+      • 或任何你常用的筆記工具<br><br>
+      
+      命名清楚，方便搜尋。每次需要寫 Email 時，複製對應範本，填入資訊，送給 AI，5 分鐘完成。<br><br>
+      
+      <strong>完成標準：</strong><br>
+      當你能在 5 分鐘內（包含填 prompt 和微調 AI 輸出）完成一封過去需要 20-30 分鐘才能寫好的 Email 時，就算成功了。
+    </div>
+
+    <div class="practice-desc">
+      <strong>加分挑戰：</strong><br>
+      1. 建立「語氣參考庫」— 收集 10 封你認為語氣完美的 Email（自己寫的或別人的），標註是哪個語氣等級，作為 few-shot 範例<br>
+      2. 設計「危機處理 Email 範本」— 專門用於處理緊急、敏感、高風險的溝通<br>
+      3. 建立「多語言版本」— 如果你需要用英文寫 Email，為每個場景準備中英文雙語範本
+    </div>
+  </div>
+
+  <!-- 總結 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">10</div>
+      <h2 class="section-title">今日重點總結</h2>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">🎯 核心概念</div>
+      <div class="prose">
+        <strong>商業 Email 難寫不是因為內容複雜，而是需要同時處理資訊、關係、目的三個層次。</strong>好的 Email prompt 的關鍵是「讓 AI 理解情境」— 提供足夠的背景資訊讓 AI 知道你和收件人的關係、溝通的微妙之處、期望達成的目標。語氣刻度盤是精準控制正式程度的有力工具。
+      </div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-item">
+        <strong>六要素框架：</strong>情境資訊、溝通目標、語氣設定、特殊要求、期望輸出
+      </div>
+      <div class="checklist-item">
+        <strong>語氣刻度盤：</strong>五個等級從「非常正式」到「親密」，不確定時往正式一級靠
+      </div>
+      <div class="checklist-item">
+        <strong>八種常見場景：</strong>請求協助、道歉補救、提案說服、拒絕婉拒、跟進提醒、感謝致謝、壞消息傳遞、意見不同
+      </div>
+      <div class="checklist-item">
+        <strong>五個隱藏技巧：</strong>主旨行藝術、首句決定性、條件句軟化、預設善意、明確 CTA
+      </div>
+      <div class="checklist-item">
+        <strong>範本化系統：</strong>建立可重複使用的 prompt 範本，5 分鐘完成過去需要 30 分鐘的 Email
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <div class="quote-text">
+        "好的工具不是讓你工作更快，而是讓你思考更清楚。"
+      </div>
+      <div class="quote-author">
+        設計 Email prompt 的過程，也是釐清溝通目標的過程
+      </div>
+    </div>
+  </section>
+
+  <!-- 導航 -->
+  <nav class="lesson-nav">
+    <a href="day6.html" class="nav-link">
+      <span class="nav-label">← 上一課</span>
+      <span class="nav-title">Day 06: 設計預約系統對話流程</span>
+    </a>
+    <a href="day8.html" class="nav-link" style="text-align: right;">
+      <span class="nav-label">下一課 →</span>
+      <span class="nav-title">Day 08: 旅遊行程規劃師</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-text">
+    Prompt Mastery — 20-Day Intensive Course — 2026
+  </div>
+</footer>
+
+</body>
+</html>

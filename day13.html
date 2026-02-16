@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 - 決策輔助 Agent | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
+.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
+.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
+.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.decision-matrix{background:var(--white);border:2px solid var(--ink);padding:24px;margin:32px 0}
+.matrix-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:16px}
+.matrix-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--cream)}
+.matrix-label{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
+.matrix-value{font-family:'Noto Serif TC',serif;font-size:14px}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+.warning-box{background:var(--ink);color:var(--white);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.warning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent-light)}
+.warning-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8;opacity:.9}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 13 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 3</span>
+<span>60 分鐘</span>
+<span>Agent 設計</span>
+</div>
+<h1 class="lesson-title">決策輔助<br>Agent 設計</h1>
+<p class="lesson-subtitle">
+人生充滿選擇，有些決策簡單（中午吃什麼），有些複雜（要不要換工作）。決策輔助 Agent 不是替你決定，而是幫你<strong>釐清思路、評估選項、看見盲點</strong>。今天學習如何設計能引導你做出更好決策的 AI 顧問，從決策框架、多角度分析、到風險評估。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">什麼是決策輔助 Agent？</h2>
+</div>
+
+<div class="prose">
+想像你面對一個重要決定：要不要接受新工作機會？薪水高 30%，但要搬到另一個城市。你的朋友會給建議，但可能帶有偏見。<strong>決策輔助 Agent 就像一個理性的顧問</strong>，幫你系統性地分析，但最終決定權在你手上。
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">直接給建議（不好）</div>
+<div class="comparison-text">
+<strong>你：</strong>「我該不該接受新工作？」<br>
+<strong>AI：</strong>「建議你接受，薪水高 30% 是很好的機會。」<br><br>
+<em>問題：</em>AI 不了解你的處境、價值觀、考量因素，就直接給建議。這不是決策輔助，是瞎猜。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">引導式決策輔助（好）</div>
+<div class="comparison-text">
+<strong>你：</strong>「我該不該接受新工作？」<br>
+<strong>Agent：</strong>「讓我幫你理清思路。先問幾個問題：<br>
+1. 搬到新城市對你的生活影響如何？<br>
+2. 除了薪水，這份工作還有什麼吸引你？<br>
+3. 什麼因素會讓你說不？<br><br>
+我們一起分析各種可能性。」
+</div>
+</div>
+</comparison>
+
+<div class="quote-box">
+<div class="quote-text">
+"好的決策顧問不是告訴你答案，而是幫你問對問題。"
+</div>
+<div class="quote-author">
+引導式提問的力量
+</div>
+</quote-box>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>釐清問題</strong><br>
+很多時候我們連問題是什麼都不清楚。「要不要換工作？」背後可能是「我對現況不滿」或「我想要更多成長」。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>收集資訊</strong><br>
+決策需要資訊。薪資、工作內容、成長機會、生活品質、人際關係...收集所有相關因素。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>評估選項</strong><br>
+通常不只 A 或 B，還有 C、D、E。好的決策輔助會幫你看見更多可能性。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>分析利弊</strong><br>
+每個選項的優點、缺點、風險、機會成本。不只看眼前，還要看長期。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">05</div>
+<div class="step-content">
+<strong>挑戰假設</strong><br>
+我們常有未經檢驗的假設（「薪水高就一定好」「大公司一定穩定」）。好的顧問會挑戰這些。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">06</div>
+<div class="step-content">
+<strong>情境模擬</strong><br>
+「如果選 A，一年後會如何？」「如果最壞情況發生怎麼辦？」想像未來場景幫助決策。
+</div>
+</div>
+</div>
+
+<div class="highlight-box">
+<div class="highlight-title">核心洞察</div>
+<div class="prose">
+<strong>決策輔助 Agent 不是算命，而是結構化思考的工具。</strong>它的價值不在於「給答案」，而在於「幫你想得更清楚」。
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">決策輔助的流程設計</h2>
+</div>
+
+<div class="prose">
+一個完整的決策輔助流程通常包含六個階段：
+</div>
+
+<div class="code-block-header">決策輔助流程 Prompt</div>
+<div class="code-block">你是一位決策輔助顧問，幫助使用者做出深思熟慮的決策。
+
+【決策輔助流程】
+
+階段 1：理解決策
+→ 目標：搞清楚真正的問題是什麼
+→ 提問：
+  • 這個決策背後的真正需求是什麼？
+  • 為什麼現在要做這個決定？
+  • 不做決定會怎樣？
+→ 輸出：明確的決策陳述
+
+階段 2：探索選項
+→ 目標：找出所有可能的選擇
+→ 提問：
+  • 除了你想到的，還有其他可能性嗎？
+  • 有沒有結合兩種選項的方法？
+  • 如果資源無限，你會怎麼選？
+→ 輸出：3-5 個可行選項
+
+階段 3：定義標準
+→ 目標：確定評估的依據
+→ 提問：
+  • 什麼對你最重要？（價值觀）
+  • 如何衡量「好」的決定？（標準）
+  • 什麼是絕對不能接受的？（底線）
+→ 輸出：5-7 個評估標準，並標註權重
+
+階段 4：評估分析
+→ 目標：系統化評估每個選項
+→ 方法：
+  • 用標準評分每個選項（1-10 分）
+  • 分析優缺點
+  • 評估風險與機會
+→ 輸出：評分矩陣 + 詳細分析
+
+階段 5：挑戰與反思
+→ 目標：找出盲點和未經檢驗的假設
+→ 提問：
+  • 什麼假設可能是錯的？
+  • 最壞情況是什麼？能接受嗎？
+  • 三年後回頭看，會後悔嗎？
+  • 如果建議朋友，你會說什麼？
+→ 輸出：潛在盲點與風險清單
+
+階段 6：決策建議
+→ 目標：提供清晰的建議（但不替使用者決定）
+→ 輸出格式：
+  • 基於分析，傾向選項是...
+  • 理由：...
+  • 但你應該考慮：...
+  • 如果你重視 X，選 A；如果重視 Y，選 B
+  • 最終決定權在你
+
+【重要原則】
+• 永遠不要替使用者做決定
+• 保持中立，不帶個人偏見
+• 用提問引導思考，而非直接給答案
+• 尊重使用者的價值觀和優先級
+• 如果資訊不足，要求補充而非猜測</code-block>
+
+<div class="prose">
+這個流程的關鍵是<strong>循序漸進</strong>。不要一開始就跳到評估，而是先確保問對了問題。
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">決策框架：多角度分析法</h2>
+</div>
+
+<div class="prose">
+決策輔助 Agent 可以運用多種決策框架，從不同角度分析問題。以下是四個常用框架：
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>利弊分析（Pros & Cons）</strong><br>
+最基本但有效的方法：列出每個選項的優點和缺點。<br><br>
+<strong>進階版：</strong>不只列出，還要評估每個利弊的重要性和可能性。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>機會成本分析</strong><br>
+「選 A 意味著放棄什麼？」每個選擇都有代價，看見機會成本幫助做出明智決定。<br><br>
+<strong>提問：</strong>如果選這個，我會錯過什麼其他機會？
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>情境模擬（Scenario Planning）</strong><br>
+想像最好、最可能、最壞三種情況。每種情況下，選項的結果如何？<br><br>
+<strong>問題：</strong>最好情況：成功了會如何？<br>最壞情況：失敗了能承受嗎？<br>最可能：實際上會發生什麼？
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>多重標準評分（Multi-Criteria Decision Analysis）</strong><br>
+定義 5-7 個評估標準，每個選項依標準評分，加權計算總分。<br><br>
+<strong>範例標準：</strong>薪資（權重 30%）、成長機會（25%）、工作生活平衡（20%）、地點（15%）、公司文化（10%）
+</div>
+</div>
+</div>
+
+<div class="code-block-header">多重標準評分 Prompt</div>
+<div class="code-block">【多重標準決策分析】
+
+步驟 1：定義評估標準
+請列出 5-7 個對這個決策重要的標準。
+例如：薪資、成長機會、工作生活平衡、通勤時間、公司文化...
+
+步驟 2：設定權重
+每個標準的重要性（總和 100%）
+範例：
+- 薪資：30%
+- 成長機會：25%
+- 工作生活平衡：20%
+- 地點：15%
+- 公司文化：10%
+
+步驟 3：評分
+對每個選項，依據每個標準評分（1-10 分）
+
+步驟 4：計算加權分數
+每個選項的總分 = Σ(標準分數 × 權重)
+
+步驟 5：分析結果
+• 哪個選項總分最高？
+• 哪個選項在最重要的標準上表現最好？
+• 有沒有某個選項在關鍵標準上分數太低？
+
+【範例】
+
+選項 A：現職公司升遷
+- 薪資：7 分 × 30% = 2.1
+- 成長機會：6 分 × 25% = 1.5
+- 工作生活平衡：8 分 × 20% = 1.6
+- 地點：10 分 × 15% = 1.5
+- 公司文化：8 分 × 10% = 0.8
+總分：7.5
+
+選項 B：新公司 offer
+- 薪資：9 分 × 30% = 2.7
+- 成長機會：8 分 × 25% = 2.0
+- 工作生活平衡：5 分 × 20% = 1.0
+- 地點：4 分 × 15% = 0.6
+- 公司文化：7 分 × 10% = 0.7
+總分：7.0
+
+分析：
+A 總分略高，但 B 在薪資和成長（兩個最重要標準）表現更好。
+A 的優勢在於地點和工作生活平衡。
+如果你更重視成長而非平衡，B 可能是更好選擇。</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">挑戰假設與盲點檢測</h2>
+</div>
+
+<div class="prose">
+決策輔助最有價值的部分之一是<strong>幫你看見自己看不見的盲點</strong>。
+</div>
+
+<div class="code-block-header">盲點檢測 Prompt</div>
+<div class="code-block">【挑戰假設與盲點檢測】
+
+針對使用者的決策，檢查以下常見盲點：
+
+1. 確認偏誤（Confirmation Bias）
+   → 檢查：使用者是否只看支持預設立場的資訊？
+   → 提問：「有沒有反對這個選擇的理由你還沒考慮？」
+
+2. 沉沒成本謬誤（Sunk Cost Fallacy）
+   → 檢查：是否因為已投入太多而不願放棄？
+   → 提問：「如果重新開始，你還會做同樣選擇嗎？」
+
+3. 過度樂觀（Optimism Bias）
+   → 檢查：是否低估了風險和困難？
+   → 提問：「如果進展不如預期，你有 Plan B 嗎？」
+
+4. 從眾效應（Bandwagon Effect）
+   → 檢查：是否因為「大家都這樣」而跟隨？
+   → 提問：「如果沒人這樣做，你還會選擇它嗎？」
+
+5. 現狀偏誤（Status Quo Bias）
+   → 檢查：是否只是因為習慣而不願改變？
+   → 提問：「如果現狀不是選項，你會選什麼？」
+
+6. 近因偏誤（Recency Bias）
+   → 檢查：是否被最近的經驗過度影響？
+   → 提問：「這是長期趨勢，還是短期波動？」
+
+【挑戰提問範本】
+
+「你說你想要 X，但你也提到 Y。這兩者似乎有衝突。
+你能幫我理解：
+- 如果只能選一個，你會選哪個？
+- 有沒有辦法兩者兼顧？
+- 這個衝突背後反映了什麼更深層的需求？」
+
+「你的分析很完整，但我想挑戰一個假設：
+你假設『[某個假設]』。
+- 如果這個假設是錯的會怎樣？
+- 有什麼證據支持這個假設？
+- 有沒有相反的可能性？」
+
+「讓我們做個思想實驗：
+- 如果三年後回頭看，你會為這個決定感到驕傲嗎？
+- 如果是你最尊敬的人面對同樣情況，你會建議他們怎麼做？
+- 如果失敗了，你會後悔嗎？還是覺得值得一試？」</code-block>
+
+<div class="warning-box">
+<div class="warning-title">⚠️ 挑戰假設的藝術</div>
+<div class="warning-content">
+挑戰使用者的假設時要<strong>溫和而堅定</strong>。不是質疑他們的判斷力，而是幫助他們看得更清楚。<br><br>
+<strong>不好的挑戰：</strong>「這個假設明顯是錯的。」<br>
+<strong>好的挑戰：</strong>「這是個合理的假設。讓我們測試一下：如果情況不如預期，會怎樣？」<br><br>
+用<strong>「如果...會怎樣？」</strong>而非「你錯了」。
+</div>
+</warning-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">完整案例：職涯轉換決策</h2>
+</div>
+
+<div class="prose">
+讓我們看一個完整的決策輔助流程：30 歲工程師考慮要不要轉職產品經理。
+</div>
+
+<div class="code-block-header">職涯決策輔助完整 Prompt</div>
+<div class="code-block">你是一位職涯決策顧問，幫助使用者分析職涯轉換的決策。
+
+【使用者情境】
+• 30 歲，軟體工程師，工作 5 年
+• 考慮轉職產品經理
+• 目前薪資：年薪 150 萬
+• PM offer：年薪 130 萬（降薪）
+• 原因：覺得寫程式到了瓶頸，想要更多策略性工作
+
+【決策輔助流程】
+
+階段 1：釐清真正的問題
+「讓我先理解你的情況。你說『到了瓶頸』，能具體說明嗎？
+- 是技術上沒挑戰了？
+- 還是對寫程式本身失去興趣？
+- 或者是想要更大的影響力？
+
+你說想要『更多策略性工作』，在你心中，這是什麼意思？
+- 是想做決策而非執行？
+- 是想看到更大的影響？
+- 還是想要不同的工作內容？」
+
+→ 目標：確認轉職的真正動機
+
+階段 2：探索所有選項
+「除了『留在工程師』或『轉 PM』，還有其他可能嗎？
+
+選項 A：留任工程師，但爭取更多策略參與
+- 可以提議參與產品規劃會議
+- 成為技術負責人，有更多決策權
+
+選項 B：轉職 PM（目前的 offer）
+- 薪資降低 20 萬
+- 重新學習新領域
+
+選項 C：先做兼職 PM 或內部轉調
+- 測試是否真的喜歡 PM 工作
+- 不用馬上離職
+
+選項 D：技術管理路線
+- 成為 Tech Lead 或 Engineering Manager
+- 保留技術背景，增加管理職責
+
+選項 E：創業或自由工作
+- 如果真的想要自主性和影響力
+
+你覺得哪些選項值得考慮？」
+
+階段 3：定義評估標準
+「讓我們定義什麼對你最重要：
+
+1. 工作滿足感（40%）
+   - 你最重視這個，對吧？
+
+2. 薪資水平（20%）
+   - 降薪 20 萬可以接受嗎？
+
+3. 職涯發展（20%）
+   - 長期來看，哪個路線更好？
+
+4. 生活品質（10%）
+   - PM 通常會議更多，工時可能更長
+
+5. 風險（10%）
+   - 轉換跑道的不確定性
+
+這個權重分配符合你的優先級嗎？」
+
+階段 4：系統化評估
+
+【選項 B：轉職 PM 的深度分析】
+
+優點：
++ 做你想做的策略性工作
++ 新挑戰，重燃熱情
++ PM 技能是跨領域通用能力
++ 有技術背景的 PM 很稀缺
+
+缺點：
+- 降薪 20 萬（13%）
+- 從零開始，前 1-2 年會很挫折
+- 失去技術深度
+- PM 天花板可能比技術低
+
+風險：
+• 發現不喜歡 PM 怎麼辦？
+• 年紀漸長，再轉回工程師更難
+• 新公司文化適應問題
+
+機會成本：
+• 放棄技術專家路線
+• 放棄可能的升遷機會
+• 可能錯過技術風口（如 AI）
+
+階段 5：挑戰假設
+
+「我想挑戰幾個假設：
+
+假設 1：『寫程式到了瓶頸』
+→ 真的是技術瓶頸，還是當前專案沒挑戰？
+→ 如果換個技術領域（如轉 AI/ML），還會覺得瓶頸嗎？
+
+假設 2：『PM 可以做策略性工作』
+→ 所有 PM 都做策略嗎？還是很多 PM 也是執行層？
+→ 你了解 PM 的日常工作嗎？（很多會議、協調、救火）
+
+假設 3：『降薪可以接受』
+→ 130 萬夠支持你的生活嗎？
+→ 如果兩年後還是這個薪資，你會後悔嗎？
+
+最關鍵的問題：
+如果你最尊敬的導師面對同樣情況，你會建議他怎麼做？」
+
+階段 6：建議
+
+「基於我們的分析：
+
+【如果你的答案是...】
+✓ 對 PM 充滿熱情，願意承擔風險 → 轉職
+✓ 主要是想逃避現狀，對 PM 不太了解 → 先嘗試選項 C
+✓ 想要策略性工作，但不確定 PM 是答案 → 選項 A 或 D
+
+【我的觀察】
+你的核心需求似乎是『影響力』和『策略參與』，而非一定要離開技術。
+
+【建議的行動】
+1. 先用 3 個月測試『選項 C』（內部兼職或側面參與）
+2. 同時探索『選項 D』（技術管理）
+3. 深入了解 PM 日常（找 3 個 PM 聊聊）
+4. 3 個月後再決定是否轉職
+
+這樣你：
+- 降低風險（不是直接離職）
+- 獲得真實資訊（而非想像）
+- 保留選擇權
+- 不用倉促決定
+
+最終決定權在你。你覺得呢？」</code-block>
+
+<div class="highlight-box">
+<div class="highlight-title">這個案例展示了什麼？</div>
+<div class="prose">
+• <strong>深度提問：</strong>不只問表面問題，挖掘真正動機<br>
+• <strong>擴展選項：</strong>不只 A 或 B，找出 C、D、E<br>
+• <strong>系統化評估：</strong>用標準和權重分析<br>
+• <strong>挑戰假設：</strong>測試未經檢驗的想法<br>
+• <strong>提供方向但不替使用者決定：</strong>給建議，但尊重自主權
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">06</div>
+<h2 class="section-title">決策後的反思與學習</h2>
+</div>
+
+<div class="prose">
+好的決策輔助不只幫助當下決策，還要<strong>幫助使用者從決策中學習</strong>。
+</div>
+
+<div class="code-block-header">決策反思 Prompt</div>
+<div class="code-block">【決策後反思】
+
+當使用者做出決定後（無論執行與否），引導反思：
+
+1. 決策記錄
+   「讓我們記錄這次決策：
+   - 你選擇了什麼？
+   - 主要考量是什麼？
+   - 期待的結果是什麼？」
+
+2. 設定檢查點
+   「建議在以下時間點檢視這個決策：
+   - 1 個月後：初步感受如何？
+   - 3 個月後：是否符合預期？
+   - 6 個月後：如果重來會怎麼選？」
+
+3. 學習提取
+   「這次決策過程，你學到什麼？
+   - 什麼方法有幫助？
+   - 下次可以怎麼改進？
+   - 有什麼意外發現？」
+
+4. 更新決策模式
+   「基於這次經驗，更新你的決策原則：
+   - 什麼因素比你想的更重要？
+   - 什麼因素其實沒那麼重要？
+   - 未來類似決策要注意什麼？」</code-block>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Side Project</div>
+<h2 class="practice-title">建立你的決策輔助 Agent</h2>
+
+<div class="practice-desc">
+<strong>第一步：選擇決策領域（20 分鐘）</strong><br>
+選擇一個你經常需要決策的領域：<br>
+• 職涯發展決策<br>
+• 財務投資決策<br>
+• 學習方向決策<br>
+• 生活方式決策<br>
+• 商業策略決策<br><br>
+
+<strong>第二步：設計決策流程（40 分鐘）</strong><br>
+基於今天學到的框架，設計 6 階段流程：<br>
+1. 如何理解問題？（關鍵提問清單）<br>
+2. 如何探索選項？（擴展思路的方法）<br>
+3. 如何定義標準？（該領域的常見標準）<br>
+4. 如何評估分析？（使用哪種框架）<br>
+5. 如何挑戰假設？（該領域的常見盲點）<br>
+6. 如何給建議？（建議的格式）<br><br>
+
+<strong>第三步：建立評估框架（30 分鐘）</strong><br>
+為你的領域設計評估標準：<br>
+• 列出 5-7 個重要標準<br>
+• 定義如何衡量每個標準（1-10 分）<br>
+• 設定權重分配<br>
+• 準備常見選項的評分範例<br><br>
+
+<strong>第四步：準備挑戰提問庫（20 分鐘）</strong><br>
+收集 10-15 個該領域常用的挑戰性問題：<br>
+• 挑戰假設的問題<br>
+• 檢測盲點的問題<br>
+• 情境模擬的問題<br>
+• 長期視角的問題<br><br>
+
+<strong>第五步：測試與優化（30 分鐘）</strong><br>
+用一個真實決策測試你的 Agent：<br>
+1. 走完整個流程<br>
+2. 記錄哪些有幫助、哪些不夠好<br>
+3. 調整 prompt 和流程<br>
+4. 再測試一次<br><br>
+
+<strong>完成標準：</strong><br>
+當 Agent 能幫你看見原本沒想到的角度、挑戰你的假設、讓你對決策更有信心時，就算成功。
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day12.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 12: 個人助理 Agent</span>
+</a>
+<a href="day14.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 14: 創意協作 Agent</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>

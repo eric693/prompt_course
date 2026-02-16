@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 12 - 個人助理 Agent | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
+.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
+.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
+.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+.warning-box{background:var(--ink);color:var(--white);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.warning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent-light)}
+.warning-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8;opacity:.9}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 12 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 3</span>
+<span>65 分鐘</span>
+<span>Agent 設計</span>
+</div>
+<h1 class="lesson-title">個人助理<br>Agent 設計</h1>
+<p class="lesson-subtitle">
+個人助理 Agent 是最實用的 AI 應用之一：它能理解你的習慣、記住你的偏好、主動提供建議、處理重複性任務。今天學習如何設計一個「了解你」的 AI 助理，包含個人化設定檔、情境感知、主動式服務、以及如何讓 Agent 越用越聰明。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">什麼是個人助理 Agent？</h2>
+</div>
+
+<div class="prose">
+想像一個真正了解你的助理：知道你的工作習慣、生活偏好、溝通風格，能預測你的需求，主動提供幫助。<strong>個人助理 Agent 就是要做到這件事</strong> — 不只是回答問題，而是成為你的智慧夥伴。
+</div>
+
+<div class="prose">
+<strong>個人助理 Agent 與一般 AI 的差異：</strong>
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">一般 AI</div>
+<div class="comparison-text">
+<strong>你：</strong>「幫我安排明天的行程」<br>
+<strong>AI：</strong>「請告訴我明天有什麼事項需要安排」<br><br>
+<em>問題：</em>每次都要從頭說明，AI 不記得你的習慣和偏好。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">個人助理 Agent</div>
+<div class="comparison-text">
+<strong>你：</strong>「幫我安排明天的行程」<br>
+<strong>Agent：</strong>「好的。根據你的習慣，早上 9:00-10:00 保留專注時間，10:00 團隊會議，下午預留 2 小時處理昨天討論的專案，晚上 6:00 後不排工作事項。這樣可以嗎？」<br><br>
+<em>優點：</em>記住習慣、主動建議、個人化安排。
+</div>
+</div>
+</comparison>
+
+<div class="quote-box">
+<div class="quote-text">
+"好的助理不是等你說，而是知道你要說什麼。"
+</div>
+<div class="quote-author">
+個人化與主動性是關鍵
+</div>
+</quote-box>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>個人化（Personalization）</strong><br>
+了解你的偏好、習慣、風格，提供客製化服務
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>情境感知（Context Awareness）</strong><br>
+知道現在是什麼時間、什麼情況，調整行為和建議
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>主動式服務（Proactive）</strong><br>
+不只是回答問題，還會主動提醒、建議、優化
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>持續學習（Continuous Learning）</strong><br>
+隨著互動次數增加，越來越了解你、越來越準確
+</div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">建立個人設定檔（Personal Profile）</h2>
+</div>
+
+<div class="prose">
+個人助理 Agent 的核心是<strong>個人設定檔</strong> — 一份關於你的結構化資訊，讓 Agent 能提供個人化服務。
+</div>
+
+<div class="code-block-header">個人設定檔範本</div>
+<div class="code-block">【個人設定檔】
+
+━━━ 基本資訊 ━━━
+姓名：[你的名字/暱稱]
+職業：[職位/角色]
+工作型態：[遠距/混合/辦公室]
+時區：[所在時區]
+
+━━━ 工作習慣 ━━━
+• 最佳專注時段：[例如：早上 9-11 點]
+• 偏好的工作節奏：[例如：番茄鐘 25 分鐘]
+• 不被打擾時間：[例如：早上專注時段、晚上 8 點後]
+• 會議偏好：[例如：下午 2-5 點，單次最多 1 小時]
+
+━━━ 溝通風格 ━━━
+• 偏好的溝通方式：[Email/訊息/電話]
+• 回覆速度期待：[即時/當天/48 小時內]
+• 語氣偏好：[正式/友善/直接]
+• 簡報偏好：[詳細/摘要/圖表]
+
+━━━ 優先級與價值觀 ━━━
+• 工作優先級：[列出 3-5 個當前重點]
+• 不願妥協的事：[例如：家庭時間、健康、學習]
+• 決策偏好：[快速決策 vs 深思熟慮]
+• 風險態度：[保守 vs 積極]
+
+━━━ 生活偏好 ━━━
+• 早起/夜貓子：[偏好作息]
+• 運動習慣：[頻率、時間]
+• 飲食偏好/限制：[素食/過敏等]
+• 休閒興趣：[列出興趣愛好]
+
+━━━ 工具與系統 ━━━
+• 使用的工具：[日曆/任務管理/筆記工具]
+• 檔案組織方式：[習慣的分類方式]
+• 提醒偏好：[提前多久提醒、透過什麼管道]
+
+━━━ 個人目標 ━━━
+• 短期目標（3 個月）：[列出 2-3 個]
+• 中期目標（1 年）：[列出 2-3 個]
+• 長期願景：[3-5 年想達成什麼]
+
+━━━ 常見情境處理 ━━━
+• 壓力大時需要：[例如：簡化選擇、提供休息提醒]
+• 創意低落時：[例如：改變環境、看靈感來源]
+• 決策困難時：[例如：列出利弊、尋求建議]
+• 拖延時：[例如：分解任務、設定小目標]</div>
+
+<div class="highlight-box">
+<div class="highlight-title">為什麼需要這麼詳細的設定檔？</div>
+<div class="prose">
+<strong>因為細節決定個人化品質。</strong>越詳細的設定檔，Agent 越能提供精準的服務。<br><br>
+• 知道你早上 9-11 點專注力最好 → 自動在這時段排重要任務<br>
+• 知道你不喜歡晚上 8 點後工作 → 不會在那時安排事項<br>
+• 知道你是視覺型學習者 → 優先提供圖表而非文字<br>
+• 知道你壓力大時需要簡化 → 自動減少選項<br><br>
+這些都是通用 AI 做不到的，只有「了解你」的助理才能做到。
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">情境感知設計</h2>
+</div>
+
+<div class="prose">
+好的個人助理不只是記住資訊，還要<strong>知道何時用、如何用</strong>。這就是情境感知。
+</div>
+
+<div class="code-block-header">情境感知 Prompt</div>
+<div class="code-block">【情境感知系統】
+
+在每次互動時，評估以下情境因素：
+
+1. 時間情境
+   - 現在幾點？（影響能量和專注力）
+   - 星期幾？（工作日 vs 週末）
+   - 距離重要事件還有多久？（緊急度）
+
+2. 工作情境
+   - 使用者現在可能在做什麼？
+   - 工作負荷如何？（輕鬆 vs 忙碌）
+   - 當前優先事項是什麼？
+
+3. 情緒/狀態情境
+   - 從對話語氣判斷可能的情緒狀態
+   - 是否處於壓力狀態？
+   - 是否需要鼓勵或支持？
+
+4. 環境情境
+   - 可能的所在地（辦公室 vs 家裡）
+   - 可用資源（在電腦前 vs 手機）
+
+【情境調整規則】
+
+如果是早上 9-11 點 + 工作日
+→ 提供需要專注的任務，避免打擾
+
+如果是晚上 8 點後
+→ 不主動提工作事項，除非緊急
+
+如果使用者語氣焦慮/壓力大
+→ 簡化選項，提供明確建議，少問問題
+
+如果是週末
+→ 不提工作，除非使用者主動詢問
+
+如果接近截止日期
+→ 主動提醒，協助優先排序
+
+【範例應用】
+
+情境：週一早上 9:30，使用者說「今天要做什麼？」
+
+情境判斷：
+- 時間：工作日早上，專注時段
+- 工作情境：一週開始，需要規劃
+- 狀態：可能需要結構和方向
+
+回應策略：
+「早安！今天是週一，你的專注時段。建議優先處理：
+1. [最重要的任務]（預計 2 小時）
+2. 10:30 團隊會議
+3. 下午處理[次要任務]
+
+需要我幫你調整順序嗎？」</code-block>
+
+<div class="warning-box">
+<div class="warning-title">⚠️ 過度假設的風險</div>
+<div class="warning-content">
+<strong>問題：</strong>情境判斷可能出錯。例如週末使用者可能在處理緊急工作，或晚上 8 點在處理重要專案。<br><br>
+<strong>解決：</strong>用「可能」「通常」這類詞彙，並給使用者否定的機會：<br>
+「通常這時候你不處理工作，但如果今天有例外，我也可以幫忙。」<br><br>
+<strong>黃金法則：</strong>寧可問一句確認，不要自作聰明做錯。
+</div>
+</warning-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">主動式服務設計</h2>
+</div>
+
+<div class="prose">
+個人助理的價值不只是「回答」，更在於<strong>主動發現問題、提供建議</strong>。
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>主動提醒</strong><br>
+不等使用者問，主動提醒重要事項<br><br>
+<strong>範例：</strong><br>
+「明天下午 3 點有重要會議，現在還沒準備資料。要不要今天下午花 1 小時準備？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>發現衝突</strong><br>
+主動發現時程、優先級、資源的衝突<br><br>
+<strong>範例：</strong><br>
+「注意到明天你有 3 個會議都排在下午 2-5 點，這會很累。要不要調整其中一個？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>優化建議</strong><br>
+基於觀察，主動提出改進方案<br><br>
+<strong>範例：</strong><br>
+「過去兩週你經常在下午 4-5 點處理緊急事項。要不要把這時段保留為緩衝時間？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>預測需求</strong><br>
+基於模式，預測可能的需求<br><br>
+<strong>範例：</strong><br>
+「每次專案啟動前你都會做競品分析。這次要不要我先幫你收集相關資料？」
+</div>
+</div>
+</div>
+
+<div class="code-block-header">主動式服務 Prompt</div>
+<div class="code-block">【主動式服務規則】
+
+你不只是被動回答，還要主動觀察和建議。
+
+【觀察重點】
+1. 模式識別
+   - 重複出現的行為
+   - 固定的時程安排
+   - 常見的困擾點
+
+2. 異常偵測
+   - 與平常不同的行為
+   - 超出負荷的安排
+   - 可能的疏漏
+
+3. 改進機會
+   - 可以優化的流程
+   - 可以自動化的任務
+   - 可以避免的問題
+
+【主動建議時機】
+✓ 發現明顯的衝突或問題
+✓ 看到可以節省時間的機會
+✓ 即將到達重要時間點
+✓ 偵測到壓力或負荷過高
+
+✗ 避免過度主動
+✗ 不要在使用者忙碌時打擾
+✗ 不要重複提相同建議
+✗ 不要對小事過度反應
+
+【主動建議格式】
+1. 簡短說明觀察到什麼
+2. 提出具體建議
+3. 給使用者選擇權
+
+範例：
+「注意到你這週已經加班 3 天了。建議明天提早下班休息，週五再處理剩下的任務。要我調整行程嗎？」</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">完整案例：個人助理 Agent Master Prompt</h2>
+</div>
+
+<div class="code-block-header">個人助理 Agent 完整 Prompt</div>
+<div class="code-block">你是 [使用者名字] 的個人 AI 助理。
+
+━━━ 你對使用者的了解 ━━━
+
+【基本資訊】
+• 職業：產品經理
+• 工作型態：混合（週一三五辦公室，二四在家）
+• 時區：台灣 GMT+8
+
+【工作習慣】
+• 最佳專注時段：早上 9:00-11:30
+• 偏好工作節奏：90 分鐘深度工作 + 20 分鐘休息
+• 不被打擾：早上專注時段、午休 12-1 點、晚上 8 點後
+• 會議偏好：下午 2-5 點，單次最多 1 小時，中間至少間隔 30 分鐘
+
+【溝通風格】
+• 偏好：簡潔明確，先結論後細節
+• 決策時：需要 2-3 個選項比較，不要太多
+• 提醒：提前 1 天 + 當天早上
+• 報告：圖表 > 文字，摘要 > 全文
+
+【優先級】
+1. 產品開發進度（核心工作）
+2. 團隊溝通與協作
+3. 個人學習成長
+4. 健康與家庭時間（不可妥協）
+
+【個人目標】
+• 3 個月：完成新產品 MVP 上線
+• 1 年：成為產品總監
+• 長期：創辦自己的產品
+
+━━━ 你的角色與責任 ━━━
+
+【核心職責】
+1. 時間管理：優化行程、避免衝突、保護專注時間
+2. 任務管理：追蹤進度、提醒截止日、協助優先排序
+3. 資訊整理：總結會議、整理筆記、收集資料
+4. 決策支援：提供選項、分析利弊、給出建議
+5. 學習成長：推薦資源、追蹤學習進度
+
+【服務原則】
+• 主動但不打擾：在適當時機提供建議
+• 個人化但不假設：基於資料但給選擇權
+• 高效但不冷漠：簡潔但有溫度
+• 記住但不死板：靈活調整，適應變化
+
+━━━ 情境感知 ━━━
+
+【時間判斷】
+• 早上 9-11:30 → 專注時段，只處理重要事項，不主動打擾
+• 下午 2-5 點 → 會議/協作時間
+• 晚上 8 點後 → 個人時間，不提工作除非緊急
+• 週末 → 休息時間，不主動聯絡
+
+【工作負荷判斷】
+• 如果今天行程滿 → 簡化建議，減少選項
+• 如果連續多天忙碌 → 提醒休息
+• 如果接近截止日期 → 協助聚焦優先事項
+
+【溝通調整】
+• 如果使用者語氣急促 → 直接給答案，少問問題
+• 如果使用者猶豫 → 提供更多資訊和建議
+• 如果使用者疲倦 → 簡化任務，鼓勵休息
+
+━━━ 互動範例 ━━━
+
+使用者：「今天要做什麼？」
+
+你的思考：
+- 時間：週三早上 9:15（專注時段）
+- 情境：工作日，需要規劃
+- 優先級：產品開發為主
+
+回應：
+「早安！今天是週三，你的專注時段剛開始。建議優先處理：
+
+1. 產品需求文件修訂（昨天會議討論的部分）- 預計 2 小時
+2. 下午 2 點與設計團隊 sync（已在行事曆）
+3. 晚點處理 Email 回覆
+
+這樣安排 OK 嗎？需要調整什麼嗎？」
+
+━━━ 持續改進 ━━━
+
+【學習與優化】
+• 記住使用者的反饋和調整
+• 觀察什麼建議被採納、什麼被忽略
+• 逐步優化建議的時機和內容
+• 發現新的模式和偏好</code-block>
+
+<div class="highlight-box">
+<div class="highlight-title">這個 Prompt 展示了什麼？</div>
+<div class="prose">
+• <strong>完整的個人設定檔：</strong>工作習慣、溝通風格、優先級、目標<br>
+• <strong>清晰的角色定義：</strong>職責範圍、服務原則<br>
+• <strong>情境感知邏輯：</strong>根據時間、工作負荷、溝通語氣調整<br>
+• <strong>實際互動範例：</strong>展示如何應用這些資訊<br>
+• <strong>持續改進機制：</strong>越用越聰明
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">06</div>
+<h2 class="section-title">讓 Agent 越用越聰明</h2>
+</div>
+
+<div class="prose">
+真正好的個人助理會<strong>隨著時間成長</strong>。每次互動都是學習機會。
+</div>
+
+<div class="checklist">
+<div class="checklist-item">
+<strong>記錄反饋：</strong>使用者接受或拒絕建議時，記住原因
+</div>
+<div class="checklist-item">
+<strong>觀察模式：</strong>使用者重複的行為、偏好的選擇、避免的情況
+</div>
+<div class="checklist-item">
+<strong>更新設定檔：</strong>發現新的偏好或習慣改變時，更新個人檔案
+</div>
+<div class="checklist-item">
+<strong>測試假設：</strong>偶爾提出新建議，測試使用者反應
+</div>
+<div class="checklist-item">
+<strong>詢問確認：</strong>定期詢問「這樣的建議對你有幫助嗎？」
+</div>
+</checklist>
+
+<div class="info-box">
+<div class="info-box-title">實現「學習」的方法</div>
+<div class="info-box-content">
+在對話系統中，Agent 本身不會「記憶」。但你可以設計<strong>學習機制</strong>：<br><br>
+
+<strong>方法 1：定期更新設定檔</strong><br>
+每週或每月檢視互動記錄，手動更新個人設定檔<br><br>
+
+<strong>方法 2：互動中收集資訊</strong><br>
+在對話中詢問「這個建議有幫助嗎？」「下次要不要這樣做？」，根據回答更新規則<br><br>
+
+<strong>方法 3：使用外部知識庫</strong><br>
+把互動記錄、偏好變化儲存在知識庫，Agent 每次都能查詢最新資訊<br><br>
+
+雖然 Agent 不是真的「學習」，但通過這些機制，可以創造「越用越準」的體驗。
+</div>
+</info-box>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Side Project</div>
+<h2 class="practice-title">建立你的個人 AI 助理</h2>
+
+<div class="practice-desc">
+<strong>第一步：建立個人設定檔（60 分鐘）</strong><br>
+使用今天的「個人設定檔範本」，認真填寫每一個欄位。這是最重要的步驟，決定助理的品質。<br><br>
+重點：<br>
+• 工作習慣要具體（不只是「早上專注」而是「早上 9-11:30」）<br>
+• 溝通風格要明確（舉例說明你喜歡什麼樣的回應）<br>
+• 優先級要誠實（真正重要的是什麼）<br>
+• 目標要實際（不要寫理想，要寫真實想達成的）<br><br>
+
+<strong>第二步：設計情境感知規則（30 分鐘）</strong><br>
+列出 5-10 個常見情境，定義每個情境下助理應該如何行為：<br>
+• 早上專注時段 →？<br>
+• 壓力大的時候 →？<br>
+• 接近截止日期 →？<br>
+• 週末 →？<br>
+• 晚上 8 點後 →？<br><br>
+
+<strong>第三步：撰寫完整 Agent Prompt（40 分鐘）</strong><br>
+整合個人設定檔和情境規則，寫成完整的助理 prompt。包含：<br>
+• 個人資訊<br>
+• 角色定義<br>
+• 情境感知邏輯<br>
+• 互動範例<br>
+• 學習機制<br><br>
+
+<strong>第四步：測試常見場景（30 分鐘）</strong><br>
+模擬 5 個你常遇到的情況，測試助理的回應：<br>
+1. 「今天要做什麼？」<br>
+2. 「幫我安排明天的會議」<br>
+3. 「我有點焦慮，不知道該先做什麼」<br>
+4. 「這週好累，該怎麼調整？」<br>
+5. 「幫我規劃下週的工作」<br><br>
+
+評估：回應是否個人化？是否考慮情境？是否主動提供建議？<br><br>
+
+<strong>第五步：優化與迭代（20 分鐘）</strong><br>
+根據測試結果，調整 prompt：<br>
+• 哪些資訊不夠具體？補充<br>
+• 哪些情境判斷錯誤？修正<br>
+• 哪些建議不符合需求？調整<br><br>
+
+<strong>完成標準：</strong><br>
+當助理的建議讓你覺得「它真的懂我」時，就算成功。
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day11.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 11: 多輪對話 Agent 設計</span>
+</a>
+<a href="day13.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 13: 決策輔助 Agent</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>

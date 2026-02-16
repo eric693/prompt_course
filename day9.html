@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 09 - RAG 知識庫系統 | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
+.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
+.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
+.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+.warning-box{background:var(--ink);color:var(--white);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.warning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent-light)}
+.warning-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8;opacity:.9}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 09 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 2</span>
+<span>55 分鐘</span>
+<span>進階應用</span>
+</div>
+<h1 class="lesson-title">RAG 知識庫<br>系統設計</h1>
+<p class="lesson-subtitle">
+RAG（Retrieval-Augmented Generation，檢索增強生成）是讓 AI 使用外部知識庫回答問題的技術。今天學習如何設計「引導 AI 檢索文件」的 prompt，包含如何明確檢索需求、如何要求引用來源、以及如何處理檢索到的資訊。這是構建企業知識庫、客服系統、文件助理的核心技能。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">什麼是 RAG？為什麼重要？</h2>
+</div>
+
+<div class="prose">
+想像你要問 AI「我們公司去年 Q3 的銷售數據是多少？」如果沒有 RAG，AI 只能根據它的訓練資料回答，而它的訓練資料裡不可能有你公司的內部資料。<strong>RAG 解決的就是這個問題：讓 AI 能夠查詢外部知識庫，找到相關資訊，然後基於這些資訊回答問題。</strong>
+</div>
+
+<div class="prose">
+RAG 的運作流程：
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>使用者提問</strong><br>
+「我們公司去年 Q3 的銷售數據是多少？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>檢索相關文件</strong><br>
+系統在知識庫中搜尋相關文件（例如：2025 Q3 銷售報告.pdf）
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>提供給 AI</strong><br>
+把檢索到的文件內容和使用者問題一起提供給 AI
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>AI 生成答案</strong><br>
+AI 基於檢索到的文件內容，生成準確的回答，並引用來源
+</div>
+</div>
+</div>
+
+<div class="quote-box">
+<div class="quote-text">
+"RAG = 讓 AI 擁有圖書館，而不只是記憶"
+</div>
+<div class="quote-author">
+AI 可以查找資訊，而非只靠訓練時記住的知識
+</div>
+</quote-box>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">沒有 RAG</div>
+<div class="comparison-text">
+<strong>問：</strong>「我們公司的遠距工作政策是什麼？」<br><br>
+<strong>AI 回答：</strong>「我沒有關於您公司具體政策的資訊。一般來說，遠距工作政策通常包括...」<br><br>
+<em>問題：AI 只能給通用建議，無法回答公司特定問題。</em>
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">有 RAG</div>
+<div class="comparison-text">
+<strong>問：</strong>「我們公司的遠距工作政策是什麼？」<br><br>
+<strong>AI 回答：</strong>「根據《員工手冊 2026》第 12 章，公司的遠距工作政策如下：全職員工每週可遠距工作最多 3 天，需提前一週向主管申請...」<br><br>
+<em>優點：AI 基於公司實際文件回答，準確且可追溯來源。</em>
+</div>
+</div>
+</div>
+
+<div class="highlight-box">
+<div class="highlight-title">核心洞察</div>
+<div class="prose">
+<strong>RAG 不是讓 AI 更聰明，而是讓 AI 能查資料。</strong>這個概念的威力在於：你不需要重新訓練 AI 模型，只需要給它一個好的知識庫和好的檢索機制，它就能回答任何領域的專業問題。
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">RAG Prompt 的核心要素</h2>
+</div>
+
+<div class="prose">
+設計 RAG prompt 時，你需要告訴 AI 三件事：<strong>如何使用檢索到的資訊、如何引用來源、如何處理找不到資訊的情況。</strong>
+</div>
+
+<div class="code-block-header">基礎 RAG Prompt 範本</div>
+<div class="code-block">你是一個知識庫助理，專門回答基於公司內部文件的問題。
+
+【你的任務】
+1. 仔細閱讀提供的文件內容
+2. 基於文件內容回答使用者的問題
+3. 必須引用具體的來源（文件名稱和段落）
+4. 如果文件中沒有相關資訊，明確告知使用者
+
+【回答原則】
+✓ 只使用提供的文件資訊，不要編造或猜測
+✓ 如果答案在多個文件中，整合後回答
+✓ 用清晰、簡潔的語言回答
+✓ 每個重要資訊都要標註來源
+
+【引用格式】
+使用此格式引用來源：[文件名稱，第 X 段]
+例如：「根據《員工手冊 2026》第 3 段...」
+
+【如果找不到答案】
+回答：「我在提供的文件中沒有找到關於 [問題主題] 的資訊。
+您可能需要：
+1. 提供更多相關文件
+2. 換個方式描述問題
+3. 詢問有權限的同事」
+
+---
+
+【檢索到的文件】
+[這裡會放入檢索到的文件內容]
+
+【使用者問題】
+[使用者的問題]</div>
+
+<div class="prose">
+這個基礎範本解決了 RAG 最常見的三個問題：
+</div>
+
+<div class="checklist">
+<div class="checklist-item">
+<strong>幻覺問題：</strong>明確要求「只使用提供的文件，不要編造」
+</div>
+<div class="checklist-item">
+<strong>可追溯性：</strong>要求引用具體來源，讓使用者能驗證資訊
+</div>
+<div class="checklist-item">
+<strong>誠實性：</strong>當找不到答案時，要誠實告知而非猜測
+</div>
+</checklist>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">處理複雜查詢：多步驟檢索</h2>
+</div>
+
+<div class="prose">
+有些問題無法用單次檢索回答，需要<strong>多步驟推理</strong>。例如：「去年哪個產品線的成長率最高？」需要先找到所有產品線的資料，再進行比較。
+</div>
+
+<div class="code-block-header">多步驟 RAG Prompt</div>
+<div class="code-block">你是一個進階知識庫分析師，能處理需要多步驟推理的複雜問題。
+
+【問題處理流程】
+步驟 1：分解問題
+- 識別問題需要哪些資訊
+- 列出需要查找的關鍵主題
+
+步驟 2：檢索資訊
+- 在提供的文件中找到所有相關資訊
+- 標註每條資訊的來源
+
+步驟 3：整合分析
+- 整合來自不同文件的資訊
+- 進行必要的比較或計算
+- 得出結論
+
+步驟 4：提供答案
+- 清晰說明分析過程
+- 引用所有使用的來源
+- 如果資訊不完整，說明缺少什麼
+
+【範例】
+問題：「去年哪個產品線成長率最高？」
+
+分析步驟：
+1. 需要資訊：各產品線去年和前年的銷售數據
+2. 檢索：從 2025 年度報告和 2024 年度報告中提取數據
+3. 計算：每個產品線的成長率 = (2025-2024)/2024
+4. 比較：找出成長率最高的產品線
+5. 回答：引用數據來源和計算過程
+
+【使用者問題】
+[問題]
+
+【可用文件】
+[文件內容]</div>
+
+<div class="info-box">
+<div class="info-box-title">何時使用多步驟 RAG？</div>
+<div class="info-box-content">
+• 需要<strong>比較</strong>多個項目（「哪個最好？」「有什麼差異？」）<br>
+• 需要<strong>計算</strong>（「成長率」「平均值」「總計」）<br>
+• 需要<strong>整合</strong>多份文件的資訊<br>
+• 需要<strong>時間序列分析</strong>（「趨勢如何？」「變化是什麼？」）<br>
+• 需要<strong>因果推理</strong>（「為什麼會這樣？」「原因是什麼？」）
+</div>
+</info-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">引用來源的最佳實踐</h2>
+</div>
+
+<div class="prose">
+引用來源是 RAG 系統的核心價值之一。好的引用讓使用者能：<strong>驗證資訊、深入閱讀、建立信任。</strong>
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>最小引用單位：段落或章節</strong><br>
+不要只寫「根據文件 A」，要具體到段落：「根據《員工手冊》第 3 章第 2 段」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>多來源整合要全部引用</strong><br>
+如果答案來自 3 份文件，每份都要引用：「銷售數據來自《Q3 報告》，成本數據來自《財務摘要》，市場分析來自《競爭分析》」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>直接引用 vs 改寫說明</strong><br>
+關鍵數字和政策要直接引用原文，概念性內容可以改寫但要標註來源
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>提供文件連結（如果可能）</strong><br>
+除了文件名稱，還可以提供直接連結：「詳見：[員工手冊.pdf](/docs/handbook.pdf) 第 12 頁」
+</div>
+</div>
+</div>
+
+<div class="code-block-header">引用格式範例</div>
+<div class="code-block">【方案 A：簡潔引用】
+公司的遠距政策允許每週最多 3 天在家工作。[員工手冊 2026，第 12 章]
+
+【方案 B：詳細引用】
+根據《員工手冊 2026》第 12 章「遠距工作政策」第 2 段：
+「全職員工可申請每週最多 3 天的遠距工作，需提前一週向直屬主管提出申請。」
+
+【方案 C：多來源整合】
+公司對遠距工作有以下規定：
+- 申請流程：提前一週向主管申請 [員工手冊，第 12.2 段]
+- 設備支援：公司提供筆電和 VPN [IT 政策，第 5.1 段]
+- 考核標準：與辦公室工作相同 [績效管理，第 3.4 段]</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">處理資訊衝突與更新</h2>
+</div>
+
+<div class="prose">
+知識庫中可能有<strong>過時資訊</strong>或<strong>互相矛盾的資訊</strong>。你的 prompt 需要教 AI 如何處理這些情況。
+</div>
+
+<div class="code-block-header">處理資訊衝突 Prompt</div>
+<div class="code-block">【處理資訊衝突的原則】
+
+情況 1：同一主題有多個版本
+→ 優先使用最新日期的文件
+→ 明確告知使用者：「根據最新版本（2026 年 3 月）...舊版本（2025 年 6 月）的規定是...」
+
+情況 2：不同文件說法不一致
+→ 指出矛盾：「文件 A 說 X，但文件 B 說 Y」
+→ 如果能判斷哪個更權威，說明理由
+→ 如果無法判斷，建議使用者確認
+
+情況 3：資訊不完整
+→ 提供已知部分
+→ 明確指出缺少什麼資訊
+→ 建議可能的資訊來源
+
+【範例】
+問題：「年假有幾天？」
+文件 A（2025 年版）：「年假 10 天」
+文件 B（2026 年版）：「年假 12 天」
+
+回答：
+「根據最新的《員工手冊 2026 年版》，年假為 12 天。
+注意：這是 2026 年更新的政策，2025 年版規定為 10 天。」</div>
+
+<div class="warning-box">
+<div class="warning-title">⚠️ 常見陷阱：過度自信</div>
+<div class="warning-content">
+當 AI 找到相關資訊時，它可能會過度自信地回答，即使資訊不完整或有矛盾。<br><br>
+<strong>解決方法：</strong>在 prompt 中明確要求 AI 標註「確定性等級」<br><br>
+「如果資訊完整且明確 → 『確定：...』<br>
+如果資訊部分相關但不完全符合 → 『可能：...但需注意...』<br>
+如果資訊矛盾或不確定 → 『不確定：文件中有不同說法...』」
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">06</div>
+<h2 class="section-title">實戰場景：客服知識庫</h2>
+</div>
+
+<div class="prose">
+讓我們用一個完整案例展示如何設計客服場景的 RAG 系統。
+</div>
+
+<div class="code-block-header">客服知識庫 RAG Prompt</div>
+<div class="code-block">你是一位專業客服助理，使用公司知識庫回答客戶問題。
+
+【你的角色】
+- 友善、專業、有同理心
+- 基於知識庫提供準確資訊
+- 當無法完全解決問題時，提供升級路徑
+
+【回答流程】
+
+步驟 1：理解問題
+- 客戶真正想知道什麼？
+- 是技術問題、帳務問題、還是使用問題？
+
+步驟 2：檢索資訊
+- 在知識庫中找相關解決方案
+- 注意檢查常見問題 FAQ
+- 查看相關的疑難排解步驟
+
+步驟 3：提供答案
+格式：
+a) 同理客戶：「我理解您遇到 XX 問題一定很困擾」
+b) 提供解決方案：「根據我們的技術文件...」
+c) 引用來源：[文件名稱]
+d) 詢問是否解決：「這樣有幫助到您嗎？」
+
+步驟 4：無法解決時
+- 誠實告知：「這個問題超出我目前的知識範圍」
+- 提供替代方案：「建議您...」
+- 升級途徑：「我可以幫您轉接給專業技術團隊」
+
+【語氣】
+✓ 使用「您」而非「你」
+✓ 避免技術術語，用簡單語言解釋
+✓ 表達同理心
+✗ 不要說「我不知道」，而是「讓我查一下」或「需要專業團隊協助」
+
+【範例】
+
+客戶：「我的訂單一直顯示處理中，已經三天了！」
+
+好的回答：
+「我理解您等待訂單的心情。讓我幫您查看一下。
+
+根據我們的《訂單處理流程》，一般訂單處理時間為 1-2 個工作天。
+如果超過 3 天，可能的原因有：
+1. 商品缺貨需要調貨
+2. 付款狀態待確認
+3. 配送地址需要驗證
+
+建議您：
+1. 檢查您的 Email 是否有我們的通知信
+2. 到「我的訂單」查看詳細狀態
+3. 如果狀態未更新，我立即為您向物流部門查詢
+
+需要我現在幫您查詢嗎？」
+
+---
+
+【知識庫文件】
+[這裡放入檢索到的文件]
+
+【客戶問題】
+[客戶的問題]</div>
+
+<div class="highlight-box">
+<div class="highlight-title">客服 RAG 的關鍵差異</div>
+<div class="prose">
+客服場景的 RAG 和一般知識查詢不同：<br>
+• <strong>需要同理心：</strong>不只是提供資訊，還要安撫情緒<br>
+• <strong>需要行動指引：</strong>告訴客戶「下一步做什麼」<br>
+• <strong>需要升級機制：</strong>知道什麼時候轉人工處理<br>
+• <strong>語氣更親切：</strong>用「您」、避免術語、表達理解
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">07</div>
+<h2 class="section-title">RAG 的限制與應對</h2>
+</div>
+
+<div class="prose">
+RAG 很強大，但不是萬能的。了解它的限制，才能設計出更好的系統。
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>限制：檢索品質決定回答品質</strong><br>
+如果檢索系統沒找到相關文件，AI 就無法回答，即使答案就在知識庫裡。<br><br>
+<strong>應對：</strong>設計多種檢索策略（關鍵字、語意搜尋、同義詞擴展）
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>限制：無法處理需要推理的問題</strong><br>
+「根據過去三年趨勢，明年會如何？」— RAG 能提供歷史數據，但預測需要額外的推理。<br><br>
+<strong>應對：</strong>明確告訴 AI 可以基於數據做「分析」，但要標註「這是基於歷史數據的推測」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>限制：文件太多時容易遺漏</strong><br>
+如果檢索返回 20 份文件，AI 可能無法全部仔細閱讀。<br><br>
+<strong>應對：</strong>限制檢索結果數量（通常 3-5 份最佳），或要求 AI 先總結每份文件的相關性
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>限制：可能過度依賴單一來源</strong><br>
+如果第一份文件看起來相關，AI 可能忽略其他文件。<br><br>
+<strong>應對：</strong>明確要求「檢查所有提供的文件，不要只看第一份」
+</div>
+</div>
+</div>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Side Project</div>
+<h2 class="practice-title">建立個人知識庫助理</h2>
+
+<div class="practice-desc">
+<strong>第一步：選擇知識領域</strong><br>
+選擇一個你有大量文件的領域：工作專案文件、學習筆記、研究資料、個人知識庫等。<br><br>
+
+<strong>第二步：設計 RAG Prompt</strong><br>
+基於今天學到的框架，為你的知識庫設計專屬 prompt。包含：<br>
+• 角色定義（這個助理是什麼專家？）<br>
+• 回答原則（如何使用文件？）<br>
+• 引用格式（如何標註來源？）<br>
+• 找不到答案時怎麼辦<br><br>
+
+<strong>第三步：測試常見問題</strong><br>
+準備 10 個你常問的問題，測試 prompt 的效果。觀察：<br>
+1. AI 有正確引用來源嗎？<br>
+2. 回答是否準確？<br>
+3. 有沒有編造資訊？<br>
+4. 找不到答案時的處理是否恰當？<br><br>
+
+<strong>完成標準：</strong><br>
+當你的知識庫助理能準確回答 80% 的問題，並且每個答案都有清楚的來源引用時，就算成功。
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day8.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 08: 旅遊行程規劃師</span>
+</a>
+<a href="day10.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 10: 品牌文案生成系統</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>
