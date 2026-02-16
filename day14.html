@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 - 創意協作 Agent | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
+.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
+.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
+.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+.warning-box{background:var(--ink);color:var(--white);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.warning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent-light)}
+.warning-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8;opacity:.9}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 14 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 3</span>
+<span>65 分鐘</span>
+<span>Agent 設計</span>
+</div>
+<h1 class="lesson-title">創意協作<br>Agent 設計</h1>
+<p class="lesson-subtitle">
+創意工作不是孤軍奮戰，而是想法的碰撞與演化。創意協作 Agent 像一個永遠在線的共創夥伴：幫你發散思考、挑戰想法、組合概念、突破框架。今天學習如何設計能激發創意、引導腦力激盪、協助概念發展的 AI 協作者。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">什麼是創意協作 Agent？</h2>
+</div>
+
+<div class="prose">
+想像你在設計新產品，需要創意的夥伴一起腦力激盪。好的協作夥伴不只是同意你的想法，而是<strong>挑戰、擴展、重組你的思考</strong>。創意協作 Agent 就是這樣的存在。
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">被動執行型 AI</div>
+<div class="comparison-text">
+<strong>你：</strong>「幫我想一個 App 點子」<br>
+<strong>AI：</strong>「一個待辦事項 App，可以設定提醒和優先級。」<br><br>
+<em>問題：</em>只給一個平庸的點子，沒有探索你的真正需求，沒有挑戰思維。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">創意協作型 Agent</div>
+<div class="comparison-text">
+<strong>你：</strong>「幫我想一個 App 點子」<br>
+<strong>Agent：</strong>「先幫我理解：這個 App 是為了解決什麼問題？目標使用者是誰？你想要顛覆什麼現有體驗？<br><br>
+讓我們從你的痛點出發，而非從『App』出發。告訴我，你最近遇到什麼讓你覺得『應該有更好的解決方法』的事？」
+</div>
+</div>
+</comparison>
+
+<div class="quote-box">
+<div class="quote-text">
+"創意不是憑空產生，而是連結與重組已知的元素。"
+</div>
+<div class="quote-author">
+好的協作者幫你看見新的連結
+</div>
+</quote-box>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>發散思考（Divergent Thinking）</strong><br>
+擴展可能性，產生大量想法，不評判好壞
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>收斂整理（Convergent Thinking）</strong><br>
+從眾多想法中篩選、組合、精煉出最佳方案
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>概念演化（Concept Evolution）</strong><br>
+不斷迭代改進想法，從粗糙到精緻
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>框架突破（Frame Breaking）</strong><br>
+挑戰既有假設，用新角度看問題
+</div>
+</div>
+</div>
+
+<div class="highlight-box">
+<div class="highlight-title">核心洞察</div>
+<div class="prose">
+<strong>創意協作 Agent 的價值不在於「想出好點子」，而在於「幫你想得更多、更深、更廣」。</strong>它是思考的催化劑，不是答案的提供者。
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">創意協作的四種模式</h2>
+</div>
+
+<div class="prose">
+根據創意任務的不同階段和需求，Agent 可以扮演四種不同角色：
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>探索者（Explorer）</strong><br>
+幫助發散思考，探索各種可能性<br><br>
+<strong>何時使用：</strong>剛開始思考、需要靈感、想突破框架<br>
+<strong>特點：</strong>問「如果...會怎樣？」「還有什麼可能？」「換個角度呢？」<br>
+<strong>範例：</strong>「如果這個產品不是 App 而是實體物品，會是什麼？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>挑戰者（Challenger）</strong><br>
+質疑假設，挑戰既有想法，找出盲點<br><br>
+<strong>何時使用：</strong>想法太保守、陷入慣性思維、需要突破<br>
+<strong>特點：</strong>問「為什麼一定要這樣？」「這個假設成立嗎？」「反過來會怎樣？」<br>
+<strong>範例：</strong>「你說要『簡單易用』，但如果複雜度本身就是價值呢？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>組合者（Synthesizer）</strong><br>
+連結不同想法，找出新組合，創造混搭<br><br>
+<strong>何時使用：</strong>有很多零散想法、需要整合、尋找新組合<br>
+<strong>特點：</strong>「X + Y 會產生什麼？」「這兩個想法的共同點是什麼？」<br>
+<strong>範例：</strong>「你提到社交和遊戲，如果結合成『社交遊戲化』呢？」
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>精煉者（Refiner）</strong><br>
+優化想法，增加細節，讓概念更具體可行<br><br>
+<strong>何時使用：</strong>有初步想法、需要深化、準備執行<br>
+<strong>特點：</strong>問「具體來說如何實現？」「細節是什麼？」「潛在問題？」<br>
+<strong>範例：</strong>「這個想法不錯，讓我們定義：目標用戶是誰？核心功能是什麼？」
+</div>
+</div>
+</div>
+
+<div class="code-block-header">四種模式切換 Prompt</div>
+<div class="code-block">你是一個創意協作 Agent，可以在四種模式間切換：
+
+【模式 1：探索者】
+角色：好奇、開放、不設限
+任務：幫助發散思考，擴展可能性
+方法：
+- 問「如果...會怎樣？」類型的問題
+- 引入看似無關的領域或概念
+- 鼓勵天馬行空，不評判
+範例提問：
+「如果預算無限，你會做什麼？」
+「如果這個產品是給外星人用，會長什麼樣？」
+「歷史上有類似的創新嗎？能借鑒什麼？」
+
+【模式 2：挑戰者】
+角色：批判、質疑、挑釁
+任務：挑戰假設，打破框架
+方法：
+- 質疑「為什麼」和「一定要嗎」
+- 提出相反觀點
+- 指出矛盾和盲點
+範例提問：
+「為什麼要做這個？真的有人需要嗎？」
+「你說要快速，但慢下來會不會更好？」
+「這個想法和你的價值觀一致嗎？」
+
+【模式 3：組合者】
+角色：連結者、整合者
+任務：找出新組合和連結
+方法：
+- 連接不同領域的概念
+- 尋找共同模式
+- 創造混搭和融合
+範例提問：
+「你提到 A 和 B，兩者結合會產生什麼？」
+「這個想法和另一個領域的 X 很像，能借用嗎？」
+「如果把這三個點子的優點組合起來？」
+
+【模式 4：精煉者】
+角色：務實、細節導向
+任務：讓想法更具體可行
+方法：
+- 要求定義和澄清
+- 深入細節和執行
+- 評估可行性
+範例提問：
+「具體來說，第一步是什麼？」
+「這個想法的核心價值主張是什麼？」
+「實現這個需要什麼資源和時間？」
+
+【如何切換模式】
+根據使用者的需求和創意階段自動切換：
+- 剛開始 → 探索者
+- 想法太保守 → 挑戰者
+- 有多個零散想法 → 組合者
+- 準備執行 → 精煉者
+
+或者讓使用者明確要求：「用挑戰者模式」「現在幫我整合想法」</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">腦力激盪技法庫</h2>
+</div>
+
+<div class="prose">
+創意協作 Agent 應該掌握多種腦力激盪技法，根據情況選用：
+</div>
+
+<div class="code-block-header">SCAMPER 技法</div>
+<div class="code-block">【SCAMPER 創意激發法】
+
+這是一個系統化的創意工具，用 7 個問題激發新想法：
+
+S - Substitute（替代）
+「可以用什麼替代？」
+- 替代材料、人員、流程、地點
+範例：「如果不用 App，用實體卡片呢？」
+
+C - Combine（結合）
+「可以結合什麼？」
+- 合併功能、概念、目的
+範例：「咖啡館 + 共享辦公室 = ？」
+
+A - Adapt（調整）
+「可以從哪裡借鑒？」
+- 其他產業、歷史、自然界
+範例：「遊戲的成就系統能用在學習 App 嗎？」
+
+M - Modify（修改）
+「可以改變什麼？」
+- 放大、縮小、改變外觀、屬性
+範例：「如果這個服務縮小 10 倍會怎樣？」
+
+P - Put to other uses（挪用）
+「可以用在其他地方嗎？」
+- 不同用戶、不同情境、不同目的
+範例：「這個給小孩的產品，大人會用嗎？」
+
+E - Eliminate（刪除）
+「可以移除什麼？」
+- 簡化、刪除非必要
+範例：「如果只能有 3 個功能，留哪些？」
+
+R - Reverse（反轉）
+「可以反過來嗎？」
+- 顛倒順序、角色、因果
+範例：「如果不是我們服務客戶，而是客戶服務我們？」
+
+【使用方式】
+針對一個產品/服務/想法，逐一用 7 個問題激發：
+
+產品：線上課程平台
+S - 替代：不用影片，用互動遊戲教學？
+C - 結合：課程 + 社交 + 認證？
+A - 調整：從 Netflix 的推薦系統學什麼？
+M - 修改：如果課程只有 5 分鐘會怎樣？
+P - 挪用：把這個系統用在企業訓練？
+E - 刪除：移除所有影片，只留討論區？
+R - 反轉：學生教學生，而非老師教？</code-block>
+
+<div class="code-block-header">隨機刺激法</div>
+<div class="code-block">【隨機刺激法（Random Stimulation）】
+
+用看似無關的元素激發新連結
+
+方法：
+1. 隨機選一個詞（可以從字典、新聞、身邊物品）
+2. 強制連結這個詞和你的問題
+3. 看能產生什麼新想法
+
+範例：
+問題：如何改進外送服務？
+隨機詞：「圖書館」
+
+連結：
+- 圖書館有什麼特點？安靜、有秩序、借還系統
+- 外送 + 圖書館 = ？
+  → 「借用」餐盒而非丟棄（環保）
+  → 「安靜外送」服務（深夜不吵醒室友）
+  → 「預約取餐」像借書一樣（減少等待）
+
+【Agent 實作】
+從以下清單隨機選 3 個詞，幫使用者建立連結：
+
+自然界：樹、水、風、石頭、螞蟻、候鳥
+人造物：橋、鐘、鏡子、樂器、遊戲、地圖
+抽象概念：時間、記憶、平衡、節奏、層次
+情感：驚喜、安全感、懷舊、期待、歸屬</code-block>
+
+<div class="code-block-header">六頂思考帽</div>
+<div class="code-block">【六頂思考帽（Six Thinking Hats）】
+
+從六個不同角度系統化思考
+
+白帽（事實）：「我們知道什麼？缺少什麼資訊？」
+紅帽（情感）：「我的直覺感受是什麼？」
+黑帽（風險）：「可能出什麼問題？」
+黃帽（樂觀）：「最好的情況是什麼？有什麼機會？」
+綠帽（創意）：「有什麼新想法？其他可能性？」
+藍帽（組織）：「我們現在在哪個階段？下一步？」
+
+【使用方式】
+引導使用者輪流戴上不同帽子：
+
+「戴上白帽：我們確定知道什麼？」
+「戴上綠帽：不限制，有什麼瘋狂想法？」
+「戴上黑帽：潑冷水，這個方案有什麼問題？」
+
+這樣可以避免思考盲點，全方位評估想法。</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">完整案例：產品創意協作</h2>
+</div>
+
+<div class="prose">
+讓我們看一個完整的創意協作流程：設計一個新的健康 App。
+</div>
+
+<div class="code-block-header">創意協作完整對話</div>
+<div class="code-block">【場景】使用者想設計一個健康相關的 App
+
+━━━ 探索階段（探索者模式）━━━
+
+使用者：「我想做一個健康 App」
+
+Agent：「很好的方向！在我們發散思考之前，讓我先理解你的出發點：
+
+1. 是什麼讓你想做健康 App？個人經驗？看到市場機會？
+2. 『健康』對你來說包含什麼？運動、飲食、睡眠、心理？
+3. 你想解決什麼具體問題？
+
+先不用想 App 的樣子，告訴我：你或你認識的人，在健康方面遇到最大的困擾是什麼？」
+
+使用者：「我發現大家都知道要運動，但就是懶得動」
+
+Agent：「抓到重點了！『知道但做不到』是行為改變的核心挑戰。
+
+讓我們發散思考：為什麼人們懶得動？
+- 太累？
+- 太無聊？
+- 沒時間？
+- 沒有即時回饋？
+- 獨自一人沒動力？
+
+如果我們不只是『提醒運動』，而是從根本解決『懶』的問題，
+有什麼可能性？
+
+【瘋狂想法時間】不要限制自己，想像：
+1. 如果運動像遊戲一樣好玩？
+2. 如果不運動會有『懲罰』？
+3. 如果運動是社交活動？
+4. 如果把運動變成不知不覺的日常？
+5. 如果用 AI 陪你運動？
+
+哪個方向吸引你？或者你有其他想法？」
+
+━━━ 挑戰階段（挑戰者模式）━━━
+
+使用者：「我想做運動遊戲化，像打怪升級」
+
+Agent（切換到挑戰者模式）：
+「遊戲化是個熱門方向。但讓我挑戰一下這個想法：
+
+問題 1：遊戲化不是新東西了
+市面上已經有很多『運動遊戲化』App（Pokemon GO、Zombies Run等）
+你的差異點是什麼？為什麼使用者要選你？
+
+問題 2：遊戲化真的有效嗎？
+很多人一開始覺得有趣，但 2 週後就膩了
+如何確保長期參與，而不只是新鮮感？
+
+問題 3：你確定『遊戲化』適合所有人嗎？
+有些人就是討厭遊戲元素（成就、積分、排行榜）
+如果你的目標是『大家』，這個方向會不會太窄？
+
+問題 4：『懶』真的是問題嗎？
+會不會其實問題不是懶，而是：
+- 不知道做什麼運動（困惑）
+- 害怕做錯或受傷（恐懼）
+- 覺得自己不是『運動的人』（身份認同）
+
+如果根本問題不是『懶』，遊戲化能解決嗎？」
+
+使用者：「嗯...你說的有道理。可能問題更深層」
+
+━━━ 重新探索（探索者模式）━━━
+
+Agent：「很好！你願意重新思考。讓我們換個角度：
+
+不要從『App』出發，從『人』出發：
+
+想像一個 35 歲上班族，叫小美：
+- 知道要運動，但下班很累
+- 試過健身房，辦了卡但沒去
+- 試過跑步，跑兩次就放棄
+- 看到朋友 po 健身照，既羨慕又焦慮
+
+如果你是小美最好的朋友，你會怎麼幫她？
+不是『給她一個 App』，而是『陪她建立運動習慣』。
+
+你會怎麼做？」
+
+使用者：「我會...找她一起運動？讓她不孤單？」
+
+Agent：「對！這就是洞察。問題不是『缺少工具』，是『缺少支持』。
+
+現在讓我們組合想法（切換到組合者模式）：
+
+你提到的元素：
+1. 遊戲化（有趣）
+2. 社交（不孤單）
+3. 陪伴（支持）
+
+如果組合起來：
+→ 不是『運動遊戲』，而是『運動陪伴社群』
+→ 重點不是積分，而是『有人一起』
+
+延伸想法：
+- 配對『運動夥伴』（像交友 App）
+- 虛擬教練每天陪你（AI 語音鼓勵）
+- 小組挑戰（3-5 人互相支持）
+- 紀錄不是給自己看，而是給夥伴看
+
+覺得哪個方向有潛力？」
+
+━━━ 精煉階段（精煉者模式）━━━
+
+使用者：「配對運動夥伴感覺不錯！」
+
+Agent（切換到精煉者模式）：
+「很好！讓我們把這個想法具體化：
+
+【核心概念】
+配對運動夥伴 App，解決『一個人運動沒動力』的問題
+
+【需要定義的細節】
+
+1. 配對機制
+   - 根據什麼配對？（地點、時間、運動類型、程度）
+   - 見面運動 vs 線上互相督促？
+   - 如何確保安全？
+
+2. 目標用戶
+   - 誰最需要這個？（年齡、性別、生活型態）
+   - 為什麼現有朋友不能當運動夥伴？
+
+3. 核心功能（MVP）
+   - 最少要有什麼功能才能運作？
+   - 什麼可以之後再加？
+
+4. 商業模式
+   - 免費 vs 付費？
+   - 如何獲利？
+
+5. 差異化
+   - 和『運動社群』『找球友 App』有什麼不同？
+
+我們一個一個釐清。先從目標用戶開始：
+誰最需要『運動夥伴』？」</code-block>
+
+<div class="highlight-box">
+<div class="highlight-title">這個案例展示了什麼？</div>
+<div class="prose">
+• <strong>模式切換：</strong>從探索 → 挑戰 → 重新探索 → 組合 → 精煉<br>
+• <strong>深度提問：</strong>不直接給答案，引導思考<br>
+• <strong>挑戰假設：</strong>質疑「遊戲化」和「懶」的假設<br>
+• <strong>人性洞察：</strong>從工具思維轉向人的需求<br>
+• <strong>概念演化：</strong>從「健康 App」→「運動遊戲化」→「運動陪伴社群」
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">創意評估框架</h2>
+</div>
+
+<div class="prose">
+產生想法後，需要評估哪些值得深入。創意協作 Agent 可以用多種框架協助評估：
+</div>
+
+<div class="code-block-header">RICE 評分法（適合產品功能）</div>
+<div class="code-block">【RICE 評分法】
+
+評估想法的優先級，計算 RICE 分數
+
+R - Reach（影響範圍）
+「會影響多少人？」
+評分：估計每月/每季受影響的用戶數
+
+I - Impact（影響程度）
+「對每個人的影響有多大？」
+評分：3（巨大）/ 2（高）/ 1（中）/ 0.5（低）/ 0.25（極小）
+
+C - Confidence（信心度）
+「我們有多確定這個評估？」
+評分：100%（高）/ 80%（中）/ 50%（低）
+
+E - Effort（投入成本）
+「需要多少人月/人週？」
+評分：團隊成員總工時
+
+RICE 分數 = (R × I × C) / E
+
+分數越高，優先級越高
+
+【範例】
+想法：增加社交分享功能
+R = 1000（預估每月 1000 人使用）
+I = 2（高影響）
+C = 80%（中等信心）
+E = 4（需要 4 人週）
+
+RICE = (1000 × 2 × 0.8) / 4 = 400
+
+想法：改進搜尋演算法
+R = 5000（所有使用搜尋的用戶）
+I = 3（巨大影響）
+C = 50%（低信心，不確定效果）
+E = 8（需要 8 人週）
+
+RICE = (5000 × 3 × 0.5) / 8 = 937.5
+
+→ 搜尋演算法優先級更高</code-block>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Side Project</div>
+<h2 class="practice-title">建立你的創意協作 Agent</h2>
+
+<div class="practice-desc">
+<strong>第一步：選擇創意領域（15 分鐘）</strong><br>
+選擇一個你需要創意協作的領域：<br>
+• 產品創新<br>
+• 內容創作（寫作、影片、播客）<br>
+• 商業策略<br>
+• 學習課程設計<br>
+• 個人專案<br><br>
+
+<strong>第二步：設計四種模式（60 分鐘）</strong><br>
+為你的領域設計四種協作模式：<br>
+1. 探索者：如何發散思考？用什麼問題？<br>
+2. 挑戰者：該領域常見的假設是什麼？如何挑戰？<br>
+3. 組合者：該領域可以跨界結合什麼？<br>
+4. 精煉者：從想法到執行需要定義什麼？<br><br>
+
+<strong>第三步：建立技法庫（30 分鐘）</strong><br>
+整理 3-5 個適合該領域的創意技法：<br>
+• SCAMPER<br>
+• 隨機刺激<br>
+• 六頂思考帽<br>
+• 類比法<br>
+• 限制激發法<br><br>
+
+<strong>第四步：撰寫完整 Prompt（30 分鐘）</strong><br>
+整合成完整的創意協作 Agent prompt，包含：<br>
+• 角色定義<br>
+• 四種模式<br>
+• 技法庫<br>
+• 模式切換邏輯<br>
+• 互動範例<br><br>
+
+<strong>第五步：實戰測試（25 分鐘）</strong><br>
+用一個真實創意挑戰測試 Agent：<br>
+1. 從探索開始<br>
+2. 讓 Agent 挑戰你的想法<br>
+3. 組合新概念<br>
+4. 精煉成可執行方案<br>
+5. 評估整個過程的價值<br><br>
+
+<strong>完成標準：</strong><br>
+當 Agent 能幫你想出「自己想不到的點子」、挑戰你「未經檢驗的假設」、組合出「新的可能性」時，就算成功。
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day13.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 13: 決策輔助 Agent</span>
+</a>
+<a href="day15.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 15: 學習教練 Agent</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>
