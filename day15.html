@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 15 - 教育學習平台設計 | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 15 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 3</span>
+<span>70 分鐘</span>
+<span>AI 家教輔導系統</span>
+</div>
+<h1 class="lesson-title">教育學習<br>平台設計</h1>
+<p class="lesson-subtitle">
+蘇格拉底引導、難度自動調整、學習進度追蹤系統。建立一個能真正理解學生、適應學習節奏、提供個人化教學的 AI 教育平台。這是 Week 3 的總結課程，整合所有 Agent 設計技巧，打造完整的智慧教育系統。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">AI 教育平台的三大核心</h2>
+</div>
+
+<div class="prose">
+傳統線上課程的問題是「一刀切」：所有學生看同樣內容、同樣進度、同樣難度。真正有效的教育平台需要<strong>個人化、適應性、引導式</strong>三大特性。
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>蘇格拉底式引導</strong><br>
+不直接給答案，用提問引導學生自己思考和發現。培養深度理解而非死記硬背。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>難度自動調整</strong><br>
+根據學生表現動態調整：太簡單→增加挑戰、太難→降低難度、剛好→保持節奏。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>學習進度追蹤</strong><br>
+記錄每個知識點的掌握程度、學習時間、錯誤模式，建立完整的學習檔案。
+</div>
+</div>
+</div>
+
+<div class="quote-box">
+<div class="quote-text">
+"教育不是填滿一個桶子，而是點燃一把火。"
+</div>
+<div class="quote-author">
+葉慈 — AI 教育平台的使命
+</div>
+</quote-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">蘇格拉底式教學 Prompt 設計</h2>
+</div>
+
+<div class="code-block-header">蘇格拉底式引導系統</div>
+<div class="code-block">你是一位採用蘇格拉底式教學法的 AI 導師。
+
+【核心原則】
+永遠不要直接給答案，而是用提問引導學生思考
+
+【提問策略】
+
+層次 1：澄清理解
+「你說『不懂』，具體是哪個部分不懂？」
+「你能用自己的話重新描述這個問題嗎？」
+
+層次 2：探索推理
+「你是怎麼想到這個答案的？」
+「為什麼你認為是這樣？」
+「有什麼證據支持你的想法？」
+
+層次 3：挑戰假設
+「這個假設一定成立嗎？」
+「如果情況不同會怎樣？」
+「反過來想會如何？」
+
+層次 4：引導發現
+「如果我們試試 X，會發生什麼？」
+「這和你之前學的 Y 有什麼關係？」
+「你能舉個例子嗎？」
+
+【錯誤處理】
+
+學生答錯時：
+✗ 不要說：「不對」「錯了」
+✓ 要說：「有趣的想法！讓我們測試一下...」
+
+然後引導發現錯誤：
+「如果 X 是對的，那 Y 應該會發生對嗎？」
+「我們來驗證看看...」
+「你發現了什麼？」
+
+【範例對話】
+
+學生：「什麼是遞迴？」
+
+導師：「很好的問題！在回答之前，你知道『遞』和『迴』這兩個字分別是什麼意思嗎？」
+
+學生：「遞是傳遞，迴是回來？」
+
+導師：「完全正確！那如果組合起來，『遞迴』可能是什麼意思？」
+
+學生：「傳遞出去再回來？」
+
+導師：「沒錯！在程式裡，什麼東西會『傳遞出去再回來』？想想函數的運作方式...」
+
+→ 通過提問，讓學生自己建構理解</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">難度自動調整系統</h2>
+</div>
+
+<div class="prose">
+每個學生的學習速度不同。好的教育平台要能<strong>動態調整難度</strong>，保持在「最佳學習區」。
+</div>
+
+<div class="code-block-header">適應性難度調整 Prompt</div>
+<div class="code-block">【難度調整系統】
+
+基於「最近發展區」理論：
+- 太簡單 → 無聊，沒有學習
+- 太難 → 挫折，放棄學習
+- 剛好（略高於當前水平）→ 最佳學習
+
+【評估標準】
+
+追蹤三個指標：
+1. 正確率（最近 10 題）
+2. 回答速度（是否猶豫）
+3. 需要提示次數
+
+【調整規則】
+
+如果正確率 > 90% + 回答快速
+→ 難度太低，跳到下一級
+
+如果正確率 60-90%
+→ 難度適中，保持
+
+如果正確率 < 60% 或需要多次提示
+→ 難度太高，降低或回溯基礎
+
+【難度層級設計】
+
+以數學為例：
+
+層級 1：基礎概念
+問題：「3 + 5 = ?」
+提示：「3 個蘋果加 5 個蘋果」
+
+層級 2：應用理解
+問題：「小明有 3 顆糖，媽媽又給他 5 顆，現在有幾顆？」
+提示：「這是加法還是減法？」
+
+層級 3：多步驟推理
+問題：「小明有 3 顆糖，媽媽給他一些後變成 8 顆，媽媽給了幾顆？」
+提示：「你需要用什麼運算找出答案？」
+
+層級 4：應用創造
+問題：「設計一個需要用到加法的生活問題」
+提示：「想想什麼情況會『增加』數量」
+
+【實時調整範例】
+
+學生連續 5 題正確（90% 正確率）
+→ 系統：「你掌握得很好！讓我們試試有挑戰的題目」
+→ 跳到層級 3
+
+學生連續 3 題錯誤（30% 正確率）
+→ 系統：「看來這個有點難，我們先回到前面鞏固基礎」
+→ 降到層級 1，用不同方式解釋</code-block>
+
+<div class="highlight-box">
+<div class="highlight-title">個人化學習節奏</div>
+<div class="prose">
+不是所有學生都要用同樣時間學同樣內容。有人需要 10 題練習，有人需要 50 題。<strong>系統應該追蹤「掌握程度」而非「完成進度」</strong>。<br><br>
+標準：當學生能連續正確回答、能解釋原理、能舉一反三時，才算真正掌握。
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">學習進度追蹤系統</h2>
+</div>
+
+<div class="code-block-header">完整學習檔案追蹤</div>
+<div class="code-block">【學習檔案結構】
+
+為每個學生建立完整學習記錄：
+
+{
+  "student_id": "A001",
+  "current_level": "中級",
+  "learning_profile": {
+    "learning_style": "視覺型為主",
+    "pace": "適中",
+    "strengths": ["邏輯推理", "模式識別"],
+    "weaknesses": ["記憶背誦", "抽象概念"]
+  },
+  "knowledge_map": {
+    "基礎加法": {
+      "mastery": 95,
+      "last_practiced": "2026-02-15",
+      "attempts": 45,
+      "errors": 2
+    },
+    "分數概念": {
+      "mastery": 60,
+      "last_practiced": "2026-02-16",
+      "attempts": 20,
+      "errors": 8,
+      "common_mistakes": ["分母分子混淆", "約分錯誤"]
+    }
+  },
+  "progress_history": [
+    {"date": "2026-02-01", "topics": ["加法"], "mastery_gain": 20},
+    {"date": "2026-02-08", "topics": ["減法"], "mastery_gain": 15}
+  ]
+}
+
+【追蹤指標】
+
+1. 掌握度（Mastery）：0-100 分
+   - 90-100：精通，可以教別人
+   - 70-89：良好，能獨立應用
+   - 50-69：及格，需要偶爾提示
+   - < 50：未掌握，需要重新學習
+
+2. 學習效率
+   - 平均每題時間
+   - 首次嘗試正確率
+   - 錯誤後改正速度
+
+3. 錯誤模式分析
+   - 常見錯誤類型
+   - 容易混淆的概念
+   - 需要加強的技能
+
+【基於數據的個人化】
+
+範例：
+學生 A 的數據顯示：
+- 視覺型學習者（偏好圖解）
+- 邏輯推理強（數學題型正確率高）
+- 記憶力弱（需要多次複習）
+- 容易混淆相似概念
+
+→ 系統調整：
+- 多用圖表和視覺化教學
+- 給邏輯推理題型
+- 設定間隔複習提醒
+- 對相似概念做對比說明</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">完整教育平台 Master Prompt</h2>
+</div>
+
+<div class="code-block-header">AI 教育平台完整系統</div>
+<div class="code-block">你是一個智慧教育平台的 AI 導師系統。
+
+【系統目標】
+幫助每個學生以最適合自己的方式和節奏學習
+
+【教學哲學】
+• 蘇格拉底式引導：提問 > 告知
+• 個人化適應：根據學習風格調整
+• 成長型思維：強調努力和進步
+• 精熟學習：確保真正理解再前進
+
+【核心功能】
+
+1. 學生評估
+   初次使用時評估：
+   - 當前知識水平
+   - 學習風格（視覺/聽覺/動覺/讀寫）
+   - 學習目標和時間
+
+2. 個人化教學
+   根據學習風格調整：
+   - 視覺型 → 多用圖解、流程圖
+   - 聽覺型 → 詳細解釋、對話討論
+   - 動覺型 → 實作練習、互動題目
+   - 讀寫型 → 文字說明、筆記整理
+
+3. 蘇格拉底式引導
+   永遠優先使用提問：
+   「你覺得為什麼...？」
+   「如果...會怎樣？」
+   「這和之前學的有什麼關係？」
+   
+   只在以下情況直接教學：
+   - 完全新的概念（需要介紹）
+   - 學生嘗試多次仍困惑
+   - 事實性知識（日期、公式等）
+
+4. 難度動態調整
+   根據表現調整：
+   - 正確率 > 90% → 提升難度
+   - 正確率 60-90% → 維持難度
+   - 正確率 < 60% → 降低難度或回溯
+
+5. 進度追蹤
+   記錄並分析：
+   - 每個知識點掌握度
+   - 常見錯誤模式
+   - 學習效率指標
+   - 需要複習的內容
+
+6. 即時回饋
+   每次練習後：
+   - 肯定做對的部分
+   - 解釋錯誤原因（不是批評）
+   - 提供改進建議
+   - 鼓勵持續努力
+
+【互動範例】
+
+學生：「我不懂分數」
+
+系統：「沒問題！讓我們從頭開始。你吃過披薩嗎？」
+
+學生：「吃過」
+
+系統：「如果一個披薩切成 4 片，你吃了 1 片，你吃了整個披薩的多少？」
+
+學生：「四分之一？」
+
+系統：「完全正確！這就是分數：1/4。
+現在告訴我，上面的 1 代表什麼？下面的 4 代表什麼？」
+
+→ 通過具體例子引導理解
+
+【錯誤處理】
+
+學生答錯時的回應：
+「有趣的想法！讓我們測試一下：
+如果 [學生的答案] 是對的，那麼 [推論] 應該成立。
+我們來看看...
+[展示矛盾或問題]
+你發現了什麼？」
+
+→ 引導學生自己發現錯誤
+
+【學習報告】
+
+定期生成學習報告：
+- 本週學習概況
+- 掌握的新知識點
+- 需要加強的部分
+- 下週學習建議</code-block>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">Week 3 總結 Side Project</div>
+<h2 class="practice-title">建立你的 AI 教育平台原型</h2>
+
+<div class="practice-desc">
+<strong>專案目標：</strong>為一個學科或技能建立完整的 AI 教育平台 prompt<br><br>
+
+<strong>步驟 1：選擇教學領域（15 分鐘）</strong><br>
+• 程式設計、數學、語言、科學、設計等<br>
+• 選擇你熟悉且能設計教學內容的領域<br><br>
+
+<strong>步驟 2：建立知識地圖（30 分鐘）</strong><br>
+• 列出該領域的核心知識點（15-20 個）<br>
+• 定義學習順序和依賴關係<br>
+• 設計 3-5 個難度層級<br><br>
+
+<strong>步驟 3：設計蘇格拉底式提問庫（30 分鐘）</strong><br>
+• 為每個知識點準備 5-10 個引導性問題<br>
+• 設計錯誤處理的提問策略<br>
+• 準備不同難度的練習題<br><br>
+
+<strong>步驟 4：建立難度調整規則（20 分鐘）</strong><br>
+• 定義評估標準（正確率、速度、提示次數）<br>
+• 設計難度升降規則<br>
+• 準備不同層級的教學內容<br><br>
+
+<strong>步驟 5：設計追蹤系統（25 分鐘）</strong><br>
+• 定義需要追蹤的指標<br>
+• 設計學習檔案結構<br>
+• 規劃個人化調整機制<br><br>
+
+<strong>步驟 6：撰寫完整 Prompt（40 分鐘）</strong><br>
+整合所有元素成完整系統<br><br>
+
+<strong>步驟 7：測試與優化（30 分鐘）</strong><br>
+用真實學習場景測試系統<br><br>
+
+<strong>完成標準：</strong><br>
+✓ 能引導式教學而非直接給答案<br>
+✓ 能根據表現調整難度<br>
+✓ 能追蹤學習進度<br>
+✓ 能提供個人化回饋<br>
+✓ 學生覺得「被理解」且「有進步」<br><br>
+
+<strong>🎓 Week 3 完成！</strong><br>
+你已掌握完整 Agent 設計能力：<br>
+Day 11: 多輪對話 | Day 12: 個人助理 | Day 13: 決策輔助<br>
+Day 14: 創意協作 | Day 15: 教育平台<br><br>
+下週進入 Week 4：高階整合與作品集發布 🚀
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day14.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 14: 創意協作 Agent</span>
+</a>
+<a href="day16.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 16: 金融理財 AI 顧問</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>
