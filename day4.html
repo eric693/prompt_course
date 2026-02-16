@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 04 - Chain-of-Thought 推理鏈 | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #f5f2ed;
+    --cream: #e8e3da;
+    --ink: #1a1814;
+    --warm-mid: #8b7355;
+    --accent: #c9431f;
+    --accent-light: #e8a882;
+    --text-dim: #6b6358;
+  }
+
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+  
+  html { 
+    scroll-behavior: smooth; 
+  }
+  
+  body { 
+    background: var(--white); 
+    color: var(--ink); 
+    font-family: 'IBM Plex Mono', monospace; 
+    line-height: 1.6; 
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid var(--ink);
+    padding: 16px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    z-index: 100;
+  }
+
+  .back-link {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { 
+    color: var(--accent); 
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .day-badge {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 80px 48px;
+    border-bottom: 2px solid var(--ink);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .lesson-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .lesson-meta span::before {
+    content: '//';
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  .lesson-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .lesson-subtitle {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 800px;
+  }
+
+  /* Content */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+
+  .section {
+    margin-bottom: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .prose {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.9;
+    margin-bottom: 24px;
+  }
+
+  .prose strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .prose em {
+    font-style: italic;
+    color: var(--warm-mid);
+  }
+
+  /* Code Block */
+  .code-block {
+    background: var(--ink);
+    color: var(--accent-light);
+    padding: 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .code-block-header {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  /* Comparison Grid */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin: 32px 0;
+  }
+
+  .comparison-item {
+    border: 2px solid var(--ink);
+    padding: 24px;
+  }
+
+  .comparison-item.bad {
+    border-color: var(--text-dim);
+    opacity: 0.7;
+  }
+
+  .comparison-item.good {
+    border-color: var(--accent);
+  }
+
+  .comparison-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .comparison-item.bad .comparison-label {
+    color: var(--text-dim);
+  }
+
+  .comparison-item.good .comparison-label {
+    color: var(--accent);
+  }
+
+  .comparison-text {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* Highlight Box */
+  .highlight-box {
+    background: var(--cream);
+    padding: 32px;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .highlight-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  /* Step List */
+  .step-list {
+    margin: 32px 0;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .step-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 48px;
+    line-height: 1;
+  }
+
+  .step-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .step-content strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  /* Thinking Process Box */
+  .thinking-box {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .thinking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--cream);
+  }
+
+  .thinking-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .thinking-tag {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--cream);
+    padding: 6px 14px;
+  }
+
+  .thinking-step {
+    margin-bottom: 20px;
+  }
+
+  .thinking-step-label {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    margin-bottom: 8px;
+  }
+
+  .thinking-step-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.8;
+    padding-left: 20px;
+    border-left: 3px solid var(--cream);
+  }
+
+  /* Visual Flow */
+  .flow-diagram {
+    background: var(--cream);
+    padding: 40px;
+    margin: 32px 0;
+    text-align: center;
+  }
+
+  .flow-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .flow-item {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 20px 24px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 140px;
+  }
+
+  .flow-arrow {
+    font-size: 24px;
+    color: var(--accent);
+  }
+
+  /* Example Grid */
+  .example-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin: 32px 0;
+  }
+
+  .example-card {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 28px;
+  }
+
+  .example-header {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .example-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .example-response {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.8;
+    background: var(--cream);
+    padding: 20px;
+    border-left: 3px solid var(--accent);
+  }
+
+  /* Checklist */
+  .checklist {
+    background: var(--cream);
+    padding: 28px;
+    margin: 32px 0;
+  }
+
+  .checklist-item {
+    display: flex;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 14px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .checklist-item::before {
+    content: '✓';
+    color: var(--accent);
+    font-weight: 900;
+    font-size: 18px;
+  }
+
+  /* Practice Box */
+  .practice-box {
+    background: var(--ink);
+    color: var(--white);
+    padding: 48px;
+    margin: 64px 0;
+  }
+
+  .practice-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+  }
+
+  .practice-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+
+  .practice-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.8;
+    opacity: 0.9;
+    margin-bottom: 20px;
+  }
+
+  /* Technique Card */
+  .technique-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 32px 0;
+  }
+
+  .technique-card {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 28px;
+  }
+
+  .technique-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .technique-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .technique-use {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+  }
+
+  /* Navigation */
+  .lesson-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 48px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+
+  .nav-link:hover {
+    color: var(--accent);
+  }
+
+  .nav-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--white);
+    padding: 32px 48px;
+    text-align: center;
+  }
+
+  .footer-text {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+  }
+
+  /* Info Box */
+  .info-box {
+    background: var(--white);
+    border: 2px solid var(--accent);
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .info-box-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .info-box-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  /* Quote Box */
+  .quote-box {
+    background: var(--cream);
+    padding: 40px;
+    margin: 40px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .quote-author {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* Research Box */
+  .research-box {
+    background: var(--ink);
+    color: var(--white);
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .research-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 12px;
+  }
+
+  .research-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .research-content {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.8;
+    opacity: 0.9;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header { 
+      padding: 16px 24px; 
+      flex-direction: column; 
+      gap: 8px; 
+    }
+    
+    .hero { 
+      padding: 48px 24px; 
+    }
+    
+    .content { 
+      padding: 32px 24px; 
+    }
+    
+    .comparison,
+    .technique-grid { 
+      grid-template-columns: 1fr; 
+    }
+    
+    .practice-box { 
+      padding: 32px 24px; 
+    }
+
+    .flow-items {
+      flex-direction: column;
+    }
+
+    .flow-arrow {
+      transform: rotate(90deg);
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+  <div class="header-title">Prompt Mastery</div>
+  <div class="day-badge">Day 04 / 20</div>
+</header>
+
+<section class="hero">
+  <div class="lesson-meta">
+    <span>Week 1</span>
+    <span>45 分鐘</span>
+    <span>進階技巧</span>
+  </div>
+  <h1 class="lesson-title">一步一步思考：<br>Chain-of-Thought</h1>
+  <p class="lesson-subtitle">
+    研究發現，在 prompt 中加入「讓我們一步一步思考」這類指示，可以顯著提高 AI 在複雜推理任務中的準確率。今天我們學習 Chain-of-Thought（思維鏈）的原理和應用，從簡單的「思考步驟顯示」到進階的「思維樹狀結構」，讓你能設計需要深度分析的 prompt 任務。
+  </p>
+</section>
+
+<main class="content">
+  
+  <!-- 第一部分：什麼是 Chain-of-Thought？ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <h2 class="section-title">什麼是 Chain-of-Thought？</h2>
+    </div>
+    
+    <div class="prose">
+      想像你在解一道數學題。如果直接給出答案，可能會算錯；但如果<strong>一步一步寫出計算過程</strong>，不僅錯誤率降低，別人也能檢查你的邏輯。AI 也是一樣的道理。
+    </div>
+
+    <div class="prose">
+      <strong>Chain-of-Thought（CoT）</strong>是一種 prompt 技巧，核心概念是：不要讓 AI 直接給答案，而是要求它<strong>展示推理過程</strong>。這個簡單的改變，能讓 AI 在複雜任務中的表現提升 30-50%。
+    </div>
+
+    <div class="quote-box">
+      <div class="quote-text">
+        "讓我們一步一步思考..."
+      </div>
+      <div class="quote-author">
+        最簡單但最強大的 Prompt 魔法咒語
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">❌ 沒有 Chain-of-Thought</div>
+        <div class="comparison-text">
+          <strong>問題：</strong>「小明有 15 顆糖果，給了小華 3 顆，又買了一袋有 8 顆的糖果，現在有幾顆？」<br><br>
+          <strong>AI 回答：</strong>「小明現在有 20 顆糖果。」<br><br>
+          <em>問題：你不知道 AI 是怎麼算的，萬一算錯了也不知道錯在哪裡。</em>
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 使用 Chain-of-Thought</div>
+        <div class="comparison-text">
+          <strong>問題：</strong>「小明有 15 顆糖果，給了小華 3 顆，又買了一袋有 8 顆的糖果，現在有幾顆？請一步一步計算。」<br><br>
+          <strong>AI 回答：</strong><br>
+          「讓我們一步一步來：<br>
+          1. 一開始：15 顆<br>
+          2. 給了小華 3 顆：15 - 3 = 12 顆<br>
+          3. 買了 8 顆：12 + 8 = 20 顆<br>
+          答案：小明現在有 20 顆糖果。」<br><br>
+          <em>優點：過程透明，可以驗證每一步，發現錯誤時容易修正。</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">核心洞察</div>
+      <div class="prose">
+        Chain-of-Thought 不只是為了「看起來專業」——它實際上<strong>改變了 AI 的推理方式</strong>。當 AI 被要求展示步驟時，它會更仔細地處理資訊，就像人類寫下計算過程時會更謹慎一樣。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第二部分：為什麼 CoT 有效？ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <h2 class="section-title">為什麼 Chain-of-Thought 有效？</h2>
+    </div>
+
+    <div class="prose">
+      要理解 CoT 為什麼有效，我們需要回到 Day 1 學到的概念：AI 是<strong>序列預測系統</strong>。它一次生成一個 token（詞），每個新的 token 都基於前面的所有 token。
+    </div>
+
+    <div class="research-box">
+      <div class="research-label">科學研究發現</div>
+      <div class="research-title">Google Research 的突破性發現</div>
+      <div class="research-content">
+        2022 年，Google 的研究團隊發表了一篇論文，證明在 prompt 中加入「Let's think step by step」（讓我們一步一步思考）這句話，能讓大型語言模型在數學推理任務中的準確率從 17.7% 提升到 78.7% — 這是 4.4 倍的提升！
+        <br><br>
+        更驚人的是，這個技巧<strong>不需要任何額外訓練</strong>，只是改變了 prompt 的寫法。這個發現改變了整個 AI 產業對 prompt 工程的認知。
+      </div>
+    </div>
+
+    <div class="prose">
+      <strong>為什麼簡單的一句話能有這麼大的效果？</strong>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <strong>建立中間推理空間</strong><br>
+          當 AI 被要求「一步一步」思考時，它會在最終答案之前生成中間推理步驟。這些中間步驟成為後續推理的基礎，就像人類在草稿紙上算數學題一樣。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <strong>啟動更深層的推理模式</strong><br>
+          當 prompt 暗示「這需要推理」時，AI 會調用它訓練時學到的更複雜的推理模式，而不是簡單地從記憶中檢索答案。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <strong>減少「跳步」錯誤</strong><br>
+          複雜問題最常見的錯誤來源是「跳過中間步驟」。要求展示過程迫使 AI 不能跳步，每個邏輯環節都要明確表達。
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">04</div>
+        <div class="step-content">
+          <strong>提供自我驗證機制</strong><br>
+          當 AI 寫出推理步驟後，它後續生成的內容會基於這些步驟。如果中間某步有矛盾，AI 更容易在後續步驟中發現並修正。
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-items">
+        <div class="flow-item">接收問題</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">生成步驟 1</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">生成步驟 2</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">生成步驟 3</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">得出結論</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第三部分：CoT 的基本用法 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <h2 class="section-title">Chain-of-Thought 的基本用法</h2>
+    </div>
+
+    <div class="prose">
+      最簡單的 CoT prompt 就是在問題後面加上一句<strong>「讓我們一步一步思考」</strong>或<strong>「請展示你的推理過程」</strong>。但如果你想要更精確的控制，可以設計結構化的思考框架。
+    </div>
+
+    <div class="code-block-header">基礎 CoT Prompt 範本</div>
+    <div class="code-block">問題：[你的問題]
+
+請一步一步地思考和分析這個問題，
+展示你的推理過程，然後給出最終答案。</div>
+
+    <div class="prose">
+      這是最基本的形式，適合大部分需要推理的任務。但對於更複雜的問題，我們需要<strong>結構化的推理框架</strong>。
+    </div>
+
+    <div class="code-block-header">結構化 CoT Prompt 範本</div>
+    <div class="code-block">請分析以下問題，按照以下步驟逐步推理：
+
+問題：[描述你的問題]
+
+步驟 1：理解問題
+- 這個問題在問什麼？
+- 關鍵資訊是什麼？
+- 有什麼隱含的假設？
+
+步驟 2：分析現狀
+- 目前已知的事實是什麼？
+- 有什麼限制或約束？
+- 缺少什麼資訊？
+
+步驟 3：探索選項
+- 有哪些可能的解決方案？
+- 每個方案的優缺點是什麼？
+- 哪些方案可以排除？為什麼？
+
+步驟 4：做出決策
+- 基於以上分析，最佳方案是什麼？
+- 為什麼選擇這個方案？
+- 接下來的具體行動是什麼？
+
+請在每個步驟中詳細展示你的推理過程。</div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">💡 設計原則</div>
+      <div class="prose">
+        結構化框架的好處是：你可以<strong>根據任務類型設計專屬的思考步驟</strong>。商業決策、技術問題、創意發想，每種任務適合的推理框架都不一樣。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第四部分：不同場景的 CoT 範本 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <h2 class="section-title">針對不同場景的 CoT 範本</h2>
+    </div>
+
+    <div class="prose">
+      Chain-of-Thought 不是萬能公式 — 不同類型的任務需要不同的推理結構。以下是五種常見場景的專屬 CoT 範本。
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card">
+        <div class="example-header">場景 1：商業決策分析</div>
+        <div class="example-question">「我們該不該進入這個新市場？」</div>
+        <div class="code-block">步驟 1：市場機會評估
+- 市場規模和成長潛力
+- 目標客戶是誰？他們的需求是什麼？
+- 現有競爭者的優劣勢
+
+步驟 2：內部能力評估
+- 我們現有的優勢和資源
+- 需要新建立的能力
+- 團隊準備度如何？
+
+步驟 3：風險與報酬分析
+- 進入市場的成本（金錢、時間、機會成本）
+- 預期收益和時間框架
+- 最大風險是什麼？如何降低？
+
+步驟 4：決策建議
+- Go / No-Go 決定
+- 如果 Go：優先做什麼？
+- 如果 No-Go：替代策略是什麼？</div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">場景 2：技術問題診斷</div>
+        <div class="example-question">「為什麼我的程式跑得這麼慢？」</div>
+        <div class="code-block">步驟 1：問題定義
+- 「慢」的具體表現是什麼？（延遲時間、吞吐量）
+- 什麼時候開始變慢的？
+- 影響範圍多大？
+
+步驟 2：資訊收集
+- 系統架構是什麼樣的？
+- 最近有什麼變更？
+- 有什麼監控數據或錯誤訊息？
+
+步驟 3：假設生成
+列出所有可能的原因：
+- 資料庫查詢效率問題
+- 網路延遲
+- 記憶體洩漏
+- 演算法複雜度過高
+- 第三方服務問題
+
+步驟 4：優先排查
+根據可能性和影響，決定檢查順序
+
+步驟 5：提出解決方案
+針對最可能的原因，給出具體的優化建議</div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">場景 3：創意發想</div>
+        <div class="example-question">「如何設計一個創新的產品功能？」</div>
+        <div class="code-block">步驟 1：理解用戶痛點
+- 目標用戶是誰？
+- 他們現在遇到什麼問題？
+- 這個問題有多嚴重？多頻繁？
+
+步驟 2：探索現有解決方案
+- 市場上現有的方案是什麼？
+- 它們哪裡做得好？哪裡不足？
+- 有什麼被忽視的需求？
+
+步驟 3：發散思考
+列出 10 個不同方向的解決方案
+不評判，只發想
+
+步驟 4：收斂評估
+根據以下標準篩選：
+- 技術可行性
+- 用戶價值
+- 實現成本
+- 差異化程度
+
+步驟 5：提出概念
+描述最有潛力的 2-3 個方案
+包含核心功能、用戶流程、獨特價值</div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">場景 4：學習規劃</div>
+        <div class="example-question">「如何在 3 個月內學會資料分析？」</div>
+        <div class="code-block">步驟 1：目標具體化
+- 「學會資料分析」具體指什麼？
+- 期望達到什麼程度？（入門/中級/專業）
+- 學習目的是什麼？（轉職/工作需求/興趣）
+
+步驟 2：現況評估
+- 目前的程度如何？
+- 每週可投入多少時間？
+- 擅長什麼學習方式？
+
+步驟 3：分解學習路徑
+將「資料分析」拆解為子技能：
+- 統計基礎
+- Python/R 程式語言
+- 資料清理和處理
+- 視覺化技巧
+- 商業分析思維
+
+步驟 4：設計學習計劃
+Week 1-4：統計基礎 + Python 入門
+Week 5-8：資料處理實戰
+Week 9-12：專案實作 + 作品集
+
+步驟 5：里程碑設定
+每個月的具體可驗證成果是什麼？</div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">場景 5：文本分析</div>
+        <div class="example-question">「這篇文章的論點站得住腳嗎？」</div>
+        <div class="code-block">步驟 1：識別核心論點
+- 作者的主要主張是什麼？
+- 論點的範圍和限制是什麼？
+
+步驟 2：檢視論證結構
+- 作者用什麼證據支持論點？
+- 論證邏輯是否完整？
+- 有沒有邏輯謬誤？
+
+步驟 3：評估證據品質
+- 引用的資料來源可靠嗎？
+- 數據解讀是否正確？
+- 有沒有選擇性引用？
+
+步驟 4：考慮反方觀點
+- 有什麼相反的證據？
+- 這些反例如何解釋？
+- 作者有沒有回應反對意見？
+
+步驟 5：綜合評判
+基於以上分析，論點的可信度如何？
+哪些部分站得住腳？哪些站不住？</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第五部分：進階技巧 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <h2 class="section-title">進階技巧：思維樹與多路徑推理</h2>
+    </div>
+
+    <div class="prose">
+      基本的 Chain-of-Thought 是<strong>線性推理</strong>：步驟 1 → 步驟 2 → 步驟 3 → 結論。但真實世界的複雜問題往往需要<strong>多路徑探索</strong>，就像下棋時要考慮多種走法。
+    </div>
+
+    <div class="prose">
+      這就是<strong>思維樹（Tree of Thoughts）</strong>的概念：在每個步驟都產生多個可能性，評估每個可能性，選擇最有前景的路徑繼續探索。
+    </div>
+
+    <div class="code-block-header">思維樹 Prompt 範本</div>
+    <div class="code-block">問題：[複雜的決策或策略問題]
+
+請使用思維樹方法分析這個問題：
+
+第一層思考：產生多個可能的方向
+列出 3-5 個不同的解決策略
+對每個策略，簡要說明核心思路
+
+第二層思考：深入評估每個方向
+對每個策略：
+  - 優勢是什麼？
+  - 風險和挑戰是什麼？
+  - 成功的關鍵因素是什麼？
+
+第三層思考：選擇與深化
+選擇最有潛力的 1-2 個策略
+對選出的策略：
+  - 具體實施步驟是什麼？
+  - 如何降低風險？
+  - 需要什麼資源？
+
+最終建議：
+基於以上多路徑探索，給出你的推薦方案和理由</div>
+
+    <div class="thinking-box">
+      <div class="thinking-header">
+        <div class="thinking-title">思維樹實戰範例</div>
+        <div class="thinking-tag">案例解析</div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">問題情境</div>
+        <div class="thinking-step-content">
+          「我們的 SaaS 產品用戶增長停滯了，該如何突破？」
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">第一層：三個可能方向</div>
+        <div class="thinking-step-content">
+          <strong>方向 A：優化轉化漏斗</strong><br>
+          重點改善試用到付費的轉換率<br><br>
+          <strong>方向 B：開發新客戶群</strong><br>
+          瞄準目前沒有觸及的市場區隔<br><br>
+          <strong>方向 C：增加產品黏性</strong><br>
+          讓現有用戶更頻繁使用，帶來口碑推薦
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">第二層：深入評估方向 A</div>
+        <div class="thinking-step-content">
+          <strong>優勢：</strong>現有流量不變，只要提高轉換率就能增長<br>
+          <strong>風險：</strong>如果流量來源本身有問題，優化轉換也無濟於事<br>
+          <strong>關鍵成功因素：</strong>找到轉換瓶頸在哪個環節
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">第三層：選定方向 A 的執行計劃</div>
+        <div class="thinking-step-content">
+          <strong>具體步驟：</strong><br>
+          1. 分析試用用戶的行為數據，找出流失點<br>
+          2. 訪談流失用戶，了解放棄原因<br>
+          3. 設計 A/B 測試，優化關鍵頁面<br>
+          4. 追蹤轉換率變化<br><br>
+          <strong>降低風險：</strong>同時準備方向 C 作為備案<br>
+          <strong>需要資源：</strong>數據分析工具、設計師支援、2 週測試週期
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">何時使用思維樹？</div>
+      <div class="prose">
+        思維樹適合<strong>沒有明確正確答案</strong>的開放性問題，比如策略規劃、創新設計、複雜決策。對於有明確答案的問題（如數學計算、事實查證），標準的線性 CoT 就夠了。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第六部分：Self-Consistency 技巧 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">06</div>
+      <h2 class="section-title">Self-Consistency：讓 AI 自己驗證答案</h2>
+    </div>
+
+    <div class="prose">
+      有時候，即使使用了 Chain-of-Thought，AI 還是可能得出錯誤的結論。這時候可以用一個強大的技巧：<strong>Self-Consistency（自我一致性）</strong>。
+    </div>
+
+    <div class="prose">
+      原理很簡單：讓 AI <strong>用不同的推理路徑多次解決同一個問題</strong>，然後比較結果。如果多次推理都得出相同答案，那個答案更可能是對的。
+    </div>
+
+    <div class="code-block-header">Self-Consistency Prompt 範本</div>
+    <div class="code-block">問題：[你的問題]
+
+請用三種不同的方法來分析這個問題：
+
+【方法 1：從第一性原理思考】
+回到最基本的假設和定義，從頭推導
+
+【方法 2：從實際案例類比】
+找一個類似的實際案例，套用其解決方式
+
+【方法 3：從反面論證】
+假設相反的結論，看會導致什麼矛盾
+
+然後比較三種方法的結論：
+- 它們是否一致？
+- 如果不一致，哪個方法更可靠？為什麼？
+- 綜合三種方法，你的最終答案是什麼？</div>
+
+    <div class="info-box">
+      <div class="info-box-title">研究證據</div>
+      <div class="info-box-content">
+        Google Research 的實驗顯示，使用 Self-Consistency 技巧（讓模型生成多個推理路徑並選擇最一致的答案）可以將準確率再提升 10-15%。這個技巧在數學、邏輯推理、常識推理等任務中特別有效。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第七部分：常見錯誤與修正 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">07</div>
+      <h2 class="section-title">使用 CoT 的常見錯誤</h2>
+    </div>
+
+    <div class="technique-grid">
+      <div class="technique-card">
+        <div class="technique-name">錯誤 1：過度結構化</div>
+        <div class="technique-desc">
+          給了太多太細的步驟要求，反而限制了 AI 的推理靈活性。<br><br>
+          <strong>範例：</strong><br>
+          ❌「步驟 1 必須正好 50 字，步驟 2 必須包含 3 個論點...」<br><br>
+          <strong>修正：</strong><br>
+          ✓「請分成幾個邏輯清晰的步驟來分析，每步說明你的思考邏輯。」
+        </div>
+        <div class="technique-use">適度指引，保留彈性</div>
+      </div>
+
+      <div class="technique-card">
+        <div class="technique-name">錯誤 2：忘記要求展示過程</div>
+        <div class="technique-desc">
+          設計了完美的推理框架，但忘了明確要求「展示推理過程」。<br><br>
+          <strong>範例：</strong><br>
+          ❌「分析這個商業案例，給出建議。」<br><br>
+          <strong>修正：</strong><br>
+          ✓「分析這個商業案例，<strong>展示你的分析過程</strong>，然後給出建議。」
+        </div>
+        <div class="technique-use">明確要求透明推理</div>
+      </div>
+
+      <div class="technique-card">
+        <div class="technique-name">錯誤 3：簡單問題用複雜 CoT</div>
+        <div class="technique-desc">
+          對不需要推理的問題也強加複雜的思考框架。<br><br>
+          <strong>範例：</strong><br>
+          ❌「巴黎是哪個國家的首都？請一步一步分析...」<br><br>
+          <strong>修正：</strong><br>
+          ✓ 事實查詢不需要 CoT，直接問就好。
+        </div>
+        <div class="technique-use">根據任務複雜度選擇</div>
+      </div>
+
+      <div class="technique-card">
+        <div class="technique-name">錯誤 4：不驗證推理邏輯</div>
+        <div class="technique-desc">
+          接受 AI 展示的推理過程，但沒檢查邏輯是否合理。<br><br>
+          <strong>記住：</strong><br>
+          AI 展示推理步驟不代表推理一定正確！你還是要檢查每一步的邏輯是否站得住腳。
+        </div>
+        <div class="technique-use">批判性檢視輸出</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第八部分：CoT 的適用與不適用場景 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">08</div>
+      <h2 class="section-title">什麼時候該用 CoT？什麼時候不該？</h2>
+    </div>
+
+    <div class="prose">
+      Chain-of-Thought 不是萬能鑰匙。有些任務用了 CoT 反而會降低效率或品質。關鍵是<strong>判斷任務是否需要推理</strong>。
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-item">
+        <strong>適合用 CoT 的場景：</strong><br>
+        數學計算、邏輯推理、商業分析、技術診斷、策略規劃、複雜決策、因果分析、批判性思考
+      </div>
+      <div class="checklist-item">
+        <strong>不適合用 CoT 的場景：</strong><br>
+        事實查詢（「巴黎在哪個國家？」）、簡單翻譯、格式轉換、創意寫作（詩歌、故事）、情感表達、快速總結
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 適合用 CoT</div>
+        <div class="comparison-text">
+          <strong>任務：</strong>「我該不該接受這個工作 offer？」<br><br>
+          <strong>為什麼適合：</strong><br>
+          這是需要權衡多個因素的複雜決策。CoT 可以幫助系統性地考慮薪資、職涯發展、工作環境、生活平衡等各個面向。
+        </div>
+      </div>
+      <div class="comparison-item bad">
+        <div class="comparison-label">✗ 不適合用 CoT</div>
+        <div class="comparison-text">
+          <strong>任務：</strong>「幫我寫一首關於春天的詩。」<br><br>
+          <strong>為什麼不適合：</strong><br>
+          創意寫作需要的是靈感和美感，不是邏輯推理。要求「一步一步」創作詩歌反而會扼殺創意。
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">判斷原則</div>
+      <div class="prose">
+        問自己一個問題：<strong>「這個任務，人類在做的時候會需要在紙上寫下推理步驟嗎？」</strong><br><br>
+        如果答案是「會」（比如解數學題、做商業分析），那就適合用 CoT。<br>
+        如果答案是「不會」（比如寫詩、查事實），那就不需要 CoT。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第九部分：實戰案例完整解析 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">09</div>
+      <h2 class="section-title">完整實戰案例：職涯決策分析</h2>
+    </div>
+
+    <div class="prose">
+      讓我們用一個真實場景來展示完整的 CoT 設計過程。
+    </div>
+
+    <div class="thinking-box">
+      <div class="thinking-header">
+        <div class="thinking-title">案例背景</div>
+        <div class="thinking-tag">真實場景</div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">情境</div>
+        <div class="thinking-step-content">
+          小陳，28 歲，目前在一家中型軟體公司當產品經理，年薪 120 萬。最近收到兩個 offer：<br><br>
+          <strong>Offer A：</strong>大型科技公司，產品經理，年薪 160 萬，但團隊規模大，個人影響力小<br>
+          <strong>Offer B：</strong>早期新創，產品負責人，年薪 100 萬 + 股票選擇權，風險高但成長空間大
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block-header">完整 CoT Prompt 設計</div>
+    <div class="code-block">我是小陳，28 歲產品經理，面臨職涯選擇。請幫我分析：
+
+【背景資訊】
+現職：中型公司產品經理，年薪 120 萬
+Offer A：大型科技公司，年薪 160 萬，穩定但影響力小
+Offer B：新創公司，年薪 100 萬 + 股票，風險高成長快
+
+【我的情況】
+- 單身，無房貸壓力
+- 職涯目標：5 年內成為產品總監
+- 風險承受度：中等偏高
+- 重視：學習成長 > 短期收入
+
+請用以下框架分析：
+
+步驟 1：釐清決策目標
+基於我的情況，這個決策最核心要優化的是什麼？
+
+步驟 2：評估各選項
+對每個選項（包含「留在現職」）：
+  - 對職涯目標的幫助
+  - 3 年後的可能狀況
+  - 最大風險是什麼
+  - 如果選了會後悔什麼
+
+步驟 3：情境分析
+分別考慮「最好情況」「最可能情況」「最壞情況」
+每個選項在這三種情境下的結果
+
+步驟 4：決策矩陣
+用我重視的因素（學習成長、收入、風險、影響力）打分
+
+步驟 5：給出建議
+基於以上分析，你推薦哪個選項？
+理由是什麼？
+有什麼需要進一步確認的資訊？</div>
+
+    <div class="thinking-box">
+      <div class="thinking-header">
+        <div class="thinking-title">AI 的推理輸出（範例）</div>
+        <div class="thinking-tag">完整推理過程</div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">步驟 1：釐清決策目標</div>
+        <div class="thinking-step-content">
+          基於你的情況，這個決策的核心不是「哪個薪水最高」，而是<strong>「哪條路徑最快讓你在 5 年內具備產品總監的能力和履歷」</strong>。<br><br>
+          關鍵因素：學習曲線的陡峭度、決策權的大小、能累積的實戰經驗。
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">步驟 2：評估 Offer A（大公司）</div>
+        <div class="thinking-step-content">
+          <strong>職涯幫助：</strong>中等。大公司品牌好，但個人影響力小，學到的可能更多是「怎麼在大組織生存」而非「怎麼做產品決策」。<br><br>
+          <strong>3 年後：</strong>薪水可能到 200 萬，但職級可能還在 PM，距離總監還有 2-3 級。<br><br>
+          <strong>最大風險：</strong>變成「大公司螺絲釘」，習慣了大平台的資源，失去獨立作戰能力。<br><br>
+          <strong>可能後悔：</strong>「我錯過了真正主導產品的機會」。
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">步驟 2：評估 Offer B（新創）</div>
+        <div class="thinking-step-content">
+          <strong>職涯幫助：</strong>高。產品負責人意味著你要對整個產品的成敗負責，會快速學會資源分配、優先級判斷、跨部門協作。<br><br>
+          <strong>3 年後最好情況：</strong>公司成功，股票價值遠超薪資差距，你已經是產品 VP。<br>
+          <strong>3 年後最壞情況：</strong>公司倒閉，但你有了「從 0 到 1 做產品」的經驗，跳槽時履歷很亮眼。<br><br>
+          <strong>最大風險：</strong>公司倒閉前你沒學到東西（比如公司方向一直搖擺，或資金鏈斷裂太快）。<br><br>
+          <strong>可能後悔：</strong>「我為什麼要犧牲 60 萬年薪去賭一個不確定的未來」。
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">步驟 3：情境分析</div>
+        <div class="thinking-step-content">
+          <strong>最好情況：</strong><br>
+          Offer A：成為大公司中層，年薪 250 萬<br>
+          Offer B：新創成功，股票價值 > 500 萬，成為產品 VP<br><br>
+          <strong>最可能情況：</strong><br>
+          Offer A：穩定上升，3 年後年薪 180 萬，還是 PM<br>
+          Offer B：公司小成功或被收購，股票價值 100-200 萬，有豐富經驗<br><br>
+          <strong>最壞情況：</strong><br>
+          Offer A：部門重組被調去不喜歡的產品線，學習停滯<br>
+          Offer B：公司 1 年內倒閉，財務壓力，但經驗還是有價值
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">步驟 4：決策矩陣（滿分 10 分）</div>
+        <div class="thinking-step-content">
+          <strong>Offer A 大公司：</strong><br>
+          學習成長：6 分（有學習但受限）<br>
+          收入保障：9 分（高且穩定）<br>
+          風險程度：2 分（很低風險）<br>
+          個人影響力：4 分（影響力小）<br>
+          總分：21 分<br><br>
+          <strong>Offer B 新創：</strong><br>
+          學習成長：9 分（學習曲線陡峭）<br>
+          收入保障：5 分（基本薪資 + 不確定股票）<br>
+          風險程度：8 分（高風險）<br>
+          個人影響力：9 分（主導產品）<br>
+          總分：31 分
+        </div>
+      </div>
+
+      <div class="thinking-step">
+        <div class="thinking-step-label">步驟 5：最終建議</div>
+        <div class="thinking-step-content">
+          <strong>我的推薦：Offer B（新創）</strong><br><br>
+          <strong>理由：</strong><br>
+          1. 你 28 歲，單身，無房貸，<strong>現在是你職涯中風險承受度最高的時候</strong><br>
+          2. 你明確重視「學習成長 > 短期收入」，Offer B 完全符合這個優先級<br>
+          3. 即使新創失敗，「產品負責人」的經驗會讓你跳槽時更有競爭力<br>
+          4. 5 年總監目標：Offer B 路徑更快，可能 3 年就達成<br><br>
+          <strong>但有條件：</strong><br>
+          在接受前，你需要確認：<br>
+          • 新創的融資狀況（至少還有 18 個月 runway）<br>
+          • 創辦人背景和產品 vision 是否讓你信服<br>
+          • 股票條款（vesting schedule、行使價）<br>
+          • 團隊核心成員的穩定性<br><br>
+          如果這些都 OK，我會建議去 Offer B。<br>
+          如果有任何一個讓你擔心，再考慮 Offer A。
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">這個案例展示了什麼？</div>
+      <div class="prose">
+        一個好的 CoT 不只是「列步驟」，而是：<br>
+        1. <strong>從根本重新定義問題</strong>（不是「哪個薪水高」而是「哪個路徑更快達成目標」）<br>
+        2. <strong>多角度評估</strong>（最好/可能/最壞情況）<br>
+        3. <strong>量化判斷</strong>（決策矩陣打分）<br>
+        4. <strong>給出可行動的建議</strong>（包含需要確認的資訊）
+      </div>
+    </div>
+  </section>
+
+  <!-- 第十部分：CoT 與其他技巧的組合 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">10</div>
+      <h2 class="section-title">CoT 與其他 Prompt 技巧的組合</h2>
+    </div>
+
+    <div class="prose">
+      Chain-of-Thought 不是孤立的技巧，它可以和前面學到的技巧（Role Prompting、四元素框架）完美結合。
+    </div>
+
+    <div class="code-block-header">組合範例：Role + CoT</div>
+    <div class="code-block">[角色設定]
+你是一位資深策略顧問，專精於科技業的商業分析，
+擅長用結構化思維拆解複雜問題。
+
+[任務]
+分析以下商業問題：
+「我們該不該開發這個新功能？」
+
+[使用 CoT 推理]
+請用你的專業判斷，按以下步驟分析：
+
+步驟 1：定義成功標準
+這個功能「值得做」的標準是什麼？
+
+步驟 2：市場需求驗證
+有多少用戶真的需要？需求有多強烈？
+
+步驟 3：競爭分析
+競品有沒有？做得如何？我們的差異化在哪？
+
+步驟 4：成本效益評估
+開發成本（時間、人力）vs 預期收益
+
+步驟 5：決策建議
+Go / No-Go / 需要更多資訊
+
+[格式要求]
+每個步驟先說明你的分析邏輯，再給出結論</div>
+
+    <div class="prose">
+      這個組合的威力在於：<strong>角色決定了「用什麼視角」思考，CoT 決定了「怎麼思考」</strong>。兩者結合，你會得到既專業又透明的分析。
+    </div>
+  </section>
+
+  <!-- 實作練習 -->
+  <div class="practice-box">
+    <div class="practice-label">今日 Side Project</div>
+    <h2 class="practice-title">打造你的邏輯分析助手</h2>
+    <div class="practice-desc">
+      設計一個「邏輯分析助手」，能夠幫你分析日常面臨的複雜決策，提供結構化的多維度分析報告。
+    </div>
+
+    <div class="practice-desc">
+      <strong>第一步：選擇一個真實的複雜決策</strong><br>
+      找一個你最近或即將面臨的複雜決策，例如：<br>
+      • 該不該換工作？<br>
+      • 該選擇哪個合作方案？<br>
+      • 該投資這個項目嗎？<br>
+      • 該搬家到另一個城市嗎？<br>
+      • 該報名這個課程嗎？<br><br>
+      
+      <strong>第二步：設計專屬的 CoT 框架</strong><br>
+      根據你選擇的決策類型，設計 4-6 個推理步驟。參考今天學到的各種框架，但要調整成適合你問題的版本。<br><br>
+      
+      必須包含的元素：<br>
+      • 問題定義（確認你真正要解決的是什麼）<br>
+      • 現況分析（你目前的處境和限制）<br>
+      • 選項評估（至少考慮 2-3 個選項）<br>
+      • 多情境分析（最好/可能/最壞情況）<br>
+      • 決策建議（給出明確的行動方向）<br><br>
+      
+      <strong>第三步：測試你的框架</strong><br>
+      用你設計的 CoT prompt 向 AI 提問，看看得到的分析是否：<br>
+      1. 思考過程清晰透明？<br>
+      2. 考慮了你沒想到的角度？<br>
+      3. 給出了可行動的建議？<br>
+      4. 有沒有邏輯漏洞？<br><br>
+      
+      <strong>第四步：迭代優化</strong><br>
+      根據測試結果調整你的框架：<br>
+      • 如果分析太淺，增加「追問為什麼」的步驟<br>
+      • 如果考慮不夠全面，加入「反面論證」<br>
+      • 如果結論太模糊，要求「明確的行動建議」<br><br>
+      
+      <strong>完成標準：</strong><br>
+      當你能用這個框架得到「比你自己想得更深入」的分析時，就算完成了。把這個框架存下來，以後面對類似決策時可以重複使用。
+    </div>
+
+    <div class="practice-desc">
+      <strong>加分挑戰：</strong><br>
+      設計 3 個不同類型的 CoT 框架：<br>
+      1. 商業決策框架<br>
+      2. 個人生活決策框架<br>
+      3. 技術問題診斷框架<br><br>
+      建立你自己的「CoT 範本庫」！
+    </div>
+  </div>
+
+  <!-- 總結 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">11</div>
+      <h2 class="section-title">本日重點總結</h2>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">🎯 核心概念</div>
+      <div class="prose">
+        <strong>Chain-of-Thought 讓 AI 不只給答案，更展示推理過程。</strong>這個簡單的改變能讓 AI 在複雜任務中的表現提升 30-50%，因為它啟動了更深層的推理模式，減少了跳步錯誤，並提供了驗證機制。
+      </div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-item">
+        <strong>基本用法：</strong>在問題後加上「讓我們一步一步思考」或「請展示你的推理過程」
+      </div>
+      <div class="checklist-item">
+        <strong>結構化框架：</strong>設計 4-6 個明確的推理步驟，引導 AI 系統性思考
+      </div>
+      <div class="checklist-item">
+        <strong>思維樹：</strong>對複雜決策使用多路徑探索，評估不同策略方向
+      </div>
+      <div class="checklist-item">
+        <strong>Self-Consistency：</strong>用多種方法推理同一問題，比較結果提高可靠性
+      </div>
+      <div class="checklist-item">
+        <strong>場景判斷：</strong>需要推理的任務才用 CoT，簡單查詢或創意任務不需要
+      </div>
+      <div class="checklist-item">
+        <strong>組合使用：</strong>CoT 可以和 Role Prompting、四元素框架完美結合
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-box-title">延伸思考</div>
+      <div class="info-box-content">
+        Chain-of-Thought 的本質是什麼？它不是在「教 AI 怎麼思考」，而是<strong>創造一個空間讓 AI 的推理能力得以展現</strong>。<br><br>
+        就像人類，有時候我們心裡知道答案，但說不出為什麼。當被要求「解釋你的推理」時，我們會更仔細地檢視自己的想法，往往能發現原本沒注意到的問題。AI 也是如此。<br><br>
+        下次當你需要 AI 處理複雜任務時，不要只問「答案是什麼」，而要問「你是怎麼想的」。
+      </div>
+    </div>
+  </section>
+
+  <!-- 導航 -->
+  <nav class="lesson-nav">
+    <a href="day3.html" class="nav-link">
+      <span class="nav-label">← 上一課</span>
+      <span class="nav-title">Day 03: 給 AI 一個身份</span>
+    </a>
+    <a href="day5.html" class="nav-link" style="text-align: right;">
+      <span class="nav-label">下一課 →</span>
+      <span class="nav-title">Day 05: Few-shot 風格學習</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-text">
+    Prompt Mastery — 20-Day Intensive Course — 2026
+  </div>
+</footer>
+
+</body>
+</html>

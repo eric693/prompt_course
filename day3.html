@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 03 - 給 AI 一個身份：Role Prompting | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap;overflow-x:auto}.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9}.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 03 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 1</span>
+<span>50 分鐘</span>
+<span>核心技巧</span>
+</div>
+<h1 class="lesson-title">給 AI 一個身份：<br>Role Prompting</h1>
+<p class="lesson-subtitle">
+角色扮演是 prompt 工程最強大的技巧之一。當你告訴 AI「你是一位外科醫生」vs「你是一位負責任的健康顧問」，同樣的醫學問題會得到截然不同的回答。今天深入探討如何設計有效的角色，包括角色的背景、個性、專業限制，以及如何讓角色在整個對話中保持一致。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">為什麼角色設定如此重要？</h2>
+</div>
+
+<div class="prose">
+想像你要問「如何處理膝蓋疼痛？」如果你問一位外科醫生，他可能會從手術選項開始談；如果你問物理治療師，她可能會建議復健運動。<strong>同樣的問題，不同的角色會給出完全不同角度的答案。</strong>
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">❌ 沒有角色設定</div>
+<div class="comparison-text">
+「如何提升我的投資報酬率？」<br><br>
+<em>結果：</em>AI 可能給你泛泛的理財建議，沒有針對性，不知道你的風險承受度。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">✓ 有明確角色設定</div>
+<div class="comparison-text">
+「你是一位專為 30 歲上班族服務的財務規劃師，擅長穩健型投資策略。如何提升我的投資報酬率？」<br><br>
+<em>結果：</em>AI 會針對你的年齡層和風險偏好，提供具體且實用的建議。
+</div>
+</div>
+</div>
+
+<div class="highlight-box">
+<div class="highlight-title">核心洞察</div>
+<div class="prose">
+角色設定不只是改變語氣——它從根本上<strong>改變了 AI 思考問題的角度</strong>。一個好的角色設定會讓 AI「戴上特定的專業眼鏡」來看待你的問題。
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">角色設定的三個層次</h2>
+</div>
+
+<div class="prose">
+一個完整的角色設定包含三個層次：
+</div>
+
+<div class="prose">
+<strong>層次 1：職業與專業背景</strong><br>
+告訴 AI 它應該以什麼專業身份來回答。<br>
+範例：「你是一位資深軟體工程師」、「你是一位營養師」
+</div>
+
+<div class="prose">
+<strong>層次 2：個性與溝通風格</strong><br>
+決定 AI 如何表達它的專業知識。<br>
+範例：「你的個性直接務實，不說廢話」、「你善於用生活化的比喻解釋複雜概念」
+</div>
+
+<div class="prose">
+<strong>層次 3：行為準則與限制</strong><br>
+設定 AI 的行為邊界。什麼能做、什麼不能做。<br>
+範例：「你不提供具體投資建議」、「遇到超出專業範圍的問題，你會誠實告知」
+</div>
+
+<div class="highlight-box">
+<div class="highlight-title">💡 實用技巧</div>
+<div class="prose">
+不是每個 prompt 都需要三個層次。簡單任務，基礎層就夠了。但如果你需要<strong>高品質、有個性、負責任</strong>的回答，三個層次缺一不可。
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">完整角色範本：Alex 財務顧問</h2>
+</div>
+
+<div class="code-block-header">完整 Role Prompt 範本</div>
+<div class="code-block">你現在扮演「Alex」，一位個人財務顧問：
+
+【專業背景】
+CFP 認證，10 年財富管理經驗
+專門服務 25-40 歲都市上班族
+
+【個性特質】
+直接、務實、不說廢話
+善於用生活化例子解釋複雜概念
+
+【溝通風格】
+先給結論，再解釋原因
+每次建議前先確認用戶情況：
+  - 收入水平
+  - 理財目標  
+  - 時間框架
+  - 風險承受度
+
+【行為準則】
+✓ 給出 1-3 個可行選項
+✓ 說明每個選項的優缺點
+✓ 給出個人建議並說明理由
+✗ 不推薦超出風險承受能力的方案
+✗ 超出專業範疇時，誠實告知
+
+現在，請以 Alex 的身份回答用戶的理財問題。</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">實用角色案例庫</h2>
+</div>
+
+<div class="code-block-header">案例 1：健康顧問</div>
+<div class="code-block">你是「Dr. Sarah」，整合醫學健康顧問：
+
+專業：醫學博士，10 年臨床經驗
+專長：預防醫學、生活方式醫學
+風格：專業但溫暖，善於傾聽
+
+行為準則：
+✓ 提供基於證據的健康建議
+✓ 考慮整體生活方式
+✓ 鼓勵預防勝於治療
+✗ 不做具體診斷（建議就醫）
+✗ 不推薦未經驗證的療法</div>
+
+<div class="code-block-header">案例 2：職涯教練</div>
+<div class="code-block">你是「Marcus」，科技業職涯教練：
+
+背景：15 年科技業 HR 經驗
+風格：直接、實際、不畫大餅
+方法：蘇格拉底式提問，引導思考
+
+行為準則：
+✓ 先了解技能、興趣、限制
+✓ 提供具體可行的下一步
+✓ 分享真實的市場觀察
+✗ 不做不切實際的承諾
+✗ 不推薦明顯不適合的路徑</div>
+
+<div class="code-block-header">案例 3：創意寫作導師</div>
+<div class="code-block">你是「Elena」，創意寫作導師：
+
+背景：出版作家，教授創意寫作 8 年
+風格：鼓勵實驗，重視過程勝過結果
+個性：開放、好奇、不批判
+
+行為準則：
+✓ 用提問幫助學生發現自己的聲音
+✓ 提供具體的寫作練習和技巧
+✓ 慶祝每一次嘗試和進步
+✗ 不強加「正確」的寫作方式
+✗ 不與其他作家比較</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">常見陷阱與解決方案</h2>
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">陷阱 1：角色過於泛泛</div>
+<div class="comparison-text">
+「你是一個助理。」<br><br>
+<strong>問題：</strong>太模糊，AI 不知道該用什麼專業知識和語氣。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">✓ 解決：具體化角色</div>
+<div class="comparison-text">
+「你是一位專門幫助自由工作者管理時間的效率顧問，擅長用時間區塊法規劃工作。」<br><br>
+<strong>改善：</strong>明確專業、受眾、方法論。
+</div>
+</div>
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">陷阱 2：角色設定互相矛盾</div>
+<div class="comparison-text">
+「你是一位嚴格的健身教練，同時非常溫柔體貼。」<br><br>
+<strong>問題：</strong>「嚴格」和「溫柔體貼」可能產生衝突。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">✓ 解決：整合特質</div>
+<div class="comparison-text">
+「你是一位健身教練，對訓練標準嚴格，但對學員的心理狀態很有同理心。你會推著他們進步，同時給予情緒支持。」<br><br>
+<strong>改善：</strong>說明兩種特質如何共存。
+</div>
+</div>
+</div>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Side Project</div>
+<h2 class="practice-title">設計你的個人 AI 顧問</h2>
+<div class="practice-desc">
+選擇你最需要建議的領域（健康、財務、職涯、學習等），設計一個具有鮮明個性和專業知識的顧問角色。
+<br><br>
+<strong>第一步：選擇領域與定位</strong><br>
+• 你需要什麼領域的建議？<br>
+• 這個顧問的核心專長是什麼？<br>
+<br>
+<strong>第二步：設計角色三層次</strong><br>
+• 【基礎層】專業背景與資歷<br>
+• 【進階層】個性特質與溝通風格<br>
+• 【專家層】行為準則與專業界限<br>
+<br>
+<strong>第三步：實戰測試</strong><br>
+用你設計的角色 prompt，提出 10 個真正關心的問題。觀察：<br>
+1. 回答是否符合期待的專業水準？<br>
+2. 語氣和風格是否一致？<br>
+3. 有沒有給出不負責任或超出範圍的建議？<br>
+<br>
+<strong>完成標準：</strong><br>
+當你能用這個角色 prompt 得到「像真人顧問一樣」的回答時，就算完成了。把這個角色設定存起來，未來隨時可以用。
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day2.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 02: Prompt 的解剖學</span>
+</a>
+<a href="day4.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 04: Chain-of-Thought 推理鏈</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>

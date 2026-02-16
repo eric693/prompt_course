@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 05 - Few-shot 風格學習框架 | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
+.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
+.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
+.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
+.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 05 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 1</span>
+<span>55 分鐘</span>
+<span>進階技巧</span>
+</div>
+<h1 class="lesson-title">給範例不如給框架：<br>Few-shot 進階</h1>
+<p class="lesson-subtitle">
+Few-shot prompting 是通過給出幾個範例來引導 AI 輸出特定格式和風格。但真正的進階技巧不只是「給範例」，而是分析範例背後的模式，然後把那個模式轉化為清晰的框架說明。今天學習如何找到你喜歡的寫作風格的底層結構，並讓 AI 精準複製它。
+</p>
+</section>
+
+<main class="content">
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">什麼是 Few-shot Learning？</h2>
+</div>
+
+<div class="prose">
+想像你要教一個外國朋友寫中文的「商業 Email」。你可以花很多時間解釋規則，或者你可以<strong>直接給他看 2-3 個範例</strong>，他一看就懂了。
+</div>
+
+<div class="prose">
+<strong>Few-shot Learning</strong> 就是這個概念：通過提供少數幾個範例（通常 2-5 個），讓 AI 學習你想要的輸出格式、風格、或模式。這種方法特別適合<strong>難以用文字描述</strong>的風格要求。
+</div>
+
+<div class="quote-box">
+<div class="quote-text">"Show, don't tell."</div>
+<div class="quote-author">Few-shot Learning 的核心哲學</div>
+</div>
+
+<div class="comparison">
+<div class="comparison-item bad">
+<div class="comparison-label">Zero-shot（沒有範例）</div>
+<div class="comparison-text">
+<strong>Prompt：</strong>「請用專業但親切的語氣寫產品介紹。」<br><br>
+<strong>問題：</strong>「專業但親切」每個人理解都不同。
+</div>
+</div>
+<div class="comparison-item good">
+<div class="comparison-label">Few-shot（有範例）</div>
+<div class="comparison-text">
+<strong>Prompt：</strong>請參考範例風格：<br>
+「這款咖啡機不只是機器，它是你每天早晨的儀式感。」<br><br>
+<strong>優點：</strong>AI 能學到簡短有力、情感連結的風格。
+</div>
+</div>
+</div>
+
+<div class="highlight-box">
+<div class="highlight-title">核心洞察</div>
+<div class="prose">
+Few-shot Learning 的魔力在於：<strong>範例本身就是最精確的規格說明</strong>。你不需要想辦法用文字描述風格，你只需要給出體現這種風格的範例。
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">為什麼 Few-shot Learning 有效？</h2>
+</div>
+
+<div class="prose">
+Few-shot Learning 的效果來自於 AI 訓練時學到的<strong>模式識別能力</strong>。當你給 AI 幾個範例時，它會自動尋找這些範例的共同模式，然後在新的情境中複製這個模式。
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>模式識別</strong><br>
+AI 會分析範例的共同特徵：句子長度、用詞風格、段落結構、語氣情感等。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>隱性知識轉移</strong><br>
+有些風格特徵很難用文字描述（比如「幽默感」），但通過範例，AI 可以捕捉到這些隱性特質。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>降低歧義</strong><br>
+「專業」這個詞可以有很多種詮釋，但當你給出具體範例時，就鎖定了你心中「專業」的確切含義。
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>建立參考座標</strong><br>
+範例為 AI 提供了一個「品質基準」和「風格參考點」，讓它知道「好的輸出」應該長什麼樣子。
+</div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">Few-shot 的基本用法</h2>
+</div>
+
+<div class="code-block-header">基礎 Few-shot Prompt 範本</div>
+<div class="code-block">請參考以下範例的風格和格式：
+
+【範例 1】
+[第一個範例的完整內容]
+
+【範例 2】
+[第二個範例的完整內容]
+
+【範例 3】
+[第三個範例的完整內容]
+
+現在，請用相同的風格和格式，針對以下主題創作：
+主題：[你的主題]
+要求：[任何額外要求]</div>
+
+<div class="prose">
+<strong>範例選擇的三個原則：</strong>
+</div>
+
+<div class="checklist">
+<div class="checklist-item"><strong>多樣性：</strong>範例要涵蓋不同情境，但保持相同風格</div>
+<div class="checklist-item"><strong>品質：</strong>只用你認為「完美」的範例，AI 會複製所有特徵包括缺點</div>
+<div class="checklist-item"><strong>數量：</strong>通常 2-5 個範例最佳，太少不足以建立模式，太多會讓 prompt 過長</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">進階技巧：風格解構與框架提取</h2>
+</div>
+
+<div class="prose">
+基本的 Few-shot 是「給範例，讓 AI 自己找模式」。進階技巧是：<strong>你先分析範例找出模式，然後把模式轉化為明確的框架</strong>，再結合範例一起給 AI。
+</div>
+
+<div class="code-block-header">風格解構 Prompt 範本</div>
+<div class="code-block">我希望你學習並複製以下寫作風格。
+
+【範例 A-C】
+[貼入範例]
+
+【風格分析任務】
+請先分析以上範例的共同特徵：
+1. 句子長度和結構
+2. 用詞偏好
+3. 段落結構
+4. 情感基調
+5. 修辭手法
+
+用條列方式總結「這種風格的寫作規則」。
+
+然後，使用完全相同的風格，為以下主題寫一段文字：
+主題：[你的主題]
+長度：[指定字數]</div>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Side Project</div>
+<h2 class="practice-title">打造你的個人寫作風格複製器</h2>
+<div class="practice-desc">
+收集你最喜愛的 5 個作家或品牌的寫作樣本，設計一個「個人寫作風格複製器」，能夠在你指定的風格下，為任何主題生成符合該風格的文字。
+</div>
+
+<div class="practice-desc">
+<strong>第一步：收集優質範例</strong><br>
+選擇 3-5 個你真正喜愛的寫作風格來源，對每個風格來源找 3 個範例（每個 100-200 字）。<br><br>
+
+<strong>第二步：解構風格特徵</strong><br>
+對每個風格，用八維度分析法：句子長度、詞彙選擇、段落結構、開頭方式、結尾方式、修辭手法、語氣情感、標點習慣。<br><br>
+
+<strong>第三步：設計 Few-shot Prompt</strong><br>
+為每個風格創建標準化的 Few-shot prompt 範本，包含 3 個優質範例、風格規則總結、清晰的任務說明。<br><br>
+
+<strong>第四步：測試與優化</strong><br>
+對每個風格範本，測試至少 5 個不同主題，評估輸出品質，記錄哪些範例效果最好。<br><br>
+
+<strong>第五步：建立風格庫</strong><br>
+把你的 3-5 個風格範本整理成「個人風格庫」，給每個風格取名，註明適用場景，記錄使用效果。
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day4.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 04: Chain-of-Thought 推理鏈</span>
+</a>
+<a href="day6.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">下一課 →</span>
+<span class="nav-title">Day 06: 設計預約系統對話流程</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 02 - Prompt 的解剖學 | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #f5f2ed;
+    --cream: #e8e3da;
+    --ink: #1a1814;
+    --warm-mid: #8b7355;
+    --accent: #c9431f;
+    --accent-light: #e8a882;
+    --text-dim: #6b6358;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--white); color: var(--ink); font-family: 'IBM Plex Mono', monospace; line-height: 1.6; }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid var(--ink);
+    padding: 16px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    z-index: 100;
+  }
+
+  .back-link {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--accent); }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .day-badge {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 80px 48px;
+    border-bottom: 2px solid var(--ink);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .lesson-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .lesson-meta span::before {
+    content: '//';
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  .lesson-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .lesson-subtitle {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 800px;
+  }
+
+  /* Content */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+
+  .section {
+    margin-bottom: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .prose {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.9;
+    margin-bottom: 24px;
+  }
+
+  .prose strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* Code Block */
+  .code-block {
+    background: var(--ink);
+    color: var(--accent-light);
+    padding: 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .code-block-header {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  /* Comparison Grid */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin: 32px 0;
+  }
+
+  .comparison-item {
+    border: 2px solid var(--ink);
+    padding: 24px;
+  }
+
+  .comparison-item.bad {
+    border-color: var(--text-dim);
+    opacity: 0.7;
+  }
+
+  .comparison-item.good {
+    border-color: var(--accent);
+  }
+
+  .comparison-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .comparison-item.bad .comparison-label {
+    color: var(--text-dim);
+  }
+
+  .comparison-item.good .comparison-label {
+    color: var(--accent);
+  }
+
+  .comparison-text {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* Elements Grid */
+  .elements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    margin: 32px 0;
+  }
+
+  .element-card {
+    background: var(--white);
+    padding: 32px;
+  }
+
+  .element-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .element-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .element-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .element-example {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    background: var(--cream);
+    padding: 12px;
+    border-left: 3px solid var(--accent);
+  }
+
+  /* Highlight Box */
+  .highlight-box {
+    background: var(--cream);
+    padding: 32px;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .highlight-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  /* Practice Section */
+  .practice-box {
+    background: var(--ink);
+    color: var(--white);
+    padding: 48px;
+    margin: 64px 0;
+  }
+
+  .practice-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+  }
+
+  .practice-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+
+  .practice-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.8;
+    opacity: 0.9;
+  }
+
+  /* Navigation */
+  .lesson-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 48px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+
+  .nav-link:hover {
+    color: var(--accent);
+  }
+
+  .nav-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--white);
+    padding: 32px 48px;
+    text-align: center;
+  }
+
+  .footer-text {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header { padding: 16px 24px; flex-direction: column; gap: 8px; }
+    .hero { padding: 48px 24px; }
+    .content { padding: 32px 24px; }
+    .comparison { grid-template-columns: 1fr; }
+    .elements-grid { grid-template-columns: 1fr; }
+    .practice-box { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+  <div class="header-title">Prompt Mastery</div>
+  <div class="day-badge">Day 02 / 20</div>
+</header>
+
+<section class="hero">
+  <div class="lesson-meta">
+    <span>Week 1</span>
+    <span>40 分鐘</span>
+    <span>基礎概念</span>
+  </div>
+  <h1 class="lesson-title">Prompt 的解剖學</h1>
+  <p class="lesson-subtitle">
+    一個優秀的 prompt 有四個核心元素：角色、任務、格式、限制。今天我們逐一拆解這四個元素，並通過對比「模糊 prompt」和「精準 prompt」的輸出結果，讓你親眼看到差距有多大。
+  </p>
+</section>
+
+<main class="content">
+  
+  <!-- 第一部分：為什麼需要結構化？ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <h2 class="section-title">為什麼需要結構化？</h2>
+    </div>
+    
+    <div class="prose">
+      在 Day 1 我們了解了 AI 如何「理解」你的語言。但光是理解還不夠——你需要用一種<strong>結構化的方式</strong>來組織你的 prompt，才能讓 AI 精準地產出你想要的結果。
+    </div>
+
+    <div class="prose">
+      想像你在跟一個非常聰明但完全不了解你背景的助理對話。如果你只丟一句「幫我寫個文案」，他可能會寫出一堆你用不上的東西。但如果你清楚告訴他「你是誰」、「你要做什麼」、「要什麼格式」、「有什麼限制」，結果就會天差地別。
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">❌ 模糊 Prompt</div>
+        <div class="comparison-text">
+          「幫我寫一個產品介紹。」
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 精準 Prompt</div>
+        <div class="comparison-text">
+          「你是一位科技產品文案撰稿人。請為我們的智慧手錶撰寫一段 150 字的介紹文案，目標受眾是 25-35 歲的健康意識消費者。格式：開場 2 句、痛點 3 句、行動號召 1 句。不使用『創新』『顛覆』等詞彙。」
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">關鍵洞察</div>
+      <div class="prose">
+        AI 不會主動問你「你要什麼」，它只會基於你給的資訊盡力回答。結構化的 prompt 就像是給 AI 一張完整的地圖，而不是讓它自己去猜目的地。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第二部分：四元素框架 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <h2 class="section-title">四元素框架詳解</h2>
+    </div>
+
+    <div class="prose">
+      一個完整的 prompt 包含四個核心元素。這四個元素就像是樂高積木——你可以根據需求調整每個部分的細節，但這四個積木缺一不可。
+    </div>
+
+    <div class="elements-grid">
+      <div class="element-card">
+        <div class="element-number">01</div>
+        <h3 class="element-title">角色 Role</h3>
+        <p class="element-desc">
+          定義 AI 應該以什麼身份、專業背景來回答問題。角色會影響語氣、專業度和觀點。
+        </p>
+        <div class="element-example">
+          你是一位有 10 年經驗的資深文案撰稿人，專精於科技產品的品牌敘事。
+        </div>
+      </div>
+
+      <div class="element-card">
+        <div class="element-number">02</div>
+        <h3 class="element-title">任務 Task</h3>
+        <p class="element-desc">
+          清楚說明你要 AI 做什麼。包含目標、背景資訊、具體要求。越具體越好。
+        </p>
+        <div class="element-example">
+          請為以下產品撰寫一段介紹文案：產品名稱「FitPulse」，核心功能是 24/7 心率監測。
+        </div>
+      </div>
+
+      <div class="element-card">
+        <div class="element-number">03</div>
+        <h3 class="element-title">格式 Format</h3>
+        <p class="element-desc">
+          指定輸出的結構和形式。這決定了內容如何呈現，是條列式、段落式，還是表格？
+        </p>
+        <div class="element-example">
+          輸出格式：第一段開場（2 句）、第二段痛點（3 句）、第三段行動號召（1 句），總字數 150 字以內。
+        </div>
+      </div>
+
+      <div class="element-card">
+        <div class="element-number">04</div>
+        <h3 class="element-title">限制 Constraints</h3>
+        <p class="element-desc">
+          設定邊界——什麼不能做、不能說、不能用。這能避免 AI 產出不適合的內容。
+        </p>
+        <div class="element-example">
+          不使用以下詞彙：「創新」「顛覆」「賦能」。語氣：專業但親切，避免過度技術性用語。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第三部分：完整範本 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <h2 class="section-title">完整 Prompt 範本</h2>
+    </div>
+
+    <div class="prose">
+      現在讓我們把四個元素組合起來，看看一個完整的、結構化的 prompt 長什麼樣子。
+    </div>
+
+    <div class="code-block-header">四元素完整 Prompt 範本</div>
+    <div class="code-block">[角色] 你是一位有10年經驗的資深文案撰稿人，
+        專精於科技產品的品牌敘事。
+
+[任務] 請為以下產品撰寫一段介紹文案：
+        產品名稱：FitPulse 智慧手錶
+        核心功能：24/7 心率監測、睡眠追蹤、運動模式
+        目標用戶：25-35 歲注重健康的都市上班族
+
+[格式] 輸出格式：
+        - 第一段：吸引眼球的開場（2句）
+        - 第二段：解決痛點（3句）
+        - 第三段：行動號召（1句）
+        總字數：150字以內
+
+[限制] 不使用以下詞彙：「創新」「顛覆」「賦能」
+        語氣：專業但親切，避免過度技術性用語</div>
+
+    <div class="highlight-box">
+      <div class="highlight-title">💡 專業提示</div>
+      <div class="prose">
+        你不需要每次都把四個元素標註得這麼明顯（雖然這樣更清楚）。重點是<strong>確保這四個元素都存在</strong>。隨著你越來越熟練，你可以用更自然的方式把它們融入 prompt 中。
+      </div>
+    </div>
+  </section>
+
+  <!-- 第四部分：實戰對比 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <h2 class="section-title">實戰對比：看見差距</h2>
+    </div>
+
+    <div class="prose">
+      理論說得再多，不如實際看看效果。下面是同樣一個任務，用「模糊 prompt」和「精準 prompt」得到的結果對比。
+    </div>
+
+    <div class="code-block-header">❌ 模糊 Prompt</div>
+    <div class="code-block">幫我寫一個智慧手錶的產品介紹。</div>
+
+    <div class="prose">
+      <strong>可能的問題：</strong>
+    </div>
+    <div class="prose">
+      • 你不知道會得到什麼風格（科技感？溫馨？專業？）<br>
+      • 字數可能太長或太短<br>
+      • 可能包含你不想要的詞彙或表達方式<br>
+      • 沒有針對特定受眾，文案可能過於泛泛
+    </div>
+
+    <div class="code-block-header">✓ 精準 Prompt（使用四元素框架）</div>
+    <div class="code-block">[角色] 你是針對健康科技產品的文案專家
+
+[任務] 為「FitPulse」智慧手錶撰寫產品介紹
+        目標受眾：25-35歲都市上班族
+        核心功能：心率監測、睡眠追蹤
+        痛點：工作壓力大、睡眠品質差、缺乏運動
+
+[格式] 三段式，共150字：
+        - 開場：引起共鳴（2句）
+        - 痛點+解決方案（3句）  
+        - 行動號召（1句）
+
+[限制] 語氣親切不說教
+        禁用詞：創新、顛覆、黑科技</div>
+
+    <div class="prose">
+      <strong>你會得到：</strong>
+    </div>
+    <div class="prose">
+      • 明確符合字數和格式要求的文案<br>
+      • 針對目標受眾的語氣和訴求<br>
+      • 沒有你不想要的詞彙<br>
+      • 結構清晰，可以直接使用或微調
+    </div>
+  </section>
+
+  <!-- 第五部分：常見錯誤 -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <h2 class="section-title">常見錯誤與修正</h2>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">❌ 錯誤：角色過於模糊</div>
+        <div class="comparison-text">
+          「你是一個助理。」
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 修正：角色具體化</div>
+        <div class="comparison-text">
+          「你是一位有 5 年經驗的社群媒體內容策略師，擅長為 B2B SaaS 公司撰寫 LinkedIn 貼文。」
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">❌ 錯誤：任務不明確</div>
+        <div class="comparison-text">
+          「寫點東西關於我們的產品。」
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 修正：任務明確化</div>
+        <div class="comparison-text">
+          「撰寫一篇 LinkedIn 貼文，介紹我們的專案管理軟體如何幫助遠距團隊提升 30% 協作效率。」
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-item bad">
+        <div class="comparison-label">❌ 錯誤：格式要求缺失</div>
+        <div class="comparison-text">
+          「寫一些重點。」
+        </div>
+      </div>
+      <div class="comparison-item good">
+        <div class="comparison-label">✓ 修正：格式明確化</div>
+        <div class="comparison-text">
+          「以 5 個條列點呈現，每點不超過 15 字，用 emoji 開頭。」
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 實作練習 -->
+  <div class="practice-box">
+    <div class="practice-label">今日 Side Project</div>
+    <h2 class="practice-title">打造你的個人介紹生成器</h2>
+    <div class="practice-desc">
+      使用今天學到的四元素框架，設計一個「個人介紹生成器」Prompt。這個 prompt 應該能夠：
+      <br><br>
+      <strong>輸入資訊：</strong><br>
+      • 你的職業<br>
+      • 3-5 個核心技能<br>
+      • 個性特質（3 個形容詞）<br>
+      <br>
+      <strong>輸出場景：</strong><br>
+      • 求職面試的自我介紹（60 秒口述版本）<br>
+      • LinkedIn 個人簡介（150 字書面版本）<br>
+      • 社交場合的電梯簡報（30 秒版本）<br>
+      <br>
+      <strong>挑戰任務：</strong><br>
+      把你設計的 prompt 實際測試 3 次，針對不同場景，看看輸出品質如何。記錄下哪些部分需要調整。
+    </div>
+  </div>
+
+  <!-- 導航 -->
+  <nav class="lesson-nav">
+    <a href="day1.html" class="nav-link">
+      <span class="nav-label">← 上一課</span>
+      <span class="nav-title">Day 01: AI 是怎麼「理解」你的？</span>
+    </a>
+    <a href="day3.html" class="nav-link" style="text-align: right;">
+      <span class="nav-label">下一課 →</span>
+      <span class="nav-title">Day 03: 給 AI 一個身份</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-text">
+    Prompt Mastery — 20-Day Intensive Course — 2026
+  </div>
+</footer>
+
+</body>
+</html>
