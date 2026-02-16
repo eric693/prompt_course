@@ -368,7 +368,7 @@ document.querySelectorAll('.day-card').forEach(card => {
   if (!day || day < 1 || day > 20) return;
 
   card.addEventListener('click', () => {
-    const filename = `day${String(day).padStart(2, '0')}.html`;
+    const filename = `day${day}.html`;
     window.location.href = filename;
   });
 });
