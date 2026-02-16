@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 19 - 批量工作流自動化 | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
+.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
+.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
+.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.workflow-box{background:var(--white);border:2px solid var(--ink);padding:24px;margin:32px 0}
+.workflow-step{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:16px;background:var(--cream)}
+.workflow-arrow{font-size:24px;color:var(--accent)}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim}}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.practice-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 19 / 20</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 4</span>
+<span>80 分鐘</span>
+<span>內容批量生產系統</span>
+</div>
+<h1 class="lesson-title">批量工作流<br>自動化</h1>
+<p class="lesson-subtitle">
+變數化 prompt 模板、設計可重複執行的 AI 自動化管線。學習如何將單次 prompt 擴展為可處理數百、數千筆資料的自動化系統，從批量內容生成、數據處理、到完整工作流設計。這是將所有技巧整合應用的實戰課程。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">從單次到批量：自動化的價值</h2>
+</div>
+
+<div class="prose">
+前 18 天我們學的都是「單次互動」— 一個問題、一個回答。但在真實工作中，<strong>重複性任務才是最耗時的</strong>。批量自動化能將你的效率提升 10 倍、100 倍。
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>內容批量生成</strong><br>
+一次生成 100 篇產品描述、50 個社群貼文、20 個 Email 模板<br>
+節省時間：從 20 小時 → 2 小時
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>數據批量處理</strong><br>
+分析 1000 條客戶評論、分類 500 份履歷、摘要 200 篇文章<br>
+節省時間：從 40 小時 → 3 小時
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>多步驟工作流</strong><br>
+研究 → 撰寫 → 審核 → 發布，全流程自動化<br>
+節省時間：從 8 小時 → 1 小時
+</div>
+</div>
+</div>
+
+<div class="quote-box">
+<div class="quote-text">
+"自動化不是讓 AI 做你的工作，而是讓 AI 處理重複的部分，你專注創造價值的部分。"
+</div>
+<div class="quote-author">
+效率提升的真諦
+</div>
+</quote-box>
+
+<div class="highlight-box">
+<div class="highlight-title">批量自動化的三個關鍵</div>
+<div class="prose">
+1. <strong>模板化 Prompt：</strong>設計可填入變數的通用模板<br>
+2. <strong>數據結構化：</strong>輸入輸出都要結構化，方便批量處理<br>
+3. <strong>品質控制：</strong>設計驗證機制，確保批量生成的品質
+</div>
+</highlight-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">變數化 Prompt 模板設計</h2>
+</div>
+
+<div class="prose">
+批量處理的核心是<strong>變數化模板</strong>：一個 prompt 模板 + 不同變數 = 批量輸出。
+</div>
+
+<div class="code-block-header">變數化模板基礎</div>
+<div class="code-block">【概念】
+
+單次 Prompt（不可重複使用）：
+「為 iPhone 15 Pro 寫一段產品描述」
+
+變數化模板（可批量使用）：
+「為 {PRODUCT_NAME} 寫一段產品描述
+
+產品資訊：
+- 名稱：{PRODUCT_NAME}
+- 特點：{KEY_FEATURES}
+- 價格：{PRICE}
+- 目標受眾：{TARGET_AUDIENCE}
+
+要求：
+- 字數：150-200 字
+- 語氣：{TONE}
+- 包含 CTA：{CTA}」
+
+【變數清單範例】
+
+Row 1:
+PRODUCT_NAME = "iPhone 15 Pro"
+KEY_FEATURES = "鈦金屬、A17 Pro 晶片、4800萬像素"
+PRICE = "NT$ 36,900"
+TARGET_AUDIENCE = "科技愛好者"
+TONE = "專業但不生硬"
+CTA = "立即預購"
+
+Row 2:
+PRODUCT_NAME = "AirPods Pro 2"
+KEY_FEATURES = "主動降噪、空間音訊、續航力 6hr"
+PRICE = "NT$ 7,990"
+TARGET_AUDIENCE = "音樂愛好者"
+TONE = "輕鬆友善"
+CTA = "查看詳情"
+
+→ 一個模板 × 100 個變數組合 = 100 個客製化輸出</code-block>
+
+<div class="code-block-header">設計好的變數化模板</div>
+<div class="code-block">【模板設計原則】
+
+原則 1：變數明確定義
+✓ 好：{PRODUCT_NAME} - 清楚知道填什麼
+✗ 差：{THING} - 太模糊
+
+原則 2：預設值和容錯
+如果變數可能為空，提供預設行為：
+「如果 {OPTIONAL_FEATURE} 有值，提及它；否則略過」
+
+原則 3：格式指示
+指定輸出格式：
+「輸出格式：
+標題：[產品名稱]
+描述：[150-200字]
+標籤：#[標籤1] #[標籤2]」
+
+原則 4：範例示範
+在模板中提供範例：
+「範例輸出：
+標題：iPhone 15 Pro - 專業級攝影體驗
+描述：採用全新鈦金屬設計的 iPhone 15 Pro...
+標籤：#iPhone #專業攝影」
+
+【完整模板範例：社群貼文生成】
+
+你是社群媒體內容創作者。
+
+為以下產品生成 {PLATFORM} 貼文：
+
+【產品資訊】
+名稱：{PRODUCT_NAME}
+特點：{KEY_FEATURES}
+目標受眾：{TARGET_AUDIENCE}
+促銷：{PROMOTION}
+
+【貼文要求】
+平台：{PLATFORM}
+語氣：{TONE}
+字數：{WORD_COUNT}
+包含 hashtags：是
+包含 emoji：{USE_EMOJI}
+CTA：{CTA}
+
+【輸出格式】
+貼文內容：
+[貼文文字]
+
+Hashtags：
+[5-7個相關標籤]
+
+最佳發文時間：
+[建議時段]
+
+【範例】
+如果是 Instagram：
+貼文內容：✨ 全新 iPhone 15 Pro，專業級攝影體驗！
+鈦金屬輕量設計 + A17 Pro 超強效能 📱
+Hashtags：#iPhone15Pro #專業攝影 #科技控
+
+如果是 LinkedIn：
+貼文內容：企業專業人士的最佳選擇：iPhone 15 Pro
+Hashtags：#商務工具 #生產力 #企業科技</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">批量處理工作流設計</h2>
+</div>
+
+<div class="prose">
+批量處理不只是「跑很多次」，而是設計<strong>完整的自動化管線</strong>。
+</div>
+
+<div class="workflow-box">
+<div class="workflow-step">
+<strong>步驟 1：輸入準備</strong><br>
+整理成結構化數據（CSV、JSON、資料庫）
+</div>
+<div class="workflow-arrow">↓</div>
+<div class="workflow-step">
+<strong>步驟 2：Prompt 執行</strong><br>
+逐筆（或批次）套用模板生成內容
+</div>
+<div class="workflow-arrow">↓</div>
+<div class="workflow-step">
+<strong>步驟 3：品質檢查</strong><br>
+驗證輸出格式、長度、必要欄位
+</div>
+<div class="workflow-arrow">↓</div>
+<div class="workflow-step">
+<strong>步驟 4：人工審核</strong><br>
+抽樣檢查、標註問題、修正錯誤
+</div>
+<div class="workflow-arrow">↓</div>
+<div class="workflow-step">
+<strong>步驟 5：輸出整合</strong><br>
+匯出成需要的格式（CSV、JSON、CMS）
+</div>
+</workflow-box>
+
+<div class="code-block-header">批量工作流 Prompt 範例</div>
+<div class="code-block">【場景：批量生成產品 SEO 描述】
+
+任務：為 500 個產品生成 SEO 優化的描述
+
+【工作流程】
+
+階段 1：準備輸入數據
+CSV 格式：
+product_id, product_name, category, features, price
+P001, "藍牙耳機 XM5", "音訊設備", "降噪|續航30hr", "8990"
+P002, "智慧手錶 S9", "穿戴裝置", "健康監測|GPS", "12990"
+...
+
+階段 2：設計 Prompt 模板
+---
+為以下產品生成 SEO 描述：
+
+產品：{product_name}
+類別：{category}
+特點：{features}
+價格：{price}
+
+要求：
+1. 字數：100-150字
+2. 包含關鍵字：{category}、{product_name}
+3. 語氣：專業但易懂
+4. 包含價格資訊
+5. 結尾有購買引導
+
+輸出 JSON 格式：
+{
+  "title": "SEO 標題（50-60字）",
+  "description": "產品描述（100-150字）",
+  "keywords": ["關鍵字1", "關鍵字2", "關鍵字3"]
+}
+---
+
+階段 3：批量執行
+逐筆套用模板：
+P001 → Prompt → JSON 輸出 → 儲存
+P002 → Prompt → JSON 輸出 → 儲存
+...
+（可用 API 或批量工具自動化）
+
+階段 4：品質檢查
+驗證規則：
+□ JSON 格式正確嗎？
+□ 標題長度 50-60 字嗎？
+□ 描述長度 100-150 字嗎？
+□ 包含 3 個關鍵字嗎？
+□ 包含產品名稱嗎？
+
+不符合 → 標註為「需要修正」
+符合 → 標註為「通過」
+
+階段 5：人工抽樣
+隨機抽 5% 檢查：
+• 內容是否準確？
+• 語氣是否合適？
+• 有無錯誤資訊？
+
+階段 6：修正與重跑
+針對「需要修正」的項目：
+• 調整變數
+• 優化 prompt
+• 重新生成
+
+階段 7：輸出整合
+合併所有通過的結果：
+product_id, seo_title, seo_description, keywords
+P001, "...", "...", "關鍵字1|關鍵字2|關鍵字3"
+...
+
+導入 CMS 或電商系統</code-block>
+
+<div class="info-box">
+<div class="info-box-title">批量處理的效率計算</div>
+<div class="info-box-content">
+<strong>人工處理：</strong><br>
+500 個產品 × 6 分鐘/個 = 3000 分鐘（50 小時）<br><br>
+
+<strong>AI 批量處理：</strong><br>
+準備工作：2 小時<br>
+批量執行：1 小時（500 個 prompt）<br>
+品質檢查：1 小時<br>
+人工抽樣：0.5 小時<br>
+修正重跑：0.5 小時<br>
+總計：<strong>5 小時</strong><br><br>
+
+<strong>效率提升：</strong>50 小時 → 5 小時 = <strong>10 倍效率</strong>
+</div>
+</info-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">04</div>
+<h2 class="section-title">多步驟工作流自動化</h2>
+</div>
+
+<div class="prose">
+更進階的是<strong>多步驟工作流</strong>：前一步的輸出是下一步的輸入，形成自動化管線。
+</div>
+
+<div class="code-block-header">多步驟工作流範例：內容生產管線</div>
+<div class="code-block">【場景：從產品資料 → 完整行銷素材】
+
+目標：為每個產品生成完整行銷套件
+- 產品描述
+- 社群貼文（3 個平台）
+- Email 行銷文案
+- 廣告標語
+
+【工作流設計】
+
+步驟 1：產品特點提取
+輸入：產品原始資料
+Prompt：「分析以下產品資料，提取 5 個核心賣點」
+輸出：結構化賣點清單
+
+步驟 2：產品描述生成
+輸入：步驟 1 的賣點
+Prompt：「基於這些賣點，生成 200 字產品描述」
+輸出：產品描述文字
+
+步驟 3：社群貼文生成（並行）
+輸入：步驟 2 的產品描述
+Prompt 3a：「改寫為 Instagram 貼文（100字+emoji）」
+Prompt 3b：「改寫為 LinkedIn 貼文（150字專業）」
+Prompt 3c：「改寫為 Twitter 貼文（280字以內）」
+輸出：3 個平台的貼文
+
+步驟 4：Email 文案生成
+輸入：步驟 2 的產品描述
+Prompt：「生成 Email 行銷文案（主旨+內文）」
+輸出：Email 文案
+
+步驟 5：廣告標語生成
+輸入：步驟 1 的賣點
+Prompt：「生成 5 個廣告標語（每個 10 字以內）」
+輸出：標語清單
+
+步驟 6：整合輸出
+合併所有輸出成完整套件：
+{
+  "product_id": "P001",
+  "core_features": [...],
+  "description": "...",
+  "social_posts": {
+    "instagram": "...",
+    "linkedin": "...",
+    "twitter": "..."
+  },
+  "email": {
+    "subject": "...",
+    "body": "..."
+  },
+  "ad_slogans": [...]
+}
+
+【自動化執行】
+對每個產品：
+Run(步驟1) → Run(步驟2) → Run(步驟3abc並行) + Run(步驟4) + Run(步驟5) → Run(步驟6)
+
+批量處理 100 個產品：
+人工需要：100 × 2 小時 = 200 小時
+自動化：設定 4 小時 + 執行 6 小時 + 審核 10 小時 = 20 小時
+效率提升：10 倍</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">05</div>
+<h2 class="section-title">品質控制與錯誤處理</h2>
+</div>
+
+<div class="prose">
+批量處理的挑戰是<strong>品質控制</strong>：一個錯誤會複製 100 次。必須設計驗證機制。
+</div>
+
+<div class="code-block-header">品質控制系統</div>
+<div class="code-block">【三層品質控制】
+
+層次 1：格式驗證（自動化）
+檢查輸出結構是否正確
+
+驗證規則：
+□ JSON 格式正確嗎？
+□ 必要欄位都存在嗎？
+□ 字數在範圍內嗎？
+□ 包含必要元素嗎？
+
+實作：
+def validate_output(output, rules):
+    if not is_valid_json(output):
+        return False, "JSON格式錯誤"
+    
+    if len(output['title']) < 50 or len(output['title']) > 60:
+        return False, "標題長度不符"
+    
+    if 'keywords' not in output or len(output['keywords']) < 3:
+        return False, "缺少關鍵字"
+    
+    return True, "通過"
+
+層次 2：內容檢查（半自動）
+檢查內容品質
+
+檢查點：
+□ 有沒有重複內容？
+□ 有沒有明顯錯誤（如錯誤產品名）？
+□ 語氣是否一致？
+□ 有沒有不當內容？
+
+實作：
+- 相似度檢測（避免重複）
+- 關鍵字比對（確保提及產品）
+- 敏感詞過濾
+- 語氣分析
+
+層次 3：人工抽樣（人工）
+抽樣檢查實際品質
+
+抽樣策略：
+- 隨機抽 5-10%
+- 每個類別至少抽 1 個
+- 優先檢查邊緣案例
+
+評估標準：
+□ 內容準確嗎？
+□ 符合品牌調性嗎？
+□ 有創意/吸引力嗎？
+□ 有改進建議嗎？
+
+【錯誤處理機制】
+
+錯誤類型 1：格式錯誤
+處理：自動標註 → 修正 prompt → 重新生成
+
+錯誤類型 2：內容錯誤
+處理：人工修正 → 更新範例 → 優化 prompt
+
+錯誤類型 3：系統性錯誤
+處理：停止批量 → 檢討 prompt → 重新設計 → 重跑全部
+
+【品質報告】
+
+批量生成 500 筆
+- 一次通過：450 筆（90%）
+- 格式錯誤：30 筆（6%）- 已自動重跑
+- 內容問題：20 筆（4%）- 需人工修正
+- 最終通過率：96%
+
+改進建議：
+1. Prompt 增加格式範例 → 減少格式錯誤
+2. 加強變數驗證 → 避免空值導致錯誤
+3. 增加語氣一致性檢查</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">06</div>
+<h2 class="section-title">完整批量系統 Prompt 範本</h2>
+</div>
+
+<div class="code-block-header">批量內容生成系統完整範本</div>
+<div class="code-block">【批量內容生成系統】
+
+你是內容生產自動化系統，負責批量生成高品質內容。
+
+━━━━━━━━━━━━━━━━━━━━━━
+【輸入規格】
+━━━━━━━━━━━━━━━━━━━━━━
+
+你會收到結構化輸入：
+{
+  "item_id": "唯一識別碼",
+  "template": "模板名稱",
+  "variables": {
+    "var1": "值1",
+    "var2": "值2",
+    ...
+  }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━
+【處理流程】
+━━━━━━━━━━━━━━━━━━━━━━
+
+步驟 1：驗證輸入
+□ 所有必要變數都有值嗎？
+□ 變數格式正確嗎？
+□ 模板存在嗎？
+
+如果驗證失敗 → 返回錯誤訊息
+
+步驟 2：套用模板
+使用對應模板 + 變數生成內容
+
+步驟 3：自我檢查
+□ 輸出格式正確嗎？
+□ 字數符合要求嗎？
+□ 包含所有必要元素嗎？
+□ 語氣一致嗎？
+
+如果檢查失敗 → 重新生成（最多 2 次）
+
+步驟 4：返回結果
+{
+  "item_id": "原始ID",
+  "status": "success/error",
+  "output": {...},
+  "quality_score": 0-100,
+  "notes": "任何需要人工注意的事項"
+}
+
+━━━━━━━━━━━━━━━━━━━━━━
+【模板庫】
+━━━━━━━━━━━━━━━━━━━━━━
+
+模板 1：product_description
+用途：產品描述生成
+變數：product_name, features, price, target_audience
+輸出：title(50-60字), description(150-200字), keywords(3-5個)
+
+模板 2：social_post
+用途：社群貼文生成
+變數：platform, content, tone, use_emoji
+輸出：post_text, hashtags, best_time
+
+模板 3：email_campaign
+用途：Email 文案生成
+變數：subject_hint, product, offer, urgency
+輸出：subject, preview_text, body, cta
+
+━━━━━━━━━━━━━━━━━━━━━━
+【品質標準】
+━━━━━━━━━━━━━━━━━━━━━━
+
+品質評分依據：
+- 格式正確性：30 分
+- 內容相關性：30 分
+- 創意吸引力：20 分
+- 語法正確性：20 分
+
+總分 80+ → 優秀
+總分 60-79 → 合格
+總分 < 60 → 需要重新生成
+
+━━━━━━━━━━━━━━━━━━━━━━
+【錯誤處理】
+━━━━━━━━━━━━━━━━━━━━━━
+
+錯誤碼：
+E001: 缺少必要變數
+E002: 模板不存在
+E003: 輸出格式驗證失敗
+E004: 內容品質不達標
+E005: 重試次數超過限制
+
+每個錯誤返回：
+{
+  "status": "error",
+  "error_code": "E001",
+  "message": "具體錯誤說明",
+  "suggestion": "建議修正方式"
+}
+
+━━━━━━━━━━━━━━━━━━━━━━
+【使用範例】
+━━━━━━━━━━━━━━━━━━━━━━
+
+輸入：
+{
+  "item_id": "P001",
+  "template": "product_description",
+  "variables": {
+    "product_name": "無線藍牙耳機 XM5",
+    "features": "主動降噪、30小時續航、快充",
+    "price": "NT$ 8,990",
+    "target_audience": "音樂愛好者"
+  }
+}
+
+輸出：
+{
+  "item_id": "P001",
+  "status": "success",
+  "output": {
+    "title": "XM5 無線藍牙耳機 - 沉浸式音樂體驗，30小時超長續航",
+    "description": "為音樂愛好者打造的 XM5 無線藍牙耳機...",
+    "keywords": ["藍牙耳機", "降噪耳機", "無線音訊"]
+  },
+  "quality_score": 92,
+  "notes": "內容優秀，可直接使用"
+}</code-block>
+</section>
+
+<div class="practice-box">
+<div class="practice-label">今日 Final Project</div>
+<h2 class="practice-title">建立你的批量自動化系統</h2>
+
+<div class="practice-desc">
+<strong>終極專案：</strong>設計並測試一個完整的批量內容生產系統<br><br>
+
+<strong>步驟 1：選擇應用場景（20 分鐘）</strong><br>
+選擇一個你需要批量處理的任務：<br>
+• 產品描述生成（電商）<br>
+• 社群內容批量生產（行銷）<br>
+• 客戶 Email 客製化（CRM）<br>
+• 數據分類標註（數據處理）<br>
+• 報告自動生成（業務）<br><br>
+
+<strong>步驟 2：設計變數化模板（40 分鐘）</strong><br>
+• 識別所有變數（5-10 個）<br>
+• 設計 prompt 模板<br>
+• 定義輸出格式<br>
+• 提供範例<br><br>
+
+<strong>步驟 3：規劃工作流（30 分鐘）</strong><br>
+• 畫出完整流程圖<br>
+• 定義每個步驟的輸入/輸出<br>
+• 設計錯誤處理機制<br>
+• 規劃品質檢查點<br><br>
+
+<strong>步驟 4：準備測試數據（20 分鐘）</strong><br>
+• 準備 10-20 筆測試資料<br>
+• 包含正常案例和邊緣案例<br>
+• 結構化格式（CSV 或 JSON）<br><br>
+
+<strong>步驟 5：小規模測試（40 分鐘）</strong><br>
+• 用 5 筆資料測試<br>
+• 驗證輸出品質<br>
+• 記錄錯誤和問題<br>
+• 計算成功率<br><br>
+
+<strong>步驟 6：優化迭代（30 分鐘）</strong><br>
+• 分析失敗案例<br>
+• 優化 prompt 模板<br>
+• 加強驗證規則<br>
+• 重新測試<br><br>
+
+<strong>步驟 7：文檔撰寫（20 分鐘）</strong><br>
+記錄：<br>
+• 系統說明<br>
+• 使用方式<br>
+• 變數定義<br>
+• 已知限制<br>
+• 品質標準<br><br>
+
+<strong>完成標準：</strong><br>
+✓ 有完整的變數化模板<br>
+✓ 測試成功率 > 80%<br>
+✓ 有明確的品質標準<br>
+✓ 有錯誤處理機制<br>
+✓ 效率提升 5 倍以上<br>
+✓ 有完整文檔<br><br>
+
+<strong>🎉 恭喜！</strong><br>
+完成這個專案，你就掌握了將 AI 應用到真實工作流的能力。<br>
+這是 Prompt Mastery 課程的倒數第二天，明天我們將整合所有學到的技巧，<br>
+打造你的個人 Prompt 作品集！
+</div>
+</div>
+
+<nav class="lesson-nav">
+<a href="day18.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 18: Prompt 安全邊界設計</span>
+</a>
+<a href="day20.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">最終課 →</span>
+<span class="nav-title">Day 20: 打造你的 Prompt 作品集</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-text">
+Prompt Mastery — 20-Day Intensive Course — 2026
+</div>
+</footer>
+
+</body>
+</html>

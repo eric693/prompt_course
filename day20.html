@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 20 - 打造你的 Prompt 作品集 | Prompt Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358;--gold:#d4af37}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
+.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
+.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:500}
+.hero{padding:120px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto;background:linear-gradient(135deg,var(--cream) 0%,var(--white) 100%)}
+.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
+.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(48px,6vw,88px);font-weight:900;line-height:.95;margin-bottom:32px;letter-spacing:-.02em;color:var(--accent)}
+.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:22px;line-height:1.6;color:var(--text-dim);max-width:800px}
+.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
+.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
+.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
+.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
+.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
+.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
+.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
+.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
+.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
+.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
+.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
+.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
+.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
+.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
+.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
+.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
+.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin:32px 0}
+.portfolio-card{border:2px solid var(--ink);padding:24px;transition:all .3s}
+.portfolio-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+.portfolio-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:12px}
+.portfolio-desc{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.6;color:var(--text-dim)}
+.final-box{background:var(--ink);color:var(--white);padding:64px 48px;margin:64px 0;text-align:center;border:4px solid var(--gold)}
+.final-title{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;margin-bottom:24px;color:var(--gold)}
+.final-text{font-family:'Noto Serif TC',serif;font-size:18px;line-height:1.8;max-width:800px;margin:0 auto 32px;opacity:.95}
+.journey-box{background:var(--cream);padding:48px;margin:48px 0}
+.journey-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;margin-bottom:32px;text-align:center}
+.week-summary{margin-bottom:32px;padding:24px;background:var(--white)}
+.week-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent)}
+.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
+.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
+.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:48px;text-align:center}
+.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4;margin-bottom:16px}
+.footer-congrats{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);margin-bottom:8px}
+@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:64px 24px}.content{padding:32px 24px}.portfolio-grid{grid-template-columns:1fr}.final-box{padding:48px 24px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="prompt-mastery-20days.html" class="back-link">← 回到課程總覽</a>
+<div class="header-title">Prompt Mastery</div>
+<div class="day-badge">Day 20 / 20 ★ Final</div>
+</header>
+
+<section class="hero">
+<div class="lesson-meta">
+<span>Week 4 Final</span>
+<span>90 分鐘</span>
+<span>個人 AI 作品集發布</span>
+</div>
+<h1 class="lesson-title">打造你的<br>Prompt 作品集</h1>
+<p class="lesson-subtitle">
+整合 20 天所學，建立可展示的 AI 作品集與系統文檔。這是課程的最終章：回顧旅程、整理成果、規劃未來。將你掌握的 Prompt 技巧轉化為可展示、可重複使用、可持續優化的個人 AI 工具庫。
+</p>
+</section>
+
+<main class="content">
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">🎓</div>
+<h2 class="section-title">20 天學習旅程回顧</h2>
+</div>
+
+<div class="journey-box">
+<div class="journey-title">你的 Prompt Mastery 之旅</div>
+
+<div class="week-summary">
+<div class="week-title">Week 1 - 基礎技巧（Day 1-5）</div>
+<div class="prose">
+<strong>Day 1:</strong> Prompt 基本結構 - 角色、任務、限制、格式<br>
+<strong>Day 2:</strong> 角色扮演技巧 - 專家人設、多重身份<br>
+<strong>Day 3:</strong> 思維鏈引導 - 拆解問題、邏輯推理<br>
+<strong>Day 4:</strong> Few-shot 學習 - 範例示範、模式識別<br>
+<strong>Day 5:</strong> 輸出格式控制 - JSON、Markdown、結構化輸出<br><br>
+<strong>核心收穫：</strong>掌握 Prompt 工程的基本功，能設計清晰、有效的提示詞。
+</div>
+</div>
+
+<div class="week-summary">
+<div class="week-title">Week 2 - 進階應用（Day 6-10）</div>
+<div class="prose">
+<strong>Day 6:</strong> 長文本處理 - 文章摘要、資料提取<br>
+<strong>Day 7:</strong> 程式碼生成 - 從需求到代碼、除錯優化<br>
+<strong>Day 8:</strong> 數據分析協作 - 數據解讀、視覺化建議<br>
+<strong>Day 9:</strong> RAG 知識庫 - 檢索增強、引用來源<br>
+<strong>Day 10:</strong> 品牌文案系統 - 聲音檔案、風格一致性<br><br>
+<strong>核心收穫：</strong>將基礎技巧應用到實際場景，處理複雜任務。
+</div>
+</div>
+
+<div class="week-summary">
+<div class="week-title">Week 3 - Agent 設計（Day 11-15）</div>
+<div class="prose">
+<strong>Day 11:</strong> 多輪對話 Agent - 狀態管理、對話流程<br>
+<strong>Day 12:</strong> 個人助理 Agent - 個人化、情境感知<br>
+<strong>Day 13:</strong> 決策輔助 Agent - 框架分析、挑戰假設<br>
+<strong>Day 14:</strong> 創意協作 Agent - 四種模式、腦力激盪<br>
+<strong>Day 15:</strong> 教育學習平台 - 蘇格拉底式、難度調整<br><br>
+<strong>核心收穫：</strong>設計有記憶、有狀態、能引導的智能系統。
+</div>
+</div>
+
+<div class="week-summary">
+<div class="week-title">Week 4 - 整合實戰（Day 16-20）</div>
+<div class="prose">
+<strong>Day 16:</strong> 金融理財 AI - 風險評估、合規設計<br>
+<strong>Day 17:</strong> HR 招募系統 - 公平篩選、面試設計<br>
+<strong>Day 18:</strong> 安全邊界設計 - 防禦攻擊、異常處理<br>
+<strong>Day 19:</strong> 批量工作流 - 變數模板、自動化管線<br>
+<strong>Day 20:</strong> 作品集整合 - 成果展示、持續優化<br><br>
+<strong>核心收穫：</strong>將所有技巧整合，應用到專業領域，建立完整系統。
+</div>
+</div>
+</div>
+
+<div class="quote-box">
+<div class="quote-text">
+"20 天前你學會問問題，現在你能設計系統。"
+</div>
+<div class="quote-author">
+從 Prompt 使用者到 Prompt 架構師
+</div>
+</quote-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">01</div>
+<h2 class="section-title">建立你的 Prompt 作品集</h2>
+</div>
+
+<div class="prose">
+作品集不只是展示成果，更是<strong>你的個人 AI 工具庫</strong>。好的作品集應該包含：可重複使用的模板、清晰的文檔、實際應用案例。
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>核心 Prompt 模板庫</strong><br>
+整理你最常用、最有效的 10-15 個 prompt 模板<br>
+• 每個模板都有清楚的用途說明<br>
+• 標註變數和使用方式<br>
+• 附上實際應用範例
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>完整 Agent 系統</strong><br>
+選擇 3-5 個你設計的 Agent 系統作為代表作<br>
+• 包含完整的系統 prompt<br>
+• 說明設計理念和特色<br>
+• 展示實際對話範例
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>自動化工作流</strong><br>
+記錄 2-3 個批量處理或工作流自動化案例<br>
+• 流程圖展示<br>
+• 效率提升數據<br>
+• 可複製的模板
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>學習筆記與洞察</strong><br>
+整理關鍵概念和你的心得<br>
+• 最重要的 10 個原則<br>
+• 常見錯誤與解決方案<br>
+• 持續優化的方向
+</div>
+</div>
+</div>
+
+<div class="code-block-header">作品集結構範本</div>
+<div class="code-block">我的 Prompt Mastery 作品集
+=====================================
+
+📌 個人簡介
+• 姓名/暱稱
+• 專業領域
+• Prompt 應用重點
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Part 1: 核心 Prompt 模板庫
+
+模板 1: 【角色扮演專家顧問】
+用途：專業領域諮詢
+適用場景：需要專業建議時
+變數：{專業領域}、{問題}、{背景}
+範例：[實際應用範例]
+效果：[使用前後對比]
+
+模板 2: 【思維鏈問題拆解】
+用途：複雜問題分析
+適用場景：面對多步驟問題
+變數：{問題}、{限制條件}
+範例：[實際應用範例]
+
+[...其他模板]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🤖 Part 2: Agent 系統作品
+
+Agent 1: 【個人理財教練 AI】
+功能：風險評估 + 投資規劃 + 財務教育
+特色：
+• 三維度風險評估
+• 教育導向（非推銷）
+• 完整合規邊界
+系統 prompt: [完整 prompt]
+對話範例: [實際對話截圖或文字]
+設計心得: [為什麼這樣設計、遇到什麼挑戰]
+
+Agent 2: 【內容創作助手】
+功能：批量生成 + 品牌一致性 + 多平台適配
+特色：
+• 品牌聲音檔案系統
+• 變數化模板
+• 自動品質檢查
+系統 prompt: [完整 prompt]
+
+[...其他 Agent]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ Part 3: 自動化工作流
+
+工作流 1: 【產品內容批量生產】
+目標：500 個產品 → 完整行銷素材
+流程：
+原始資料 → 特點提取 → 描述生成 → 多平台改寫 → 品質檢查
+效率：50hr → 5hr (10x)
+模板：[變數化模板]
+成果：[成功率、品質報告]
+
+工作流 2: 【客戶評論自動分析】
+目標：1000 條評論 → 分類 + 摘要 + 洞察
+流程：[流程圖]
+效率：40hr → 3hr (13x)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 Part 4: 核心原則與心得
+
+我的 Prompt 十誡：
+1. 角色定義要具體，不要模糊
+2. 任務拆解成步驟，不要一次太多
+3. 提供範例勝過長篇解釋
+4. 限制條件寫清楚，避免誤解
+5. 格式要求明確，方便後續處理
+6. 安全邊界不妥協，防禦要完整
+7. 個人化勝過通用，客製化才有價值
+8. 測試迭代持續做，不要一次到位
+9. 文檔記錄很重要，未來自己會感謝
+10. 分享交流共成長，社群力量大
+
+常見錯誤 Top 5：
+1. 指令太模糊 → 解法：加具體範例
+2. 一次要太多 → 解法：拆分步驟
+3. 沒有驗證機制 → 解法：加品質檢查
+4. 忘記邊界情況 → 解法：測試邊緣案例
+5. 沒有持續優化 → 解法：建立反饋循環
+
+下一步學習方向：
+□ 深入特定領域（如醫療、法律）
+□ 學習 API 整合和自動化工具
+□ 研究最新 Prompt 技術
+□ 建立個人 Prompt 資料庫
+□ 參與社群分享與交流
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 成果統計
+
+完成課程：20/20 天 ✓
+建立 Prompt 模板：[數量] 個
+設計 Agent 系統：[數量] 個
+自動化工作流：[數量] 個
+預估效率提升：[X] 倍
+應用領域：[列出領域]
+
+最自豪的成果：
+[描述你最滿意的作品]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 未來規劃
+
+短期（1 個月）：
+• 將作品集應用到實際工作
+• 優化最常用的 3 個模板
+• 記錄使用反饋和改進
+
+中期（3 個月）：
+• 建立自己的 Prompt 分享網站/部落格
+• 參與社群討論和案例分享
+• 深入一個專業領域
+
+長期（1 年）：
+• 成為特定領域的 Prompt 專家
+• 幫助他人建立 AI 系統
+• 持續追蹤 AI 發展，更新技能
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+最後更新：[日期]
+版本：v1.0</code-block>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">02</div>
+<h2 class="section-title">作品集展示建議</h2>
+</div>
+
+<div class="prose">
+好的作品集不只是內容，還要<strong>容易閱讀、容易使用、容易分享</strong>。
+</div>
+
+<div class="portfolio-grid">
+<div class="portfolio-card">
+<div class="portfolio-title">📝 Notion / Obsidian</div>
+<div class="portfolio-desc">
+建立個人知識庫<br>
+優點：結構化、可搜尋、易編輯<br>
+適合：個人使用和持續更新
+</div>
+</div>
+
+<div class="portfolio-card">
+<div class="portfolio-title">💻 GitHub Repository</div>
+<div class="portfolio-desc">
+公開分享你的 Prompt<br>
+優點：版本控制、社群互動<br>
+適合：技術背景、開源分享
+</div>
+</div>
+
+<div class="portfolio-card">
+<div class="portfolio-title">🌐 個人網站/部落格</div>
+<div class="portfolio-desc">
+專業形象展示<br>
+優點：完全客製化、SEO<br>
+適合：建立個人品牌
+</div>
+</div>
+
+<div class="portfolio-card">
+<div class="portfolio-title">📊 Google Doc / Sheet</div>
+<div class="portfolio-desc">
+簡單快速開始<br>
+優點：零成本、易分享<br>
+適合：快速整理和協作
+</div>
+</div>
+</portfolio-grid>
+
+<div class="info-box">
+<div class="info-box-title">分享與隱私平衡</div>
+<div class="info-box-content">
+<strong>可以公開分享：</strong><br>
+• 通用的 Prompt 模板<br>
+• 設計方法和原則<br>
+• 匿名化的案例研究<br><br>
+
+<strong>不要公開分享：</strong><br>
+• 包含公司機密的 Prompt<br>
+• 客戶專屬的系統設計<br>
+• 敏感資料或個人資訊<br><br>
+
+<strong>建議：</strong>建立「公開版」和「私人版」兩個作品集。
+</div>
+</info-box>
+</section>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">03</div>
+<h2 class="section-title">持續學習與優化</h2>
+</div>
+
+<div class="prose">
+完成 20 天課程只是開始。真正的精通來自<strong>持續實踐、反饋、優化</strong>。
+</div>
+
+<div class="checklist">
+<div class="checklist-item">
+<strong>每週實踐：</strong>至少使用 3 個模板，記錄效果和改進點
+</div>
+<div class="checklist-item">
+<strong>每月回顧：</strong>檢視作品集，更新最佳實踐，淘汰過時內容
+</div>
+<div class="checklist-item">
+<strong>每季深化：</strong>選一個領域深入研究，成為該領域專家
+</div>
+<div class="checklist-item">
+<strong>追蹤趨勢：</strong>關注 AI 發展，學習新技術和方法
+</div>
+<div class="checklist-item">
+<strong>社群參與：</strong>分享經驗、學習他人、建立連結
+</div>
+<div class="checklist-item">
+<strong>教學相長：</strong>教導他人是最好的學習方式
+</div>
+</checklist>
+
+<div class="highlight-box">
+<div class="highlight-title">建立你的 Prompt 優化循環</div>
+<div class="prose">
+1. <strong>使用：</strong>在實際工作中應用 Prompt<br>
+2. <strong>記錄：</strong>記錄效果、問題、靈感<br>
+3. <strong>分析：</strong>什麼有效？什麼需要改進？<br>
+4. <strong>優化：</strong>調整 Prompt，測試新版本<br>
+5. <strong>文檔：</strong>更新作品集，分享心得<br>
+6. <strong>重複：</strong>回到步驟 1<br><br>
+
+這個循環會讓你的技能持續成長，永不停滯。
+</div>
+</highlight-box>
+</section>
+
+<div class="final-box">
+<div class="final-title">🎓 恭喜你完成 Prompt Mastery！</div>
+<div class="final-text">
+20 天的學習旅程，你從 Prompt 基礎走到了系統設計。<br>
+你掌握了角色扮演、思維鏈、Few-shot、Agent 設計、工作流自動化。<br>
+你學會了如何讓 AI 成為你的智慧夥伴，而非只是工具。<br><br>
+
+但這不是結束，而是開始。<br>
+真正的精通來自持續實踐。<br>
+真正的價值來自創造成果。<br>
+真正的成長來自分享幫助他人。<br><br>
+
+<strong>現在，去創造屬於你的 AI 作品吧！</strong>
+</div>
+
+<div class="checklist" style="max-width:600px;margin:32px auto;background:rgba(255,255,255,0.1)">
+<div class="checklist-item" style="color:white">
+<strong>完成你的作品集</strong> - 整理 20 天的學習成果
+</div>
+<div class="checklist-item" style="color:white">
+<strong>應用到實際工作</strong> - 讓效率提升 10 倍
+</div>
+<div class="checklist-item" style="color:white">
+<strong>分享你的經驗</strong> - 幫助更多人掌握 Prompt
+</div>
+<div class="checklist-item" style="color:white">
+<strong>持續學習成長</strong> - AI 領域永遠有新東西
+</div>
+<div class="checklist-item" style="color:white">
+<strong>建立你的影響力</strong> - 成為 Prompt 專家
+</div>
+</div>
+</div>
+
+<section class="section">
+<div class="section-header">
+<div class="section-number">🎯</div>
+<h2 class="section-title">Final Project：你的 Prompt 作品集</h2>
+</div>
+
+<div class="prose">
+<strong>最終任務：</strong>建立並發布你的個人 Prompt 作品集<br>
+<strong>時間：</strong>90 分鐘（或更多，這值得投資）<br>
+<strong>成果：</strong>一個可展示、可使用、可持續優化的作品集
+</div>
+
+<div class="step-list">
+<div class="step-item">
+<div class="step-number">01</div>
+<div class="step-content">
+<strong>回顧與篩選（20 分鐘）</strong><br>
+• 回顧 Day 1-19 的所有練習<br>
+• 選出 10-15 個最有價值的 Prompt<br>
+• 選出 3-5 個代表性 Agent 系統<br>
+• 選出 2-3 個自動化工作流
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">02</div>
+<div class="step-content">
+<strong>整理與文檔（40 分鐘）</strong><br>
+• 為每個 Prompt 寫清楚說明<br>
+• 標註使用場景和變數<br>
+• 附上實際範例<br>
+• 記錄設計思路和心得
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">03</div>
+<div class="step-content">
+<strong>結構化組織（20 分鐘）</strong><br>
+• 選擇展示平台（Notion/GitHub/網站）<br>
+• 建立清晰的結構和分類<br>
+• 設計導覽和索引<br>
+• 加入個人風格和品牌
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-number">04</div>
+<div class="step-content">
+<strong>撰寫總結（10 分鐘）</strong><br>
+• 個人簡介和學習動機<br>
+• 20 天學習心得<br>
+• 最重要的 10 個原則<br>
+• 未來學習規劃
+</div>
+</div>
+</div>
+
+<div class="info-box">
+<div class="info-box-title">完成標準</div>
+<div class="info-box-content">
+✓ 至少 10 個 Prompt 模板（含說明和範例）<br>
+✓ 至少 3 個完整 Agent 系統<br>
+✓ 至少 1 個自動化工作流<br>
+✓ 清晰的結構和導覽<br>
+✓ 個人心得和未來規劃<br>
+✓ 可以分享給他人查看<br><br>
+
+<strong>當你完成作品集時，你就正式成為 Prompt 工程師了！</strong>
+</div>
+</info-box>
+</section>
+
+<nav class="lesson-nav">
+<a href="day19.html" class="nav-link">
+<span class="nav-label">← 上一課</span>
+<span class="nav-title">Day 19: 批量工作流自動化</span>
+</a>
+<a href="prompt-mastery-20days.html" class="nav-link" style="text-align: right;">
+<span class="nav-label">回到起點 →</span>
+<span class="nav-title">課程總覽</span>
+</a>
+</nav>
+
+</main>
+
+<footer class="footer">
+<div class="footer-congrats">🎉 Prompt Mastery 完成！🎉</div>
+<div class="footer-text">
+20-Day Intensive Course — 2026<br>
+從基礎到系統，從單次到批量，從使用者到架構師<br>
+你已經掌握了 AI 時代最重要的技能之一<br><br>
+現在，去創造、去實踐、去分享吧！
+</div>
+</footer>
+
+</body>
+</html>
