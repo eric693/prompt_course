@@ -3,629 +3,1366 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 12 - 個人助理 Agent | Prompt Mastery</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<title>Day 12 — 短租平台全棧設計 | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
-.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
-.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
-.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
-.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
-.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
-.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
-.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
-.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
-.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
-.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
-.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
-.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
-.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
-.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
-.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
-.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
-.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
-.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
-.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
-.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
-.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
-.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
-.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
-.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
-.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
-.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
-.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
-.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
-.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
-.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
-.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
-.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
-.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
-.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
-.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
-.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
-.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
-.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
-.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
-.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
-.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
-.warning-box{background:var(--ink);color:var(--white);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
-.warning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent-light)}
-.warning-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8;opacity:.9}
-@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+  :root {
+    --bg: #0d0f12;
+    --surface: #161a20;
+    --surface2: #1e2330;
+    --border: #252c38;
+    --ink: #e8edf5;
+    --ink-dim: #7a8599;
+    --ink-faint: #3d4a5c;
+    --accent: #2e6fdc;
+    --accent-warm: #6aa3f5;
+    --gold: #c9a84c;
+    --green: #2a6b4a;
+    --green-light: #5ab88a;
+    --orange: #c8622a;
+    --orange-light: #e8935a;
+    --teal: #1e7070;
+    --teal-light: #4db8b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Mono', monospace; line-height: 1.6; overflow-x: hidden; }
+
+  body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; }
+
+  /* NAV */
+  .topnav { position: sticky; top: 0; z-index: 200; background: var(--bg); border-bottom: 1px solid var(--border); padding: 0 48px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .nav-back { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink-dim); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-center { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-dim); }
+  .nav-right { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--ink-dim); }
+  .nav-progress-bar { width: 120px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .nav-progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; }
+
+  /* HERO */
+  .lesson-hero { border-bottom: 1px solid var(--border); padding: 72px 48px 64px; position: relative; overflow: hidden; }
+  .lesson-hero::before { content: '12'; position: absolute; right: -10px; bottom: -48px; font-family: 'Playfair Display', serif; font-size: 280px; font-weight: 900; color: var(--surface2); line-height: 1; pointer-events: none; z-index: 0; }
+  .lesson-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; position: relative; z-index: 1; }
+  .meta-day { background: var(--accent); color: var(--ink); padding: 5px 14px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; }
+  .meta-badge { background: var(--surface2); border: 1px solid var(--border); color: var(--teal-light); padding: 5px 14px; font-size: 11px; letter-spacing: 0.12em; }
+  .meta-time { font-size: 11px; letter-spacing: 0.15em; color: var(--ink-dim); }
+  .meta-time::before { content: '—  '; }
+  .lesson-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4.5vw, 66px); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 28px; position: relative; z-index: 1; max-width: 760px; }
+  .lesson-title em { font-style: italic; color: var(--accent-warm); }
+  .lesson-lead { font-family: 'Noto Serif TC', serif; font-size: 16px; line-height: 1.9; color: var(--ink-dim); max-width: 620px; position: relative; z-index: 1; margin-bottom: 36px; }
+  .lesson-objectives { display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+  .objective-tag { border: 1px solid var(--border); padding: 6px 16px; font-size: 11px; letter-spacing: 0.1em; color: var(--ink-dim); }
+  .objective-tag.hl { border-color: var(--accent); color: var(--accent-warm); }
+  .objective-tag.hl2 { border-color: var(--teal); color: var(--teal-light); }
+
+  /* LAYOUT */
+  .lesson-body { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 296px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .lesson-main { border-right: 1px solid var(--border); }
+  .lesson-sidebar { padding: 32px 22px; position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; }
+
+  /* SECTIONS */
+  .lesson-section { border-bottom: 1px solid var(--border); padding: 48px; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .lesson-section.visible { opacity: 1; transform: translateY(0); }
+  .section-eyebrow { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--accent); }
+  .section-eyebrow.teal { color: var(--teal-light); }
+  .section-eyebrow.teal::before { background: var(--teal-light); }
+  .section-heading { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
+  .section-body { font-family: 'Noto Serif TC', serif; font-size: 14px; line-height: 1.95; color: var(--ink-dim); }
+  .section-body p { margin-bottom: 14px; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body strong { color: var(--ink); font-weight: 700; }
+
+  /* JOURNEY PIPELINE */
+  .pipeline { display: flex; align-items: stretch; margin: 28px 0; border: 1px solid var(--border); overflow: hidden; }
+  .pipe-stage { flex: 1; padding: 18px 14px; text-align: center; border-right: 1px solid var(--border); background: var(--surface); transition: background 0.2s; cursor: default; position: relative; }
+  .pipe-stage:last-child { border-right: none; }
+  .pipe-stage.active { background: var(--surface2); }
+  .pipe-stage.active .pipe-num { color: var(--accent-warm); }
+  .pipe-stage.active .pipe-name { color: var(--ink); }
+  .pipe-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: var(--ink-faint); line-height: 1; margin-bottom: 6px; }
+  .pipe-name { font-size: 11px; letter-spacing: 0.1em; color: var(--ink-dim); line-height: 1.4; }
+  .pipe-connector { width: 0; height: 0; border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 12px solid var(--border); position: absolute; right: -12px; top: 50%; transform: translateY(-50%); z-index: 1; }
+
+  /* STEP BLOCKS */
+  .step-builder { display: flex; flex-direction: column; gap: 0; margin: 28px 0; }
+  .step-block { border: 1px solid var(--border); background: var(--surface); overflow: hidden; }
+  .step-block + .step-block { border-top: none; }
+  .step-header { padding: 18px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.15s; user-select: none; }
+  .step-header:hover { background: var(--surface2); }
+  .step-num { width: 32px; height: 32px; border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
+  .step-num.done { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .step-num.teal { border-color: var(--teal-light); color: var(--teal-light); }
+  .step-num.teal.done { background: var(--teal); border-color: var(--teal); color: var(--ink); }
+  .step-title-wrap { flex: 1; }
+  .step-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .step-toggle { font-size: 16px; color: var(--ink-faint); transition: transform 0.2s; flex-shrink: 0; }
+  .step-block.open .step-toggle { transform: rotate(180deg); }
+  .step-content { display: none; border-top: 1px solid var(--border); }
+  .step-block.open .step-content { display: block; }
+  .step-inner { padding: 28px; }
+  .step-desc { font-family: 'Noto Serif TC', serif; font-size: 13px; line-height: 1.8; color: var(--ink-dim); margin-bottom: 20px; }
+  .step-desc strong { color: var(--ink); }
+
+  /* PROMPT BLOCK */
+  .prompt-block { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); margin-bottom: 16px; }
+  .prompt-block.teal { border-left-color: var(--teal-light); }
+  .prompt-block.gold { border-left-color: var(--gold); }
+  .prompt-block.green { border-left-color: var(--green-light); }
+  .prompt-block-header { padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; justify-content: space-between; align-items: center; }
+  .prompt-block-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .prompt-block.teal .prompt-block-label { color: var(--teal-light); }
+  .prompt-block.gold .prompt-block-label { color: var(--gold); }
+  .prompt-block.green .prompt-block-label { color: var(--green-light); }
+  .copy-btn { background: none; border: 1px solid var(--border); color: var(--ink-dim); padding: 4px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent-warm); }
+  .copy-btn.copied { border-color: var(--green-light); color: var(--green-light); }
+  .prompt-code { padding: 18px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.85; color: var(--accent-warm); white-space: pre-wrap; word-break: break-word; }
+  .pc { color: var(--ink-faint); }
+  .pk { color: var(--gold); }
+  .pv { color: var(--green-light); }
+  .pb { color: var(--teal-light); }
+  .po { color: var(--orange-light); }
+
+  /* WHY BOX */
+  .why-box { background: var(--surface2); border: 1px solid var(--border); border-top: 2px solid var(--gold); padding: 18px 22px; margin: 12px 0 0; }
+  .why-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .why-text { font-size: 12px; line-height: 1.7; color: var(--ink-dim); font-family: 'Noto Serif TC', serif; }
+
+  /* TEST RESULT */
+  .test-result { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--green-light); padding: 18px 22px; margin: 14px 0; }
+  .test-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green-light); margin-bottom: 10px; }
+  .test-text { font-family: 'Noto Serif TC', serif; font-size: 13px; line-height: 1.8; color: var(--ink); }
+  .role-u { color: var(--ink-dim); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .role-a { color: var(--accent-warm); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .role-sys { color: var(--teal-light); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+
+  /* KEY INSIGHT */
+  .key-insight { background: linear-gradient(135deg, var(--surface2), var(--surface)); border: 1px solid var(--border); border-top: 3px solid var(--gold); padding: 24px 28px; margin: 24px 0; position: relative; }
+  .insight-mark { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1; opacity: 0.22; position: absolute; top: 10px; right: 18px; }
+  .insight-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .insight-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; font-style: italic; line-height: 1.5; color: var(--ink); max-width: 580px; }
+
+  /* PARAM GRID */
+  .param-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 20px 0; }
+  .param-card { background: var(--surface); padding: 16px 18px; }
+  .param-icon { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal-light); margin-bottom: 6px; }
+  .param-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .param-ex { font-size: 11px; color: var(--ink-faint); line-height: 1.5; }
+
+  /* LISTING CARD */
+  .listing-demo { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 20px 0; }
+  .listing-card { background: var(--surface); padding: 20px 22px; }
+  .listing-rank { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .listing-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .listing-loc { font-size: 11px; color: var(--ink-dim); margin-bottom: 10px; }
+  .listing-price { font-size: 18px; font-weight: 600; color: var(--green-light); margin-bottom: 8px; }
+  .listing-price span { font-size: 11px; color: var(--ink-faint); font-weight: 400; }
+  .listing-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .listing-tag { border: 1px solid var(--border); padding: 3px 8px; font-size: 10px; color: var(--ink-dim); }
+  .listing-pros { font-size: 11px; color: var(--green-light); line-height: 1.6; margin-bottom: 4px; }
+  .listing-cons { font-size: 11px; color: var(--orange-light); line-height: 1.6; }
+
+  /* COMPARISON TABLE */
+  .compare-table { border: 1px solid var(--border); margin: 20px 0; overflow: hidden; }
+  .compare-row { display: grid; grid-template-columns: 160px 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-cell { padding: 12px 16px; font-size: 12px; border-right: 1px solid var(--border); }
+  .compare-cell:last-child { border-right: none; }
+  .compare-head { background: var(--surface); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-dim); }
+  .compare-label { background: var(--surface); font-size: 11px; color: var(--ink-dim); font-family: 'Noto Serif TC', serif; }
+  .compare-win { color: var(--green-light); }
+  .compare-mid { color: var(--gold); }
+  .compare-loss { color: var(--ink-faint); }
+
+  /* LIVE SIMULATOR */
+  .simulator { background: var(--surface); border: 1px solid var(--border); overflow: hidden; margin: 24px 0; }
+  .sim-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: var(--surface2); }
+  .sim-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .sim-title { font-size: 12px; letter-spacing: 0.1em; color: var(--ink-dim); }
+  .sim-phase { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; padding: 3px 10px; border: 1px solid var(--border); color: var(--ink-faint); margin-left: auto; transition: all 0.3s; }
+  .sim-phase.active { border-color: var(--accent); color: var(--accent-warm); }
+  .chat-window { height: 380px; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .chat-msg { display: flex; gap: 10px; align-items: flex-start; }
+  .chat-msg.user { flex-direction: row-reverse; }
+  .chat-avatar { width: 28px; height: 28px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; color: var(--ink-dim); }
+  .chat-avatar.agent { border-color: var(--accent); color: var(--accent-warm); }
+  .chat-bubble { max-width: 78%; background: var(--surface); border: 1px solid var(--border); padding: 10px 14px; font-size: 13px; line-height: 1.65; font-family: 'Noto Serif TC', serif; color: var(--ink); }
+  .chat-bubble.user { background: var(--surface2); color: var(--ink-dim); }
+  .chat-bubble.agent { border-left: 2px solid var(--accent); }
+  .chat-tag { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+  .chat-tag.phase { color: var(--teal-light); }
+  .chat-tag.listing { color: var(--gold); }
+  .chat-tag.booking { color: var(--green-light); }
+  .chat-tag.support { color: var(--orange-light); }
+  .sim-scenarios { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--bg); }
+  .scenario-btn { background: var(--surface); border: 1px solid var(--border); color: var(--ink-dim); padding: 6px 12px; font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; }
+  .scenario-btn:hover { border-color: var(--accent); color: var(--accent-warm); }
+  .scenario-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); padding: 8px 18px 4px; border-top: 1px solid var(--border); }
+  .sim-input-row { border-top: 1px solid var(--border); padding: 12px 18px; display: flex; gap: 10px; }
+  .sim-user-input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--ink); padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; outline: none; }
+  .sim-user-input:focus { border-color: var(--accent); }
+  .sim-send { background: var(--accent); border: none; color: var(--ink); padding: 10px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; cursor: pointer; text-transform: uppercase; transition: opacity 0.15s; }
+  .sim-send:hover { opacity: 0.85; }
+
+  /* FINAL ASSEMBLER */
+  .assembler { background: var(--surface); border: 1px solid var(--border); overflow: hidden; margin: 24px 0; }
+  .assembler-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); }
+  .assembler-title { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .assembler-output { padding: 20px 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.9; color: var(--accent-warm); white-space: pre-wrap; max-height: 520px; overflow-y: auto; }
+
+  /* SIDEBAR */
+  .sidebar-section { margin-bottom: 26px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+  .sidebar-section:last-child { border-bottom: none; }
+  .sidebar-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  .toc-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; text-decoration: none; color: var(--ink-dim); transition: color 0.15s; font-size: 11px; line-height: 1.4; }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-item:hover, .toc-item.active { color: var(--accent-warm); }
+  .toc-num { font-size: 10px; color: var(--ink-faint); min-width: 16px; flex-shrink: 0; margin-top: 1px; }
+  .step-tracker { display: flex; flex-direction: column; gap: 0; }
+  .tracker-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .tracker-item:last-child { border-bottom: none; }
+  .tracker-dot { width: 10px; height: 10px; border: 1px solid var(--border); flex-shrink: 0; transition: all 0.2s; }
+  .tracker-dot.done { background: var(--green-light); border-color: var(--green-light); }
+  .tracker-dot.current { background: var(--accent); border-color: var(--accent); }
+  .tracker-name { font-size: 11px; color: var(--ink-dim); flex: 1; }
+  .tracker-name.done { color: var(--green-light); }
+  .tracker-name.current { color: var(--accent-warm); }
+
+  .complete-section { border-top: 1px solid var(--border); padding: 48px; text-align: center; }
+  .complete-btn { background: transparent; border: 2px solid var(--green-light); color: var(--green-light); padding: 18px 56px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .complete-btn:hover { background: var(--green); color: var(--ink); }
+  .complete-btn.done { background: var(--green); color: var(--ink); border-color: var(--green); }
+  .complete-sub { margin-top: 12px; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+  .lesson-nav { border-top: 1px solid var(--border); background: var(--surface); padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+  .nav-lesson-btn { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink-dim); font-size: 12px; letter-spacing: 0.1em; transition: color 0.2s; padding: 12px 20px; border: 1px solid var(--border); }
+  .nav-lesson-btn:hover { color: var(--ink); border-color: var(--ink-dim); }
+  .nav-lesson-btn.primary { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .nav-lesson-btn.primary:hover { opacity: 0.88; }
+  .nav-center-label { text-align: center; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
 </style>
 </head>
 <body>
-<header class="header">
-<a href="index.html" class="back-link">← 回到課程總覽</a>
-<div class="header-title">Prompt Mastery</div>
-<div class="day-badge">Day 12 / 20</div>
-</header>
 
-<section class="hero">
-<div class="lesson-meta">
-<span>Week 3</span>
-<span>65 分鐘</span>
-<span>Agent 設計</span>
-</div>
-<h1 class="lesson-title">個人助理<br>Agent 設計</h1>
-<p class="lesson-subtitle">
-個人助理 Agent 是最實用的 AI 應用之一：它能理解你的習慣、記住你的偏好、主動提供建議、處理重複性任務。今天學習如何設計一個「了解你」的 AI 助理，包含個人化設定檔、情境感知、主動式服務、以及如何讓 Agent 越用越聰明。
-</p>
-</section>
-
-<main class="content">
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">01</div>
-<h2 class="section-title">什麼是個人助理 Agent？</h2>
-</div>
-
-<div class="prose">
-想像一個真正了解你的助理：知道你的工作習慣、生活偏好、溝通風格，能預測你的需求，主動提供幫助。<strong>個人助理 Agent 就是要做到這件事</strong> — 不只是回答問題，而是成為你的智慧夥伴。
-</div>
-
-<div class="prose">
-<strong>個人助理 Agent 與一般 AI 的差異：</strong>
-</div>
-
-<div class="comparison">
-<div class="comparison-item bad">
-<div class="comparison-label">一般 AI</div>
-<div class="comparison-text">
-<strong>你：</strong>「幫我安排明天的行程」<br>
-<strong>AI：</strong>「請告訴我明天有什麼事項需要安排」<br><br>
-<em>問題：</em>每次都要從頭說明，AI 不記得你的習慣和偏好。
-</div>
-</div>
-<div class="comparison-item good">
-<div class="comparison-label">個人助理 Agent</div>
-<div class="comparison-text">
-<strong>你：</strong>「幫我安排明天的行程」<br>
-<strong>Agent：</strong>「好的。根據你的習慣，早上 9:00-10:00 保留專注時間，10:00 團隊會議，下午預留 2 小時處理昨天討論的專案，晚上 6:00 後不排工作事項。這樣可以嗎？」<br><br>
-<em>優點：</em>記住習慣、主動建議、個人化安排。
-</div>
-</div>
-</comparison>
-
-<div class="quote-box">
-<div class="quote-text">
-"好的助理不是等你說，而是知道你要說什麼。"
-</div>
-<div class="quote-author">
-個人化與主動性是關鍵
-</div>
-</quote-box>
-
-<div class="step-list">
-<div class="step-item">
-<div class="step-number">01</div>
-<div class="step-content">
-<strong>個人化（Personalization）</strong><br>
-了解你的偏好、習慣、風格，提供客製化服務
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">02</div>
-<div class="step-content">
-<strong>情境感知（Context Awareness）</strong><br>
-知道現在是什麼時間、什麼情況，調整行為和建議
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">03</div>
-<div class="step-content">
-<strong>主動式服務（Proactive）</strong><br>
-不只是回答問題，還會主動提醒、建議、優化
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">04</div>
-<div class="step-content">
-<strong>持續學習（Continuous Learning）</strong><br>
-隨著互動次數增加，越來越了解你、越來越準確
-</div>
-</div>
-</div>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">02</div>
-<h2 class="section-title">建立個人設定檔（Personal Profile）</h2>
-</div>
-
-<div class="prose">
-個人助理 Agent 的核心是<strong>個人設定檔</strong> — 一份關於你的結構化資訊，讓 Agent 能提供個人化服務。
-</div>
-
-<div class="code-block-header">個人設定檔範本</div>
-<div class="code-block">【個人設定檔】
-
-━━━ 基本資訊 ━━━
-姓名：[你的名字/暱稱]
-職業：[職位/角色]
-工作型態：[遠距/混合/辦公室]
-時區：[所在時區]
-
-━━━ 工作習慣 ━━━
-• 最佳專注時段：[例如：早上 9-11 點]
-• 偏好的工作節奏：[例如：番茄鐘 25 分鐘]
-• 不被打擾時間：[例如：早上專注時段、晚上 8 點後]
-• 會議偏好：[例如：下午 2-5 點，單次最多 1 小時]
-
-━━━ 溝通風格 ━━━
-• 偏好的溝通方式：[Email/訊息/電話]
-• 回覆速度期待：[即時/當天/48 小時內]
-• 語氣偏好：[正式/友善/直接]
-• 簡報偏好：[詳細/摘要/圖表]
-
-━━━ 優先級與價值觀 ━━━
-• 工作優先級：[列出 3-5 個當前重點]
-• 不願妥協的事：[例如：家庭時間、健康、學習]
-• 決策偏好：[快速決策 vs 深思熟慮]
-• 風險態度：[保守 vs 積極]
-
-━━━ 生活偏好 ━━━
-• 早起/夜貓子：[偏好作息]
-• 運動習慣：[頻率、時間]
-• 飲食偏好/限制：[素食/過敏等]
-• 休閒興趣：[列出興趣愛好]
-
-━━━ 工具與系統 ━━━
-• 使用的工具：[日曆/任務管理/筆記工具]
-• 檔案組織方式：[習慣的分類方式]
-• 提醒偏好：[提前多久提醒、透過什麼管道]
-
-━━━ 個人目標 ━━━
-• 短期目標（3 個月）：[列出 2-3 個]
-• 中期目標（1 年）：[列出 2-3 個]
-• 長期願景：[3-5 年想達成什麼]
-
-━━━ 常見情境處理 ━━━
-• 壓力大時需要：[例如：簡化選擇、提供休息提醒]
-• 創意低落時：[例如：改變環境、看靈感來源]
-• 決策困難時：[例如：列出利弊、尋求建議]
-• 拖延時：[例如：分解任務、設定小目標]</div>
-
-<div class="highlight-box">
-<div class="highlight-title">為什麼需要這麼詳細的設定檔？</div>
-<div class="prose">
-<strong>因為細節決定個人化品質。</strong>越詳細的設定檔，Agent 越能提供精準的服務。<br><br>
-• 知道你早上 9-11 點專注力最好 → 自動在這時段排重要任務<br>
-• 知道你不喜歡晚上 8 點後工作 → 不會在那時安排事項<br>
-• 知道你是視覺型學習者 → 優先提供圖表而非文字<br>
-• 知道你壓力大時需要簡化 → 自動減少選項<br><br>
-這些都是通用 AI 做不到的，只有「了解你」的助理才能做到。
-</div>
-</highlight-box>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">03</div>
-<h2 class="section-title">情境感知設計</h2>
-</div>
-
-<div class="prose">
-好的個人助理不只是記住資訊，還要<strong>知道何時用、如何用</strong>。這就是情境感知。
-</div>
-
-<div class="code-block-header">情境感知 Prompt</div>
-<div class="code-block">【情境感知系統】
-
-在每次互動時，評估以下情境因素：
-
-1. 時間情境
-   - 現在幾點？（影響能量和專注力）
-   - 星期幾？（工作日 vs 週末）
-   - 距離重要事件還有多久？（緊急度）
-
-2. 工作情境
-   - 使用者現在可能在做什麼？
-   - 工作負荷如何？（輕鬆 vs 忙碌）
-   - 當前優先事項是什麼？
-
-3. 情緒/狀態情境
-   - 從對話語氣判斷可能的情緒狀態
-   - 是否處於壓力狀態？
-   - 是否需要鼓勵或支持？
-
-4. 環境情境
-   - 可能的所在地（辦公室 vs 家裡）
-   - 可用資源（在電腦前 vs 手機）
-
-【情境調整規則】
-
-如果是早上 9-11 點 + 工作日
-→ 提供需要專注的任務，避免打擾
-
-如果是晚上 8 點後
-→ 不主動提工作事項，除非緊急
-
-如果使用者語氣焦慮/壓力大
-→ 簡化選項，提供明確建議，少問問題
-
-如果是週末
-→ 不提工作，除非使用者主動詢問
-
-如果接近截止日期
-→ 主動提醒，協助優先排序
-
-【範例應用】
-
-情境：週一早上 9:30，使用者說「今天要做什麼？」
-
-情境判斷：
-- 時間：工作日早上，專注時段
-- 工作情境：一週開始，需要規劃
-- 狀態：可能需要結構和方向
-
-回應策略：
-「早安！今天是週一，你的專注時段。建議優先處理：
-1. [最重要的任務]（預計 2 小時）
-2. 10:30 團隊會議
-3. 下午處理[次要任務]
-
-需要我幫你調整順序嗎？」</code-block>
-
-<div class="warning-box">
-<div class="warning-title">⚠️ 過度假設的風險</div>
-<div class="warning-content">
-<strong>問題：</strong>情境判斷可能出錯。例如週末使用者可能在處理緊急工作，或晚上 8 點在處理重要專案。<br><br>
-<strong>解決：</strong>用「可能」「通常」這類詞彙，並給使用者否定的機會：<br>
-「通常這時候你不處理工作，但如果今天有例外，我也可以幫忙。」<br><br>
-<strong>黃金法則：</strong>寧可問一句確認，不要自作聰明做錯。
-</div>
-</warning-box>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">04</div>
-<h2 class="section-title">主動式服務設計</h2>
-</div>
-
-<div class="prose">
-個人助理的價值不只是「回答」，更在於<strong>主動發現問題、提供建議</strong>。
-</div>
-
-<div class="step-list">
-<div class="step-item">
-<div class="step-number">01</div>
-<div class="step-content">
-<strong>主動提醒</strong><br>
-不等使用者問，主動提醒重要事項<br><br>
-<strong>範例：</strong><br>
-「明天下午 3 點有重要會議，現在還沒準備資料。要不要今天下午花 1 小時準備？」
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">02</div>
-<div class="step-content">
-<strong>發現衝突</strong><br>
-主動發現時程、優先級、資源的衝突<br><br>
-<strong>範例：</strong><br>
-「注意到明天你有 3 個會議都排在下午 2-5 點，這會很累。要不要調整其中一個？」
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">03</div>
-<div class="step-content">
-<strong>優化建議</strong><br>
-基於觀察，主動提出改進方案<br><br>
-<strong>範例：</strong><br>
-「過去兩週你經常在下午 4-5 點處理緊急事項。要不要把這時段保留為緩衝時間？」
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">04</div>
-<div class="step-content">
-<strong>預測需求</strong><br>
-基於模式，預測可能的需求<br><br>
-<strong>範例：</strong><br>
-「每次專案啟動前你都會做競品分析。這次要不要我先幫你收集相關資料？」
-</div>
-</div>
-</div>
-
-<div class="code-block-header">主動式服務 Prompt</div>
-<div class="code-block">【主動式服務規則】
-
-你不只是被動回答，還要主動觀察和建議。
-
-【觀察重點】
-1. 模式識別
-   - 重複出現的行為
-   - 固定的時程安排
-   - 常見的困擾點
-
-2. 異常偵測
-   - 與平常不同的行為
-   - 超出負荷的安排
-   - 可能的疏漏
-
-3. 改進機會
-   - 可以優化的流程
-   - 可以自動化的任務
-   - 可以避免的問題
-
-【主動建議時機】
-✓ 發現明顯的衝突或問題
-✓ 看到可以節省時間的機會
-✓ 即將到達重要時間點
-✓ 偵測到壓力或負荷過高
-
-✗ 避免過度主動
-✗ 不要在使用者忙碌時打擾
-✗ 不要重複提相同建議
-✗ 不要對小事過度反應
-
-【主動建議格式】
-1. 簡短說明觀察到什麼
-2. 提出具體建議
-3. 給使用者選擇權
-
-範例：
-「注意到你這週已經加班 3 天了。建議明天提早下班休息，週五再處理剩下的任務。要我調整行程嗎？」</code-block>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">05</div>
-<h2 class="section-title">完整案例：個人助理 Agent Master Prompt</h2>
-</div>
-
-<div class="code-block-header">個人助理 Agent 完整 Prompt</div>
-<div class="code-block">你是 [使用者名字] 的個人 AI 助理。
-
-━━━ 你對使用者的了解 ━━━
-
-【基本資訊】
-• 職業：產品經理
-• 工作型態：混合（週一三五辦公室，二四在家）
-• 時區：台灣 GMT+8
-
-【工作習慣】
-• 最佳專注時段：早上 9:00-11:30
-• 偏好工作節奏：90 分鐘深度工作 + 20 分鐘休息
-• 不被打擾：早上專注時段、午休 12-1 點、晚上 8 點後
-• 會議偏好：下午 2-5 點，單次最多 1 小時，中間至少間隔 30 分鐘
-
-【溝通風格】
-• 偏好：簡潔明確，先結論後細節
-• 決策時：需要 2-3 個選項比較，不要太多
-• 提醒：提前 1 天 + 當天早上
-• 報告：圖表 > 文字，摘要 > 全文
-
-【優先級】
-1. 產品開發進度（核心工作）
-2. 團隊溝通與協作
-3. 個人學習成長
-4. 健康與家庭時間（不可妥協）
-
-【個人目標】
-• 3 個月：完成新產品 MVP 上線
-• 1 年：成為產品總監
-• 長期：創辦自己的產品
-
-━━━ 你的角色與責任 ━━━
-
-【核心職責】
-1. 時間管理：優化行程、避免衝突、保護專注時間
-2. 任務管理：追蹤進度、提醒截止日、協助優先排序
-3. 資訊整理：總結會議、整理筆記、收集資料
-4. 決策支援：提供選項、分析利弊、給出建議
-5. 學習成長：推薦資源、追蹤學習進度
-
-【服務原則】
-• 主動但不打擾：在適當時機提供建議
-• 個人化但不假設：基於資料但給選擇權
-• 高效但不冷漠：簡潔但有溫度
-• 記住但不死板：靈活調整，適應變化
-
-━━━ 情境感知 ━━━
-
-【時間判斷】
-• 早上 9-11:30 → 專注時段，只處理重要事項，不主動打擾
-• 下午 2-5 點 → 會議/協作時間
-• 晚上 8 點後 → 個人時間，不提工作除非緊急
-• 週末 → 休息時間，不主動聯絡
-
-【工作負荷判斷】
-• 如果今天行程滿 → 簡化建議，減少選項
-• 如果連續多天忙碌 → 提醒休息
-• 如果接近截止日期 → 協助聚焦優先事項
-
-【溝通調整】
-• 如果使用者語氣急促 → 直接給答案，少問問題
-• 如果使用者猶豫 → 提供更多資訊和建議
-• 如果使用者疲倦 → 簡化任務，鼓勵休息
-
-━━━ 互動範例 ━━━
-
-使用者：「今天要做什麼？」
-
-你的思考：
-- 時間：週三早上 9:15（專注時段）
-- 情境：工作日，需要規劃
-- 優先級：產品開發為主
-
-回應：
-「早安！今天是週三，你的專注時段剛開始。建議優先處理：
-
-1. 產品需求文件修訂（昨天會議討論的部分）- 預計 2 小時
-2. 下午 2 點與設計團隊 sync（已在行事曆）
-3. 晚點處理 Email 回覆
-
-這樣安排 OK 嗎？需要調整什麼嗎？」
-
-━━━ 持續改進 ━━━
-
-【學習與優化】
-• 記住使用者的反饋和調整
-• 觀察什麼建議被採納、什麼被忽略
-• 逐步優化建議的時機和內容
-• 發現新的模式和偏好</code-block>
-
-<div class="highlight-box">
-<div class="highlight-title">這個 Prompt 展示了什麼？</div>
-<div class="prose">
-• <strong>完整的個人設定檔：</strong>工作習慣、溝通風格、優先級、目標<br>
-• <strong>清晰的角色定義：</strong>職責範圍、服務原則<br>
-• <strong>情境感知邏輯：</strong>根據時間、工作負荷、溝通語氣調整<br>
-• <strong>實際互動範例：</strong>展示如何應用這些資訊<br>
-• <strong>持續改進機制：</strong>越用越聰明
-</div>
-</highlight-box>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">06</div>
-<h2 class="section-title">讓 Agent 越用越聰明</h2>
-</div>
-
-<div class="prose">
-真正好的個人助理會<strong>隨著時間成長</strong>。每次互動都是學習機會。
-</div>
-
-<div class="checklist">
-<div class="checklist-item">
-<strong>記錄反饋：</strong>使用者接受或拒絕建議時，記住原因
-</div>
-<div class="checklist-item">
-<strong>觀察模式：</strong>使用者重複的行為、偏好的選擇、避免的情況
-</div>
-<div class="checklist-item">
-<strong>更新設定檔：</strong>發現新的偏好或習慣改變時，更新個人檔案
-</div>
-<div class="checklist-item">
-<strong>測試假設：</strong>偶爾提出新建議，測試使用者反應
-</div>
-<div class="checklist-item">
-<strong>詢問確認：</strong>定期詢問「這樣的建議對你有幫助嗎？」
-</div>
-</checklist>
-
-<div class="info-box">
-<div class="info-box-title">實現「學習」的方法</div>
-<div class="info-box-content">
-在對話系統中，Agent 本身不會「記憶」。但你可以設計<strong>學習機制</strong>：<br><br>
-
-<strong>方法 1：定期更新設定檔</strong><br>
-每週或每月檢視互動記錄，手動更新個人設定檔<br><br>
-
-<strong>方法 2：互動中收集資訊</strong><br>
-在對話中詢問「這個建議有幫助嗎？」「下次要不要這樣做？」，根據回答更新規則<br><br>
-
-<strong>方法 3：使用外部知識庫</strong><br>
-把互動記錄、偏好變化儲存在知識庫，Agent 每次都能查詢最新資訊<br><br>
-
-雖然 Agent 不是真的「學習」，但通過這些機制，可以創造「越用越準」的體驗。
-</div>
-</info-box>
-</section>
-
-<div class="practice-box">
-<div class="practice-label">今日 Side Project</div>
-<h2 class="practice-title">建立你的個人 AI 助理</h2>
-
-<div class="practice-desc">
-<strong>第一步：建立個人設定檔（60 分鐘）</strong><br>
-使用今天的「個人設定檔範本」，認真填寫每一個欄位。這是最重要的步驟，決定助理的品質。<br><br>
-重點：<br>
-• 工作習慣要具體（不只是「早上專注」而是「早上 9-11:30」）<br>
-• 溝通風格要明確（舉例說明你喜歡什麼樣的回應）<br>
-• 優先級要誠實（真正重要的是什麼）<br>
-• 目標要實際（不要寫理想，要寫真實想達成的）<br><br>
-
-<strong>第二步：設計情境感知規則（30 分鐘）</strong><br>
-列出 5-10 個常見情境，定義每個情境下助理應該如何行為：<br>
-• 早上專注時段 →？<br>
-• 壓力大的時候 →？<br>
-• 接近截止日期 →？<br>
-• 週末 →？<br>
-• 晚上 8 點後 →？<br><br>
-
-<strong>第三步：撰寫完整 Agent Prompt（40 分鐘）</strong><br>
-整合個人設定檔和情境規則，寫成完整的助理 prompt。包含：<br>
-• 個人資訊<br>
-• 角色定義<br>
-• 情境感知邏輯<br>
-• 互動範例<br>
-• 學習機制<br><br>
-
-<strong>第四步：測試常見場景（30 分鐘）</strong><br>
-模擬 5 個你常遇到的情況，測試助理的回應：<br>
-1. 「今天要做什麼？」<br>
-2. 「幫我安排明天的會議」<br>
-3. 「我有點焦慮，不知道該先做什麼」<br>
-4. 「這週好累，該怎麼調整？」<br>
-5. 「幫我規劃下週的工作」<br><br>
-
-評估：回應是否個人化？是否考慮情境？是否主動提供建議？<br><br>
-
-<strong>第五步：優化與迭代（20 分鐘）</strong><br>
-根據測試結果，調整 prompt：<br>
-• 哪些資訊不夠具體？補充<br>
-• 哪些情境判斷錯誤？修正<br>
-• 哪些建議不符合需求？調整<br><br>
-
-<strong>完成標準：</strong><br>
-當助理的建議讓你覺得「它真的懂我」時，就算成功。
-</div>
-</div>
-
-<nav class="lesson-nav">
-<a href="day11.html" class="nav-link">
-<span class="nav-label">← 上一課</span>
-<span class="nav-title">Day 11: 多輪對話 Agent 設計</span>
-</a>
-<a href="day13.html" class="nav-link" style="text-align: right;">
-<span class="nav-label">下一課 →</span>
-<span class="nav-title">Day 13: 決策輔助 Agent</span>
-</a>
+<nav class="topnav">
+  <a href="prompt-course.html" class="nav-back">← 回到課程</a>
+  <div class="nav-center">Prompt Mastery</div>
+  <div class="nav-right">
+    <span>Day 12 / 20</span>
+    <div class="nav-progress-bar"><div class="nav-progress-fill" id="scrollProgress"></div></div>
+  </div>
 </nav>
 
+<!-- HERO -->
+<div class="lesson-hero">
+  <div class="lesson-meta">
+    <span class="meta-day">Day 12</span>
+    <span class="meta-badge">Full-Stack Design</span>
+    <span class="meta-time">70 分鐘</span>
+  </div>
+  <h1 class="lesson-title">短租平台<br><em>全棧對話設計</em></h1>
+  <p class="lesson-lead">從用戶說「我想去曼谷」的第一句話，到成功辦理 Check-in 的完整旅程。六個 Prompt 模組，覆蓋 Booking.com 等級的全棧對話架構。</p>
+  <div class="lesson-objectives">
+    <span class="objective-tag hl">需求採集系統</span>
+    <span class="objective-tag hl">搜尋推薦引擎</span>
+    <span class="objective-tag hl">房源比較框架</span>
+    <span class="objective-tag hl2">預訂確認流程</span>
+    <span class="objective-tag hl2">入住前服務</span>
+    <span class="objective-tag hl2">售後問題處理</span>
+  </div>
+</div>
+
+<div class="lesson-body">
+<main class="lesson-main">
+
+<!-- SECTION 0: 全程架構 -->
+<div class="lesson-section" id="sec0">
+  <div class="section-eyebrow">Architecture Overview</div>
+  <h2 class="section-heading">六個階段，一條完整的用戶旅程</h2>
+  <div class="section-body">
+    <p>Booking.com 的強大之處不是某一個功能特別好，而是<strong>整條用戶旅程都被照顧到了</strong>。從用戶第一次開口到旅程結束，每個轉折點都有對應的系統在運作。</p>
+    <p>今天我們用六個 Prompt 模組，還原這套架構。每個模組都是獨立可用的，但組合在一起才能發揮最大威力。</p>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-stage active">
+      <div class="pipe-num">1</div>
+      <div class="pipe-name">需求<br>採集</div>
+      <div class="pipe-connector"></div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">2</div>
+      <div class="pipe-name">搜尋<br>推薦</div>
+      <div class="pipe-connector"></div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">3</div>
+      <div class="pipe-name">房源<br>比較</div>
+      <div class="pipe-connector"></div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">4</div>
+      <div class="pipe-name">預訂<br>確認</div>
+      <div class="pipe-connector"></div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-num">5</div>
+      <div class="pipe-name">入住<br>準備</div>
+      <div class="pipe-connector"></div>
+    </div>
+    <div class="pipe-stage" style="border-right:none;">
+      <div class="pipe-num">6</div>
+      <div class="pipe-name">售後<br>支援</div>
+    </div>
+  </div>
+
+  <div class="key-insight">
+    <div class="insight-mark">"</div>
+    <div class="insight-label">與 Day 11 的關鍵差異</div>
+    <div class="insight-text">Day 11 的客服 Agent 是「等待問題發生，然後解決」；今天的短租平台 AI 是「主動引導用戶完成整段旅程」。一個是被動防禦，一個是主動導覽。</div>
+  </div>
+</div>
+
+<!-- MODULE 1: 需求採集 -->
+<div class="lesson-section" id="sec1">
+  <div class="section-eyebrow">Module 01 / 06</div>
+  <h2 class="section-heading">需求採集：問對問題，比推薦房源更重要</h2>
+  <div class="section-body">
+    <p>新手最常犯的錯誤是立刻開始推薦房源。但如果你不知道用戶的真實需求，再多的推薦都是浪費。Booking.com 的搜尋系統在回傳結果之前，已經收集了至少六個維度的資訊。</p>
+    <p>關鍵技巧：<strong>問題要有優先順序</strong>。必問的放前面，可選的讓系統自動推斷。每次只問一個問題，但要讓用戶感覺「這個 AI 很聰明，問到點上了」。</p>
+  </div>
+
+  <div class="param-grid">
+    <div class="param-card">
+      <div class="param-icon">必問 P1</div>
+      <div class="param-name">目的地</div>
+      <div class="param-ex">城市 / 地區 / 景點附近</div>
+    </div>
+    <div class="param-card">
+      <div class="param-icon">必問 P2</div>
+      <div class="param-name">日期範圍</div>
+      <div class="param-ex">入住 + 退房日期，或天數</div>
+    </div>
+    <div class="param-card">
+      <div class="param-icon">必問 P3</div>
+      <div class="param-name">人數組成</div>
+      <div class="param-ex">大人 / 小孩 / 嬰兒數量</div>
+    </div>
+    <div class="param-card">
+      <div class="param-icon">必問 P4</div>
+      <div class="param-name">預算範圍</div>
+      <div class="param-ex">每晚上限（台幣 / 美金）</div>
+    </div>
+    <div class="param-card">
+      <div class="param-icon">選問 P5</div>
+      <div class="param-name">房型偏好</div>
+      <div class="param-ex">整層 / 私人套房 / 背包床</div>
+    </div>
+    <div class="param-card">
+      <div class="param-icon">自動推斷</div>
+      <div class="param-name">旅行目的</div>
+      <div class="param-ex">從人數組成推斷：家庭/情侶/商務</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block open" id="m1-block">
+      <div class="step-header" onclick="toggleStep('m1-block')">
+        <div class="step-num done">1</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">需求採集 — 智慧問卷系統</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">設計一個按優先順序採集資訊的問卷機制。核心原則：<strong>已知的不再問，不確定的智慧推斷，必要的主動追問</strong>。</div>
+          <div class="prompt-block">
+            <div class="prompt-block-header">
+              <span class="prompt-block-label">Module 1 — 需求採集 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 需求採集系統</span>
+
+當用戶表達旅遊意圖時，啟動需求採集流程。
+
+<span class="pk">採集優先順序：</span>
+
+<span class="pv">P1 目的地</span>（若未提及，立即詢問）
+→ 若用戶說「曼谷」→ 確認是否要市中心或特定區域
+→ 若用戶說「泰國」→ 詢問具體城市
+
+<span class="pv">P2 日期</span>（若未提及，立即詢問）
+→ 接受自然語言：「下週」「5/1-5/5」「住3晚」
+→ 系統轉換為具體日期後確認
+
+<span class="pv">P3 人數組成</span>（若未提及，詢問）
+→ 接受自然語言：「2個大人」「一家四口（含2個小孩）」
+→ 根據組成自動推斷旅行類型：
+   2大人 → 情侶/朋友旅行
+   含兒童 → 家庭旅行
+   1人    → 獨旅
+   4人以上成人 → 朋友團體
+
+<span class="pv">P4 預算</span>（若未提及，詢問）
+→ 說法：「每晚的預算大概是多少？（台幣計算）」
+→ 接受範圍：「1000-2000」「3000以下」「不限」
+
+<span class="pv">P5 房型</span>（可選，若有線索則推斷）
+→ 家庭旅行 + 4人 → 預設推薦整層公寓
+→ 情侶 → 預設推薦有浴缸或景觀的套房
+→ 獨旅預算低 → 預設推薦私人套房
+→ 若用戶有明確偏好，以用戶為準
+
+<span class="pk">採集規則：</span>
+- 每次最多問 2 個問題
+- 用戶若一次給出多個資訊，全部接收，不重複問
+- P1-P4 必須全部收集才能進入推薦流程
+- 採集完成後，主動確認：
+  「讓我確認一下：[重述所有資訊]，這樣對嗎？」</div>
+          </div>
+          <div class="test-result">
+            <div class="test-label">對話示範</div>
+            <div class="test-text">
+              <p><span class="role-u">[用戶]</span> 「我想找曼谷的住宿，2個大人，下個月初住5天。」</p>
+              <p style="margin-top:8px;color:var(--ink-faint);font-size:11px;">▸ 系統識別：目的地✓ 日期≈ 人數✓ 預算✗</p>
+              <p style="margin-top:8px;"><span class="role-a">[AI]</span> 「好的！曼谷5天2人，下個月初。請問您的每晚預算大概是多少？（台幣計算）另外，您偏好整層公寓還是飯店式套房？」</p>
+              <br>
+              <p><span class="role-u">[用戶]</span> 「預算每晚2000-3000，整層公寓比較好，因為我們想自己開伙。」</p>
+              <p style="margin-top:8px;color:var(--ink-faint);font-size:11px;">▸ 系統識別：預算✓ 房型✓ 額外需求：廚房設備</p>
+              <p style="margin-top:8px;"><span class="role-a">[AI]</span> 「了解！讓我確認一下：曼谷整層公寓，[日期]，2位大人，每晚2000-3000台幣，需要廚房設備。這樣對嗎？確認後我幫您搜尋。」</p>
+            </div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">為什麼要「確認摘要」這個步驟？</div>
+            <div class="why-text">確認摘要有兩個用途：讓用戶感到被理解（增加信任感），以及讓 AI 在進入推薦前對齊所有參數。少了這步，AI 可能基於錯誤理解開始推薦，浪費雙方時間。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 2: 搜尋推薦 -->
+<div class="lesson-section" id="sec2">
+  <div class="section-eyebrow">Module 02 / 06</div>
+  <h2 class="section-heading">搜尋推薦：不只是列出房源，而是做選擇</h2>
+  <div class="section-body">
+    <p>大多數 AI 推薦系統的問題是「給太多選項」。Booking.com 的設計哲學是：<strong>幫用戶做第一輪篩選，讓最終選擇聚焦在 2-3 個真正匹配的選項</strong>。</p>
+    <p>推薦的格式也至關重要。每個房源的呈現方式，必須讓用戶能在 10 秒內判斷「這個是不是我要的」。這需要精心設計的輸出結構。</p>
+  </div>
+
+  <div class="listing-demo">
+    <div class="listing-card">
+      <div class="listing-rank">推薦 A — 最符合需求</div>
+      <div class="listing-name">Sukhumvit 39 Modern Loft</div>
+      <div class="listing-loc">Phrom Phong 站步行5分鐘</div>
+      <div class="listing-price">NT$2,680 <span>/ 晚 · 含早餐</span></div>
+      <div class="listing-tags">
+        <span class="listing-tag">整層公寓</span>
+        <span class="listing-tag">全配廚房</span>
+        <span class="listing-tag">2臥室</span>
+        <span class="listing-tag">免費停車</span>
+      </div>
+      <div class="listing-pros">✓ 廚房設備完整（烤箱/洗碗機）</div>
+      <div class="listing-pros">✓ 附近有大型超市（步行3分鐘）</div>
+      <div class="listing-cons">✗ 11樓，電梯偶有排隊</div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-rank">推薦 B — 地點最佳</div>
+      <div class="listing-name">Thonglor Sky Suite</div>
+      <div class="listing-loc">Thonglor 站出口直達</div>
+      <div class="listing-price">NT$3,100 <span>/ 晚 · 含清潔</span></div>
+      <div class="listing-tags">
+        <span class="listing-tag">整層公寓</span>
+        <span class="listing-tag">簡易廚房</span>
+        <span class="listing-tag">1臥室</span>
+        <span class="listing-tag">健身房</span>
+      </div>
+      <div class="listing-pros">✓ 交通極便，夜生活豐富</div>
+      <div class="listing-pros">✓ 高樓層，曼谷夜景</div>
+      <div class="listing-cons">✗ 廚具較少，不適合大量烹飪</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m2-block">
+      <div class="step-header" onclick="toggleStep('m2-block')">
+        <div class="step-num">2</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">搜尋推薦 — 結構化輸出引擎</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">設計推薦輸出的結構格式。每個房源必須提供相同維度的資訊，讓用戶可以直接比較，同時加入「為什麼推薦這個」的個人化理由。</div>
+          <div class="prompt-block teal">
+            <div class="prompt-block-header">
+              <span class="prompt-block-label">Module 2 — 推薦輸出 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 搜尋推薦引擎</span>
+
+確認用戶需求後，生成房源推薦。
+
+<span class="pk">推薦數量規則：</span>
+- 標準情況：推薦 3 個房源
+- 預算嚴格（僅有1-2間符合）：據實說明，推薦符合的選項
+- 需求特殊（帶寵物/無障礙）：說明選項可能有限
+
+<span class="pk">每個房源的輸出格式：</span>
+
+<span class="pv">推薦 [A/B/C] — [一句話定位，例如：最符合廚房需求]</span>
+<span class="pb">房源名稱：</span>[名稱]
+<span class="pb">位置：</span>[最近地鐵站 + 步行時間，或主要地標距離]
+<span class="pb">價格：</span>[每晚價格] [幣別]（[含什麼/不含什麼]）
+<span class="pb">房型：</span>[整層/套房/etc] · [幾臥幾衛] · [最多容納人數]
+<span class="pb">符合你需求的亮點：</span>
+  ✓ [針對用戶提到的需求，說明此房源如何滿足]
+  ✓ [其他加分項目]
+<span class="pb">需要注意的缺點：</span>
+  ✗ [誠實說明1-2個潛在問題，不誇大也不隱藏]
+<span class="pb">為什麼推薦：</span>[1句個人化理由，連結到用戶的旅行場景]
+
+<span class="pk">推薦完成後，加入比較摘要：</span>
+「<span class="po">快速對比：</span>
+ 選 A 如果：[最適合的場景]
+ 選 B 如果：[最適合的場景]
+ 選 C 如果：[最適合的場景]
+ 請問哪個選項最符合您的需求，
+ 或者您有其他偏好想調整嗎？」
+
+<span class="pk">誠實原則（重要）：</span>
+- 缺點欄位不能為空，每個房源都有值得注意的事
+- 不使用「完美」「最好」「強烈推薦」等誇大詞
+- 若用戶預算無法找到品質好的房源，直接說明，
+  並提供「稍微調高預算可得到」的選項作為參考</div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">為什麼要誠實列出缺點？</div>
+            <div class="why-text">Booking.com 的高轉換率來自「信任感」。當系統主動說出缺點，用戶反而更相信推薦的亮點。一個只說優點的推薦，用戶會懷疑「這個 AI 在賣廣告」。透明地呈現優缺點，才是真正的產品級設計。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 3: 深度比較 -->
+<div class="lesson-section" id="sec3">
+  <div class="section-eyebrow">Module 03 / 06</div>
+  <h2 class="section-heading">深度比較：幫用戶做最後的決策</h2>
+  <div class="section-body">
+    <p>當用戶說「我在 A 和 B 之間猶豫」，這是一個關鍵時刻。一個普通的系統會重複列出兩個房源的資訊；一個好的系統會<strong>根據用戶的旅行場景，直接給出推薦理由</strong>，而不只是並排比較。</p>
+  </div>
+
+  <div class="compare-table">
+    <div class="compare-row">
+      <div class="compare-cell compare-head">比較維度</div>
+      <div class="compare-cell compare-head">Sukhumvit Loft</div>
+      <div class="compare-cell compare-head">Thonglor Suite</div>
+      <div class="compare-cell compare-head">重要性</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-cell compare-label">廚房設備</div>
+      <div class="compare-cell compare-win">全配（烤箱/洗碗機）</div>
+      <div class="compare-cell compare-loss">簡易（僅電磁爐）</div>
+      <div class="compare-cell" style="color:var(--gold);">★★★ 用戶明確需求</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-cell compare-label">交通便利</div>
+      <div class="compare-cell compare-mid">步行5分鐘</div>
+      <div class="compare-cell compare-win">捷運站出口直達</div>
+      <div class="compare-cell" style="color:var(--ink-faint);">★★ 一般需求</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-cell compare-label">每晚價格</div>
+      <div class="compare-cell compare-win">NT$2,680</div>
+      <div class="compare-cell compare-loss">NT$3,100</div>
+      <div class="compare-cell" style="color:var(--gold);">★★★ 在預算範圍內</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-cell compare-label">5晚總價</div>
+      <div class="compare-cell compare-win">NT$13,400</div>
+      <div class="compare-cell compare-loss">NT$15,500</div>
+      <div class="compare-cell" style="color:var(--ink-faint);">差額 NT$2,100</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m3-block">
+      <div class="step-header" onclick="toggleStep('m3-block')">
+        <div class="step-num">3</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">深度比較 — 決策輔助框架</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">當用戶在猶豫時，AI 要做的不是「再給更多資訊」，而是<strong>根據用戶已知的需求偏好，直接做出推薦並解釋理由</strong>。猶豫期的用戶需要決策支持，不是資訊轟炸。</div>
+          <div class="prompt-block gold">
+            <div class="prompt-block-header">
+              <span class="prompt-block-label">Module 3 — 深度比較 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 深度比較模組</span>
+
+當用戶說「我在 [A] 和 [B] 之間猶豫」時，執行此模組。
+
+<span class="pk">Step C1 — 找出決策關鍵維度</span>
+回顧之前採集的需求，找出用戶最在意的 2-3 個維度。
+這些維度就是比較的重心。
+
+<span class="pk">Step C2 — 生成比較表格</span>
+只比較對用戶決策有意義的維度，格式：
+
+| 維度 | [房源A] | [房源B] | 對你的重要性 |
+|------|---------|---------|-------------|
+| [維度1] | [描述] | [描述] | ★★★/★★/★ |
+| [維度2] | [描述] | [描述] | ★★★/★★/★ |
+| 5晚總價 | [價格] | [價格] | 參考 |
+
+<span class="pk">Step C3 — 直接給出推薦</span>
+
+「<span class="pv">基於你的需求</span>，我會推薦 [房源]，原因是：
+ [1-2句話，精準連結到用戶的旅行情境]
+
+ [房源B] 更適合的情況是：
+ [說明什麼樣的用戶更應該選 B]
+
+ 你的旅行重點是 [廚房/地點/價格]，
+ 所以 [房源A/B] 對你來說更划算。」
+
+<span class="pk">Step C4 — 推進決策</span>
+提供明確的下一步選項：
+「如果您決定了，我可以直接幫您辦理預訂。
+ 還是有其他問題想確認？例如入住規定、取消政策等？」
+
+<span class="pc">// 禁止：不要給「兩個都很好，看個人喜好」這類無用的結論</span>
+<span class="pc">// 必須：給出基於用戶需求的明確推薦，不能模糊帶過</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4: 預訂確認 -->
+<div class="lesson-section" id="sec4">
+  <div class="section-eyebrow">Module 04 / 06</div>
+  <h2 class="section-heading">預訂確認：從選擇到訂單的最後一哩路</h2>
+  <div class="section-body">
+    <p>用戶說「好，我要訂這間」之後，系統需要完成的工作比你想像的多。取消政策、入住規定、特殊需求、付款確認……每一個遺漏的細節，都可能在入住當天變成問題。</p>
+    <p>好的預訂流程要做到：<strong>讓用戶清楚知道他訂了什麼、有什麼限制、如果改變主意怎麼辦</strong>。</p>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m4-block">
+      <div class="step-header" onclick="toggleStep('m4-block')">
+        <div class="step-num teal">4</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">預訂確認 — 完整資訊交接</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">預訂流程分兩個階段：<strong>資訊確認</strong>（讓用戶知道他要訂什麼）和<strong>訂單生成</strong>（記錄並輸出確認單）。不要把這兩個混在一起。</div>
+          <div class="prompt-block teal">
+            <div class="prompt-block-header">
+              <span class="prompt-block-label">Module 4 — 預訂確認 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 預訂確認流程</span>
+
+當用戶確認選擇房源時，執行此流程。
+
+<span class="pk">Phase B1 — 預訂前確認清單</span>
+在進入付款前，主動說明以下資訊：
+
+「在確認預訂之前，請確認以下重要資訊：
+
+<span class="pv">入住規定</span>
+• 入住時間：[Check-in 時間，例如：下午3點後]
+• 退房時間：[Check-out 時間，例如：上午11點前]
+• 最少入住夜數：[例如：最少2晚]
+• 寵物政策：[允許/不允許/需額外費用]
+
+<span class="pv">取消政策</span>
+• 免費取消截止：[日期和時間]
+  → 在此之前取消：全額退款
+• 逾期取消：[扣除比例，例如：扣除第一晚費用]
+• 無故未入住：[收取全額房費]
+
+<span class="pv">費用明細</span>
+• 住宿費：[每晚] × [天數] = [小計]
+• 清潔費：[金額]（一次性）
+• 平台服務費：[金額]
+• 總計：[總金額] [幣別]
+
+確認以上資訊都了解後，
+請告訴我您要繼續嗎？」
+
+<span class="pk">Phase B2 — 收集訂房資訊</span>
+依序收集（每次最多2項）：
+1. 入住人姓名（英文，如證件）
+2. 聯絡電話
+3. 預計抵達時間（房東可以準備）
+4. 特殊需求（例如：嬰兒床、提早入住請求）
+
+<span class="pk">Phase B3 — 生成訂單確認單</span>
+
+「━━━━━━━━━━━━━━━━━━━━━
+訂單確認
+━━━━━━━━━━━━━━━━━━━━━
+訂單編號：BK-[8位數字]
+狀態：待付款確認
+
+房源：[房源名稱]
+地址：[地址]
+入住：[日期] 下午3:00後
+退房：[日期] 上午11:00前
+天數：[N]晚
+人數：[N]位大人
+
+住客姓名：[姓名]
+聯絡電話：[電話]
+特殊需求：[或：無]
+
+費用明細：
+  住宿費  [N晚 × NT$X] = NT$XXX
+  清潔費                  NT$XXX
+  服務費                  NT$XXX
+  ─────────────
+  總計                    NT$XXX
+
+免費取消截止：[日期時間]
+━━━━━━━━━━━━━━━━━━━━━
+請在24小時內完成付款，
+否則訂單將自動取消。」</div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">為什麼取消政策要主動說明？</div>
+            <div class="why-text">Booking.com 把取消政策放在最顯眼的位置，不是因為法律要求，而是因為這是用戶退訂糾紛的主要來源。主動、清楚地說明取消條件，能大幅減少售後投訴。這是「預防勝於治療」的 UX 設計。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 5: 入住準備 -->
+<div class="lesson-section" id="sec5">
+  <div class="section-eyebrow">Module 05 / 06</div>
+  <h2 class="section-heading">入住前服務：讓旅客在抵達前就感到安心</h2>
+  <div class="section-body">
+    <p>預訂完成後，旅客通常有一段「等待期」，這段期間是建立信任感的黃金時機。Booking.com、Airbnb 都有完整的入住前溝通系統，設計得好，可以大幅降低入住當天的問題和投訴。</p>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m5-block">
+      <div class="step-header" onclick="toggleStep('m5-block')">
+        <div class="step-num teal">5</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">入住準備 — 主動服務系統</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">入住前的溝通要做到<strong>讓旅客知道所有需要知道的事，但不要資訊轟炸</strong>。關鍵資訊（地址、門鎖密碼、入住時間）要清楚，細節資訊（附近超市、垃圾分類）按需提供。</div>
+          <div class="prompt-block green">
+            <div class="prompt-block-header">
+              <span class="prompt-block-label">Module 5 — 入住準備 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 入住前服務模組</span>
+
+當用戶詢問「入住細節」「怎麼進房」「地址是什麼」
+或入住日期前1天觸發時，執行此模組。
+
+<span class="pk">必須提供的核心資訊：</span>
+
+「您好 [姓名]，您的曼谷之旅快到了！
+ 以下是入住的重要資訊：
+
+<span class="pv">入住方式</span>
+• 地址：[完整地址] [Google Maps 連結]
+• 大門密碼：[密碼]（入住日當天下午2點後有效）
+• 電梯：到 [N] 樓，右轉第 [N] 間
+• 房門密碼：[密碼]
+
+<span class="pv">入住時間</span>
+• 標準入住：下午3:00
+• 您的預計抵達：[用戶先前告知的時間]
+  ✓ 沒有問題，房間會準備好
+  （若有提早入住需求）→ 行李可先寄放，確認是否可提前
+
+<span class="pv">出發前確認</span>
+• [城市] 現在天氣：[季節性提示]
+• 機場到房源建議：[交通方式 + 約需時間]
+
+如有任何臨時狀況，請直接回覆此訊息。」
+
+<span class="pk">按需提供的資訊（當用戶詢問時）：</span>
+- 附近超市：[名稱和步行時間]
+- 附近餐廳：[依房源位置推薦2-3間]
+- 緊急聯絡：[房東電話]
+- Wi-Fi 密碼：[密碼]（入住後提供）
+- 垃圾處理：[說明放哪裡/什麼時間）
+
+<span class="pc">// 入住前不提供 Wi-Fi 密碼，避免未入住即使用</span>
+<span class="pc">// 機場接送、餐廳推薦：作為加值服務主動提問是否需要</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 6: 售後支援 -->
+<div class="lesson-section" id="sec6">
+  <div class="section-eyebrow">Module 06 / 06</div>
+  <h2 class="section-heading">售後支援：解決入住中的即時問題</h2>
+  <div class="section-body">
+    <p>入住期間發生的問題，是短租平台評分的最大影響因子。冷氣壞掉、熱水沒有、鄰居吵鬧——這些問題的回應速度和解決方式，決定了一星還是五星評價。AI 在這個階段的角色是：<strong>快速分類問題，給出即時可行的解決方案，在無法自行解決時立刻通知房東</strong>。</p>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m6-block">
+      <div class="step-header" onclick="toggleStep('m6-block')">
+        <div class="step-num teal">6</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">售後支援 — 入住問題處理矩陣</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">問題分為三個等級：<strong>可自行解決</strong>（給操作指引）、<strong>需要房東介入</strong>（立即通知）、<strong>緊急安全問題</strong>（優先人身安全）。關鍵是 AI 要在 1 個回應內完成分類並給出行動方案，不能讓用戶等待。</div>
+          <div class="prompt-block">
+            <div class="prompt-block-header">
+              <span class="prompt-block-label">Module 6 — 售後支援 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 入住問題處理矩陣</span>
+
+當用戶反映入住問題時，執行以下分類邏輯：
+
+<span class="pv">等級 1 — 可自行解決（立即給操作指引）</span>
+問題類型 → 第一步行動：
+
+Wi-Fi 無法連線
+→ 「請嘗試：①重新輸入密碼 [XXXXX] ②重啟路由器
+   （白色盒子，在 [位置]，按住電源鍵10秒）
+   重啟後等3分鐘。如還是無法連線，告訴我。」
+
+熱水沒有
+→ 「熱水器在浴室右側牆壁。
+   ①確認開關是開啟狀態（藍燈亮起）
+   ②調高溫度旋鈕到最大
+   ③等待約5分鐘，水管需要預熱
+   如5分鐘後仍無熱水，立即通知房東。」
+
+冷氣問題
+→ 「遙控器電池可能沒電（備用電池在廚房抽屜）
+   若換電池後仍無法運作，請提供照片，
+   我立刻通知房東安排維修。」
+
+<span class="pv">等級 2 — 需要房東介入（立即通知 + 告知用戶）</span>
+問題類型：設備損壞、房源描述不符、清潔問題
+
+「我了解，這個問題需要房東直接處理。
+ 我已發送緊急通知給房東 [房東姓名]，
+ 他通常在 [X] 分鐘內回應。
+ 若 30 分鐘內沒有消息，請告知我，
+ 我會升級處理。
+ 在等待期間，[臨時解決建議]。」
+
+<span class="pv">等級 3 — 緊急安全問題（優先人身安全）</span>
+問題類型：瓦斯漏氣、火災、門鎖無法開啟、
+         緊急醫療、人身安全威脅
+
+「請立即：
+ ①確保人身安全，先離開房間
+ ②撥打緊急電話：[當地緊急號碼]
+    泰國：191（警察）/ 1669（救護車）
+ ③再聯繫我或房東
+
+ 現在最重要的是您的安全。
+ 不要等候我的回應，先撥打緊急電話。」
+
+<span class="pc">## 評價引導（退房後24小時內觸發）</span>
+「感謝您在 [房源] 的入住，希望一切順利！
+ 您對這次住宿的整體滿意度如何？（1-5分）
+ 您的評價對其他旅客很有幫助。」
+
+若用戶評分 4-5：→ 引導完成平台評價
+若用戶評分 1-3：→ 先詢問具體問題，提供補救方案，
+                   再邀請重新評價</div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">等級分類的關鍵</div>
+            <div class="why-text">所有問題都用「通知房東」處理，是錯誤的。房東收到太多通知會開始忽略訊息。AI 應該先過濾出真正需要人工介入的問題，保護房東的注意力，同時讓旅客感到問題被即時回應。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE SIMULATOR -->
+<div class="lesson-section" id="sec7">
+  <div class="section-eyebrow teal">Live Test</div>
+  <h2 class="section-heading">完整旅程模擬器 — 從搜尋到售後</h2>
+  <div class="section-body">
+    <p>下方模擬器整合了六個模組。選擇場景按鈕，或自行輸入訊息，觀察系統如何在不同階段啟動對應的模組。注意每個回應的頂部標籤，顯示當前激活的模組。</p>
+  </div>
+
+  <div class="simulator">
+    <div class="sim-header">
+      <div class="sim-dot"></div>
+      <div class="sim-title">StayBot — 短租平台 AI 助手</div>
+      <div class="sim-phase active" id="simPhase">等待中</div>
+    </div>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-msg">
+        <div class="chat-avatar agent">SB</div>
+        <div class="chat-bubble agent">
+          <div class="chat-tag phase">系統就緒</div>
+          您好！我是 StayBot，您的短租旅遊助手。您想去哪裡旅行，或是需要查詢您的訂單？
+        </div>
+      </div>
+    </div>
+    <div class="scenario-label">旅程場景測試</div>
+    <div class="sim-scenarios">
+      <button class="scenario-btn" onclick="runScenario('search_start')">開始搜尋</button>
+      <button class="scenario-btn" onclick="runScenario('with_params')">帶完整需求搜尋</button>
+      <button class="scenario-btn" onclick="runScenario('compare')">比較兩間房源</button>
+      <button class="scenario-btn" onclick="runScenario('book')">確認預訂</button>
+      <button class="scenario-btn" onclick="runScenario('checkin_ask')">入住前詢問</button>
+      <button class="scenario-btn" onclick="runScenario('wifi_issue')">Wi-Fi 無法連線</button>
+      <button class="scenario-btn" onclick="runScenario('ac_issue')">冷氣壞了</button>
+      <button class="scenario-btn" onclick="runScenario('emergency')">緊急安全問題</button>
+      <button class="scenario-btn" onclick="runScenario('cancel')">想取消訂單</button>
+    </div>
+    <div class="sim-input-row">
+      <input class="sim-user-input" id="simInput" placeholder="或自行輸入任意訊息..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="sim-send" onclick="sendMessage()">發送</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL PROMPT -->
+<div class="lesson-section" id="sec8">
+  <div class="section-eyebrow">Final Output</div>
+  <h2 class="section-heading">完整 System Prompt — 六模組組合版</h2>
+  <div class="section-body">
+    <p>以下是整合六個模組的完整 System Prompt。可以直接複製到任何支援 System Prompt 的 AI 平台，把 <span style="color:var(--gold);">[中括號]</span> 內容替換成你的實際資訊即可使用。</p>
+  </div>
+
+  <div class="assembler">
+    <div class="assembler-header">
+      <span class="assembler-title">完整 System Prompt — 短租平台全棧版</span>
+      <button class="copy-btn" onclick="copyFull()">複製全部</button>
+    </div>
+    <div class="assembler-output" id="fullPrompt">## 角色定義
+
+你是「StayBot」，[你的平台名稱] 短租平台的 AI 旅遊助手。
+你負責陪伴旅客完成從搜尋到退房的完整旅程。
+
+語氣：親切、專業、主動、直接
+語言：繁體中文
+核心原則：每個回應都要推進旅程，不只是回答問題
+
+---
+
+## 模組 1 — 需求採集
+
+當用戶表達旅遊意圖時，按以下優先順序採集資訊：
+
+P1 目的地（必問）
+P2 日期範圍（必問）→ 接受自然語言，轉換為具體日期
+P3 人數組成（必問）→ 推斷旅行類型（家庭/情侶/獨旅）
+P4 每晚預算（必問）→ 台幣計算
+P5 房型偏好（選問）→ 根據人數組成預設推薦
+
+規則：
+- 每次最多問 2 個問題
+- 已知資訊不重複詢問
+- 採集完成後確認摘要，再進入推薦
+
+---
+
+## 模組 2 — 搜尋推薦
+
+確認需求後，推薦 3 個房源。每個房源格式：
+
+推薦 [A/B/C] — [一句話定位]
+房源名稱：[名稱]
+位置：[最近捷運站 + 步行時間]
+價格：[每晚] NT$XXX（含/不含 清潔費）
+房型：[整層/套房] · [幾臥幾衛]
+符合你需求的亮點：
+  ✓ [針對用戶需求的說明]
+  ✓ [其他加分項目]
+需要注意的缺點：
+  ✗ [誠實說明1-2個問題]
+為什麼推薦：[1句個人化理由]
+
+推薦完成後附上快速對比：
+選 A 如果：[場景]
+選 B 如果：[場景]
+選 C 如果：[場景]
+
+誠實原則：缺點欄不能為空，不使用誇大詞彙
+
+---
+
+## 模組 3 — 深度比較
+
+當用戶在兩個選項之間猶豫時：
+1. 找出用戶最在意的 2-3 個維度
+2. 生成維度比較表（含重要性評級）
+3. 直接給出推薦 + 個人化理由
+4. 說明選另一個選項更合適的情況
+
+禁止：給出「兩個都很好，看個人喜好」的模糊結論
+
+---
+
+## 模組 4 — 預訂確認
+
+Phase B1 — 訂前說明（必須主動提供）：
+- 入住/退房時間
+- 取消政策（免費取消截止日）
+- 費用明細（住宿費 + 清潔費 + 服務費 + 總計）
+
+Phase B2 — 收集資訊：
+入住人姓名（英文）、聯絡電話、
+預計抵達時間、特殊需求
+
+Phase B3 — 生成訂單確認單（含訂單號、費用明細、
+取消政策提醒）
+
+---
+
+## 模組 5 — 入住準備
+
+入住前觸發，主動提供：
+- 完整地址 + 地圖連結
+- 入門方式（大門密碼 + 房門密碼）
+- 入住時間確認
+- 天氣/交通提示
+
+按需提供：附近超市、餐廳推薦、Wi-Fi 密碼（入住後）
+
+---
+
+## 模組 6 — 售後支援
+
+三個問題等級：
+
+等級 1（可自行解決）：Wi-Fi、熱水、冷氣
+→ 立即給操作步驟，提供自助解決方案
+
+等級 2（需要房東）：設備損壞、房源不符
+→ 立即通知房東 + 告知用戶等待時間
+→ 30分鐘無回應升級處理
+
+等級 3（緊急安全）：瓦斯、火災、醫療
+→ 優先指引撥打當地緊急電話
+→ 人身安全優先於一切流程
+
+退房後：評價引導（低分先補救，再邀請重新評價）</div>
+  </div>
+</div>
+
+<div class="complete-section">
+  <button class="complete-btn" id="completeBtn" onclick="markComplete()">標記 Day 12 完成</button>
+  <div class="complete-sub" id="completeNote">完成後前往 Day 13：電商 AI 銷售助理</div>
+</div>
 </main>
 
-<footer class="footer">
-<div class="footer-text">
-Prompt Mastery — 20-Day Intensive Course — 2026
-</div>
-</footer>
+<!-- SIDEBAR -->
+<aside class="lesson-sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">六模組進度</div>
+    <div class="step-tracker">
+      <div class="tracker-item"><div class="tracker-dot current" id="dot0"></div><span class="tracker-name current" id="tn0">架構總覽</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot1"></div><span class="tracker-name" id="tn1">M1 需求採集</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot2"></div><span class="tracker-name" id="tn2">M2 搜尋推薦</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot3"></div><span class="tracker-name" id="tn3">M3 深度比較</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot4"></div><span class="tracker-name" id="tn4">M4 預訂確認</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot5"></div><span class="tracker-name" id="tn5">M5 入住準備</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot6"></div><span class="tracker-name" id="tn6">M6 售後支援</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot7"></div><span class="tracker-name" id="tn7">Live 測試</span></div>
+      <div class="tracker-item"><div class="tracker-dot" id="dot8"></div><span class="tracker-name" id="tn8">完整 Prompt</span></div>
+    </div>
+  </div>
 
+  <div class="sidebar-section">
+    <div class="sidebar-label">目錄</div>
+    <a class="toc-item" href="#sec0"><span class="toc-num">00</span>六階段架構</a>
+    <a class="toc-item" href="#sec1"><span class="toc-num">01</span>M1 需求採集</a>
+    <a class="toc-item" href="#sec2"><span class="toc-num">02</span>M2 搜尋推薦</a>
+    <a class="toc-item" href="#sec3"><span class="toc-num">03</span>M3 深度比較</a>
+    <a class="toc-item" href="#sec4"><span class="toc-num">04</span>M4 預訂確認</a>
+    <a class="toc-item" href="#sec5"><span class="toc-num">05</span>M5 入住準備</a>
+    <a class="toc-item" href="#sec6"><span class="toc-num">06</span>M6 售後支援</a>
+    <a class="toc-item" href="#sec7"><span class="toc-num">07</span>Live 模擬器</a>
+    <a class="toc-item" href="#sec8"><span class="toc-num">08</span>完整 Prompt</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Day 11 vs Day 12</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:var(--surface);border:1px solid var(--border);padding:12px 14px;">
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--ink-faint);margin-bottom:6px;">DAY 11 — 客服 Agent</div>
+        <div style="font-size:11px;color:var(--ink-dim);line-height:1.6;font-family:'Noto Serif TC',serif;">被動等待問題發生，然後解決。守門員角色。</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--accent);padding:12px 14px;">
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--accent-warm);margin-bottom:6px;">DAY 12 — 旅程助手</div>
+        <div style="font-size:11px;color:var(--ink);line-height:1.6;font-family:'Noto Serif TC',serif;">主動引導用戶完成整段旅程。導覽員角色。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">下一堂課</div>
+    <div style="font-size:11px;color:var(--ink-dim);line-height:1.6;margin-bottom:12px;font-family:'Noto Serif TC',serif;">Day 13：電商 AI 銷售助理 — 需求挖掘、商品推薦、購物引導的完整銷售系統</div>
+    <a href="#" style="display:block;background:var(--accent);color:var(--ink);padding:11px 14px;text-align:center;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Day 13 →</a>
+  </div>
+</aside>
+</div>
+
+<div class="lesson-nav">
+  <a href="day11.html" class="nav-lesson-btn">← Day 11：客服 Agent</a>
+  <div class="nav-center-label">Day 12 / 20 — Full-Stack</div>
+  <a href="#" class="nav-lesson-btn primary">Day 13：電商助理 →</a>
+</div>
+
+<script>
+// SCROLL PROGRESS + SIDEBAR TRACKER
+window.addEventListener('scroll', () => {
+  const d = document.documentElement;
+  const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
+  document.getElementById('scrollProgress').style.width = Math.min(pct,100) + '%';
+  updateTracker();
+});
+
+const sectionIds = ['sec0','sec1','sec2','sec3','sec4','sec5','sec6','sec7','sec8'];
+function updateTracker() {
+  let cur = 0;
+  sectionIds.forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < window.innerHeight * 0.5) cur = i;
+  });
+  sectionIds.forEach((_,i) => {
+    const dot = document.getElementById('dot'+i);
+    const tn  = document.getElementById('tn'+i);
+    if (!dot||!tn) return;
+    dot.className = 'tracker-dot'+(i<cur?' done':i===cur?' current':'');
+    tn.className  = 'tracker-name'+(i<cur?' done':i===cur?' current':'');
+  });
+}
+
+// SECTION REVEAL
+document.querySelectorAll('.lesson-section').forEach(s => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06 }).observe(s);
+});
+
+// STEP TOGGLE
+function toggleStep(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// COPY
+function copyBlock(btn) {
+  const code = btn.closest('.prompt-block').querySelector('.prompt-code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '已複製'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyFull() {
+  navigator.clipboard.writeText(document.getElementById('fullPrompt').innerText).then(() => {
+    event.target.textContent = '已複製'; event.target.classList.add('copied');
+    setTimeout(() => { event.target.textContent = '複製全部'; event.target.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── SIMULATOR ENGINE ───
+const phases = {
+  SEARCH:  '模組 1-2 — 搜尋推薦',
+  COMPARE: '模組 3 — 深度比較',
+  BOOK:    '模組 4 — 預訂確認',
+  CHECKIN: '模組 5 — 入住準備',
+  SUPPORT: '模組 6 — 售後支援',
+  CANCEL:  '取消政策'
+};
+
+const scripts = {
+  search_start: {
+    user: '我想找個地方住',
+    phase: 'SEARCH',
+    tag: 'phase', tagText: '模組 1 啟動 — 需求採集',
+    reply: '好的！讓我幫您找到最合適的住宿。\n\n請問您打算去哪個城市或地區旅遊？'
+  },
+  with_params: {
+    user: '曼谷整層公寓，下個月 10-15 號，2個大人，每晚預算 2500-3500 台幣，需要廚房',
+    phase: 'SEARCH',
+    tag: 'listing', tagText: '模組 2 啟動 — 搜尋推薦',
+    reply: '收到！讓我確認一下您的需求：\n• 目的地：曼谷\n• 日期：5/10-5/15（5晚）\n• 人數：2位大人\n• 預算：每晚 NT$2,500-3,500\n• 偏好：整層公寓，需廚房\n\n為您推薦以下三個選項：\n\n推薦 A — 最符合廚房需求\n房源名稱：Sukhumvit 39 Modern Loft\n位置：Phrom Phong 站步行 5 分鐘\n價格：NT$2,680 / 晚（含清潔費）\n房型：整層公寓・2臥1衛\n✓ 廚房完整配置（烤箱、洗碗機、咖啡機）\n✓ 步行 3 分鐘到 Tops 超市\n✗ 11樓，早晨電梯偶有等候\n→ 想自己開伙的旅程，這間最實用。\n\n推薦 B — 地點最佳\n房源名稱：Thonglor Sky Suite\n位置：Thonglor 站出口直達\n價格：NT$3,100 / 晚（含清潔費）\n房型：整層公寓・1臥1衛\n✓ 交通最便，步出捷運站即到\n✓ 34樓，曼谷夜景絕佳\n✗ 廚具較少，只有電磁爐，不適合大量烹飪\n→ 若廚房需求其實不多、更重視地段，選這間。\n\n推薦 C — 最高性價比\n房源名稱：Ari Cozy Studio Loft\n位置：Ari 站步行 8 分鐘\n價格：NT$2,150 / 晚（含清潔費）\n房型：開放式公寓・1臥1衛\n✓ 完整廚房，價格最低\n✓ 安靜住宅區，適合放鬆型旅行\n✗ 距離商圈較遠，需靠捷運或 Grab 出行\n→ 預算最優先，且以房間為活動重心，選這間。\n\n───\n選 A：廚房是重點，地段其次\n選 B：地段是重點，廚房其次\n選 C：預算是重點，地段可接受偏遠\n\n哪個選項最符合您的旅行規劃？'
+  },
+  compare: {
+    user: '我在 A 和 B 之間猶豫，兩個都很心動',
+    phase: 'COMPARE',
+    tag: 'phase', tagText: '模組 3 啟動 — 深度比較',
+    reply: '完全理解，兩間都很好！讓我幫您做個重點比較：\n\n比較維度（依您的需求重要性排列）：\n\n廚房設備（★★★ 您明確表示需要）\nA — 全配：烤箱、洗碗機、咖啡機\nB — 簡易：僅電磁爐，烹飪選項有限\n\n交通便利（★★）\nA — 捷運站步行 5 分鐘\nB — 捷運站出口直達，贏\n\n每晚價格（參考）\nA — NT$2,680 → 5晚總計 NT$13,400\nB — NT$3,100 → 5晚總計 NT$15,500\n差額 NT$2,100\n\n───\n基於您的需求，我推薦選 A。\n原因：您一開始就提到「需要廚房開伙」，A 的廚房設備完整度是 B 的兩倍以上。5分鐘步行換來 NT$2,100 的節省，在曼谷可以多吃好幾頓大餐。\n\n選 B 更合適的情況是：您其實只是「想要有廚房」但實際上不太會煮（電磁爐泡麵沒問題），同時很在意出門的便利性。\n\n需要我幫您確認 A 的預訂嗎？'
+  },
+  book: {
+    user: '好，我決定訂 A，Sukhumvit 39 Modern Loft',
+    phase: 'BOOK',
+    tag: 'booking', tagText: '模組 4 啟動 — 預訂確認',
+    reply: '很好的選擇！在確認預訂之前，請確認以下重要資訊：\n\n入住規定\n• 入住時間：下午 3:00 後\n• 退房時間：上午 11:00 前\n• 最少入住：2晚（您的 5 晚符合）\n• 寵物政策：不允許\n\n取消政策\n• 免費取消截止：5/7（入住前3天）晚間 11:59\n• 逾期取消：扣除第一晚費用（NT$2,680）\n• 無故未入住：收取全額\n\n費用明細\n• 住宿費 NT$2,680 × 5晚 = NT$13,400\n• 清潔費（一次性）= NT$600\n• 平台服務費 = NT$420\n• 總計：NT$14,420\n\n確認以上資訊後，請提供：\n① 入住人姓名（英文，如護照）\n② 聯絡電話（含國碼）\n③ 預計抵達時間（5/10）'
+  },
+  checkin_ask: {
+    user: '明天入住，請問怎麼進房間？',
+    phase: 'CHECKIN',
+    tag: 'phase', tagText: '模組 5 啟動 — 入住準備',
+    reply: '您好！曼谷之旅明天就要開始了！以下是入住的完整資訊：\n\n入住方式\n• 地址：39 Sukhumvit Soi 39, Watthana, Bangkok 10110\n• 大門密碼：4729#（入住當天下午 2:00 後有效）\n• 電梯到 11 樓，右轉第 3 間\n• 房門密碼：8831\n\n入住時間\n• 標準入住：下午 3:00\n• 您的預計抵達：下午 4:30（您之前告知）\n  ✓ 完全沒問題，房間會備妥等您\n\n出發前小提醒\n• 曼谷目前天氣：晴、30-35°C，建議備防曬\n• 從素萬那普機場：搭 ARL 到 Phaya Thai，轉 BTS 到 Phrom Phong 站，步行 5 分鐘，約 50 分鐘\n\n抵達後 Wi-Fi 密碼會在歡迎訊息中提供。如有任何臨時狀況，直接回覆此訊息即可！'
+  },
+  wifi_issue: {
+    user: 'Wi-Fi 連不上，密碼輸入正確但一直顯示連線失敗',
+    phase: 'SUPPORT',
+    tag: 'phase', tagText: '模組 6 啟動 — 等級 1 自助排查',
+    reply: '別擔心，這個問題通常可以自行解決：\n\n請按以下步驟操作：\n\n① 先確認密碼：VoyageBKK2024（注意大小寫）\n\n② 重啟路由器\n   白色盒子位置：電視櫃右側\n   → 拔掉電源線等 10 秒，重新插上\n   → 等待藍燈亮起（約 1-2 分鐘）\n   → 重新搜尋 Wi-Fi：StayBKK_39\n\n③ 確認您的裝置 Wi-Fi 設定\n   → 「忘記這個網路」後重新連線\n\n以上步驟操作後，通常 3 分鐘內可以解決。\n\n如果 5 分鐘後仍然無法連線，請告訴我，我立刻通知房東 Khun Somchai 協助處理。\n\n您現在在執行哪一步了？'
+  },
+  ac_issue: {
+    user: '冷氣完全沒有反應，遙控器按了沒有動靜，曼谷好熱',
+    phase: 'SUPPORT',
+    tag: 'phase', tagText: '模組 6 啟動 — 等級 2 通知房東',
+    reply: '我了解，曼谷 35 度沒有冷氣真的很不舒服，要立刻處理。\n\n首先請試一下：\n• 廚房第二個抽屜有備用電池，換上試試看\n• 若換電池後仍沒有反應——\n\n我已立即發送緊急通知給房東 Khun Somchai。\n他通常在 15 分鐘內回應，會安排維修人員今天處理。\n\n等待期間的臨時措施：\n• 浴室衛生間有一個立扇，可以先用\n• 便利商店在樓下（步行 2 分鐘，24 小時開放）可以去吹冷氣\n\n案件編號：MAINT-847291\n若 30 分鐘內房東沒有回應，請告知我，我會升級處理並提供您補償方案。\n\n非常抱歉造成您的不便。'
+  },
+  emergency: {
+    user: '我聞到瓦斯味，很濃',
+    phase: 'SUPPORT',
+    tag: 'phase', tagText: '模組 6 啟動 — 等級 3 緊急安全',
+    reply: '⚠️ 請立即執行以下步驟，人身安全第一：\n\n① 立刻離開房間，不要開關任何電器或燈\n② 到走廊或戶外通風處\n③ 撥打緊急電話：\n   泰國消防：199\n   緊急救援：1669\n\n現在請先離開房間再處理其他事情。\n\n不要等我的回覆，先撥打緊急電話。\n\n──\n確認安全後，我會立即通知房東和平台緊急應變團隊，並協助您安排替代住宿。'
+  },
+  cancel: {
+    user: '我想取消訂單，可以全額退款嗎？',
+    phase: 'CANCEL',
+    tag: 'booking', tagText: '取消政策查詢',
+    reply: '當然可以協助您查詢取消退款資格。\n\n您的訂單：Sukhumvit 39 Modern Loft\n入住日期：5/10（週五）\n今天日期：5/7（週二）\n\n取消政策判斷：\n• 免費取消截止：5/7 晚間 11:59\n• 現在時間：下午 2:30\n\n✓ 您目前符合免費取消條件！\n  全額退款 NT$14,420\n  退款將在 5-7 個工作日內退回您的付款帳戶\n\n請問您確定要取消這筆訂單嗎？\n取消後無法復原，若您是行程有變更，\n也可以考慮改期而非取消。\n\n確認取消請回覆「確認取消」。'
+  }
+};
+
+function appendMsg(role, text, tagText, tagClass) {
+  const win = document.getElementById('chatWindow');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg' + (role==='user'?' user':'');
+  const av = document.createElement('div');
+  av.className = 'chat-avatar'+(role==='agent'?' agent':'');
+  av.textContent = role==='agent'?'SB':'Me';
+  const bub = document.createElement('div');
+  bub.className = 'chat-bubble '+role;
+  if (tagText) {
+    const tag = document.createElement('div');
+    tag.className = 'chat-tag '+(tagClass||'');
+    tag.textContent = tagText;
+    bub.appendChild(tag);
+  }
+  const txt = document.createElement('div');
+  txt.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  bub.appendChild(txt);
+  msg.appendChild(av); msg.appendChild(bub);
+  win.appendChild(msg);
+  win.scrollTop = win.scrollHeight;
+}
+
+function showTyping() {
+  const win = document.getElementById('chatWindow');
+  const t = document.createElement('div');
+  t.className = 'chat-msg'; t.id = 'typing';
+  t.innerHTML = '<div class="chat-avatar agent">SB</div><div class="chat-bubble agent" style="color:var(--ink-faint);font-size:12px;">分析中...</div>';
+  win.appendChild(t); win.scrollTop = win.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function setPhase(phase) {
+  const el = document.getElementById('simPhase');
+  el.textContent = phases[phase] || phase;
+  el.classList.add('active');
+}
+
+function runScenario(key) {
+  const s = scripts[key];
+  if (!s) return;
+  appendMsg('user', s.user);
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    setPhase(s.phase);
+    appendMsg('agent', s.reply, s.tagText, s.tag);
+  }, 800);
+}
+
+function sendMessage() {
+  const input = document.getElementById('simInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  appendMsg('user', msg);
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    // simple keyword routing
+    const m = msg.toLowerCase();
+    let key = 'search_start';
+    if (/曼谷|東京|首爾|巴黎|整層|公寓|住宿/.test(m) && /日|月|號|天|晚/.test(m)) key = 'with_params';
+    else if (/猶豫|比較|還是|哪個|選哪/.test(m)) key = 'compare';
+    else if (/訂.*這|確認.*訂|要訂|幫我訂/.test(m)) key = 'book';
+    else if (/怎麼進|密碼|入住|地址|check.in/.test(m)) key = 'checkin_ask';
+    else if (/wi.fi|wifi|網路|連不上/.test(m)) key = 'wifi_issue';
+    else if (/冷氣|空調|熱死|好熱/.test(m)) key = 'ac_issue';
+    else if (/瓦斯|gas|火|緊急|危險/.test(m)) key = 'emergency';
+    else if (/取消|退款|不去了|cancel/.test(m)) key = 'cancel';
+    const s = scripts[key];
+    setPhase(s.phase);
+    appendMsg('agent', s.reply, s.tagText, s.tag);
+  }, 900);
+}
+
+function markComplete() {
+  const btn = document.getElementById('completeBtn');
+  btn.classList.add('done');
+  btn.textContent = 'Day 12 完成！';
+  document.getElementById('completeNote').textContent = '繼續前往 Day 13：電商 AI 銷售助理 →';
+}
+</script>
 </body>
 </html>

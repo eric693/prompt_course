@@ -3,700 +3,1456 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 13 - 決策輔助 Agent | Prompt Mastery</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<title>Day 13 — 電商 AI 銷售助理 | Prompt Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--white:#f5f2ed;--cream:#e8e3da;--ink:#1a1814;--warm-mid:#8b7355;--accent:#c9431f;--accent-light:#e8a882;--text-dim:#6b6358}
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--white);color:var(--ink);font-family:'IBM Plex Mono',monospace;line-height:1.6}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.6}
-.header{border-bottom:2px solid var(--ink);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:100}
-.back-link{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .2s}
-.back-link:hover{color:var(--accent)}.header-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.day-badge{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500}
-.hero{padding:80px 48px;border-bottom:2px solid var(--ink);max-width:1200px;margin:0 auto}
-.lesson-meta{display:flex;gap:24px;margin-bottom:24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.lesson-meta span::before{content:'//';margin-right:8px;opacity:.5}
-.lesson-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1;margin-bottom:32px;letter-spacing:-.02em}
-.lesson-subtitle{font-family:'Noto Serif TC',serif;font-size:20px;line-height:1.6;color:var(--text-dim);max-width:800px}
-.content{max-width:1200px;margin:0 auto;padding:64px 48px}.section{margin-bottom:80px}
-.section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--cream)}
-.section-number{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1}
-.section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
-.prose{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.9;margin-bottom:24px}.prose strong{color:var(--ink);font-weight:700}
-.code-block{background:var(--ink);color:var(--accent-light);padding:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.8;margin:32px 0;border-left:4px solid var(--accent);white-space:pre-wrap}
-.code-block-header{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--cream)}
-.comparison{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}
-.comparison-item{border:2px solid var(--ink);padding:24px}.comparison-item.bad{border-color:var(--text-dim);opacity:.7}.comparison-item.good{border-color:var(--accent)}
-.comparison-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;font-weight:500}
-.comparison-item.bad .comparison-label{color:var(--text-dim)}.comparison-item.good .comparison-label{color:var(--accent)}
-.comparison-text{font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.7}
-.highlight-box{background:var(--cream);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
-.highlight-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px}
-.step-list{margin:32px 0}.step-item{display:flex;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cream)}
-.step-number{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--accent);min-width:48px;line-height:1}
-.step-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}.step-content strong{display:block;margin-bottom:8px;font-size:16px}
-.practice-box{background:var(--ink);color:var(--white);padding:48px;margin:64px 0}
-.practice-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px}
-.practice-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin-bottom:24px}
-.practice-desc{font-family:'Noto Serif TC',serif;font-size:16px;line-height:1.8;opacity:.9;margin-bottom:20px}
-.quote-box{background:var(--cream);padding:40px;margin:40px 0;border-left:4px solid var(--accent)}
-.quote-text{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;line-height:1.5;margin-bottom:16px}
-.quote-author{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.info-box{background:var(--white);border:2px solid var(--accent);padding:32px;margin:32px 0}
-.info-box-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px}
-.info-box-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8}
-.checklist{background:var(--cream);padding:28px;margin:32px 0}.checklist-item{display:flex;gap:12px;align-items:start;margin-bottom:14px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7}
-.checklist-item::before{content:'✓';color:var(--accent);font-weight:900;font-size:18px}
-.decision-matrix{background:var(--white);border:2px solid var(--ink);padding:24px;margin:32px 0}
-.matrix-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:16px}
-.matrix-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--cream)}
-.matrix-label{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
-.matrix-value{font-family:'Noto Serif TC',serif;font-size:14px}
-.lesson-nav{display:flex;justify-content:space-between;padding:48px 0;border-top:2px solid var(--ink)}
-.nav-link{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);transition:all .2s}
-.nav-link:hover{color:var(--accent)}.nav-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
-.nav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
-.footer{border-top:2px solid var(--ink);background:var(--ink);color:var(--white);padding:32px 48px;text-align:center}
-.footer-text{font-size:11px;letter-spacing:.1em;opacity:.4}
-.warning-box{background:var(--ink);color:var(--white);padding:32px;margin:32px 0;border-left:4px solid var(--accent)}
-.warning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--accent-light)}
-.warning-content{font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.8;opacity:.9}
-@media (max-width:768px){.header{padding:16px 24px;flex-direction:column;gap:8px}.hero{padding:48px 24px}.content{padding:32px 24px}.comparison{grid-template-columns:1fr}.practice-box{padding:32px 24px}}
+  :root {
+    --bg: #0c0e0a;
+    --surface: #141810;
+    --surface2: #1c2218;
+    --border: #242e1e;
+    --ink: #edf2e8;
+    --ink-dim: #7a9168;
+    --ink-faint: #3a4a30;
+    --accent: #4a9e3f;
+    --accent-warm: #82d472;
+    --gold: #d4a843;
+    --gold-dim: #7a6020;
+    --red: #c04040;
+    --red-light: #e87070;
+    --blue: #3a70c8;
+    --blue-light: #70a8f0;
+    --orange: #c87030;
+    --orange-light: #f0a860;
+    --purple: #7050c0;
+    --purple-light: #b090f0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Mono', monospace; line-height: 1.6; overflow-x: hidden; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; }
+
+  /* ── NAV ── */
+  .topnav { position: sticky; top: 0; z-index: 200; background: var(--bg); border-bottom: 1px solid var(--border); padding: 0 48px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .nav-back { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink-dim); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-center { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-dim); }
+  .nav-right { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--ink-dim); }
+  .nav-progress-bar { width: 120px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .nav-progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; }
+
+  /* ── HERO ── */
+  .lesson-hero { border-bottom: 1px solid var(--border); padding: 72px 48px 64px; position: relative; overflow: hidden; }
+  .lesson-hero::before { content: '13'; position: absolute; right: -10px; bottom: -48px; font-family: 'Playfair Display', serif; font-size: 280px; font-weight: 900; color: var(--surface2); line-height: 1; pointer-events: none; }
+  .lesson-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; position: relative; z-index: 1; }
+  .meta-day { background: var(--accent); color: var(--bg); padding: 5px 14px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; }
+  .meta-badge { background: var(--surface2); border: 1px solid var(--border); color: var(--gold); padding: 5px 14px; font-size: 11px; letter-spacing: 0.12em; }
+  .meta-time { font-size: 11px; letter-spacing: 0.15em; color: var(--ink-dim); }
+  .meta-time::before { content: '—  '; }
+  .lesson-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4.5vw, 66px); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 28px; position: relative; z-index: 1; max-width: 760px; }
+  .lesson-title em { font-style: italic; color: var(--accent-warm); }
+  .lesson-lead { font-family: 'Noto Serif TC', serif; font-size: 16px; line-height: 1.9; color: var(--ink-dim); max-width: 620px; position: relative; z-index: 1; margin-bottom: 36px; }
+  .lesson-objectives { display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+  .obj-tag { border: 1px solid var(--border); padding: 6px 16px; font-size: 11px; letter-spacing: 0.1em; color: var(--ink-dim); }
+  .obj-tag.g { border-color: var(--accent); color: var(--accent-warm); }
+  .obj-tag.o { border-color: var(--orange); color: var(--orange-light); }
+
+  /* ── LAYOUT ── */
+  .lesson-body { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 296px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .lesson-main { border-right: 1px solid var(--border); }
+  .lesson-sidebar { padding: 32px 22px; position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; }
+
+  /* ── SECTIONS ── */
+  .lesson-section { border-bottom: 1px solid var(--border); padding: 48px; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .lesson-section.visible { opacity: 1; transform: translateY(0); }
+  .section-eyebrow { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--accent); }
+  .section-eyebrow.orange { color: var(--orange-light); }
+  .section-eyebrow.orange::before { background: var(--orange-light); }
+  .section-eyebrow.purple { color: var(--purple-light); }
+  .section-eyebrow.purple::before { background: var(--purple-light); }
+  .section-heading { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
+  .section-body { font-family: 'Noto Serif TC', serif; font-size: 14px; line-height: 1.95; color: var(--ink-dim); }
+  .section-body p { margin-bottom: 14px; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body strong { color: var(--ink); font-weight: 700; }
+
+  /* ── SALES FUNNEL VIZ ── */
+  .funnel { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 28px 0; }
+  .funnel-stage { background: var(--surface); padding: 18px 12px; text-align: center; transition: background 0.2s; }
+  .funnel-stage:hover { background: var(--surface2); }
+  .funnel-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--ink-faint); line-height: 1; margin-bottom: 8px; }
+  .funnel-name { font-size: 11px; letter-spacing: 0.08em; color: var(--ink-dim); line-height: 1.4; }
+  .funnel-module { font-size: 10px; color: var(--ink-faint); margin-top: 5px; letter-spacing: 0.1em; }
+  .funnel-stage.active { background: var(--surface2); }
+  .funnel-stage.active .funnel-num { color: var(--accent-warm); }
+  .funnel-stage.active .funnel-name { color: var(--ink); }
+  .funnel-stage.active .funnel-module { color: var(--accent); }
+
+  /* ── PSYCHOLOGY CARDS ── */
+  .psych-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+  .psych-card { background: var(--surface); padding: 20px; }
+  .psych-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .psych-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .psych-desc { font-size: 12px; color: var(--ink-dim); line-height: 1.6; font-family: 'Noto Serif TC', serif; }
+  .psych-example { margin-top: 10px; padding: 8px 12px; background: var(--bg); border-left: 2px solid var(--gold); font-size: 11px; color: var(--gold); font-style: italic; line-height: 1.5; font-family: 'Noto Serif TC', serif; }
+
+  /* ── STEP BLOCKS ── */
+  .step-builder { display: flex; flex-direction: column; gap: 0; margin: 28px 0; }
+  .step-block { border: 1px solid var(--border); background: var(--surface); overflow: hidden; }
+  .step-block + .step-block { border-top: none; }
+  .step-header { padding: 18px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.15s; user-select: none; }
+  .step-header:hover { background: var(--surface2); }
+  .step-num { width: 32px; height: 32px; border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--accent); flex-shrink: 0; transition: all 0.2s; }
+  .step-num.done { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .step-num.orange { border-color: var(--orange-light); color: var(--orange-light); }
+  .step-num.orange.done { background: var(--orange); color: var(--ink); border-color: var(--orange); }
+  .step-num.purple { border-color: var(--purple-light); color: var(--purple-light); }
+  .step-num.purple.done { background: var(--purple); color: var(--ink); border-color: var(--purple); }
+  .step-title-wrap { flex: 1; }
+  .step-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .step-toggle { font-size: 16px; color: var(--ink-faint); transition: transform 0.2s; flex-shrink: 0; }
+  .step-block.open .step-toggle { transform: rotate(180deg); }
+  .step-content { display: none; border-top: 1px solid var(--border); }
+  .step-block.open .step-content { display: block; }
+  .step-inner { padding: 28px; }
+  .step-desc { font-family: 'Noto Serif TC', serif; font-size: 13px; line-height: 1.8; color: var(--ink-dim); margin-bottom: 20px; }
+  .step-desc strong { color: var(--ink); }
+
+  /* ── PROMPT BLOCKS ── */
+  .prompt-block { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); margin-bottom: 14px; }
+  .prompt-block.orange { border-left-color: var(--orange-light); }
+  .prompt-block.gold   { border-left-color: var(--gold); }
+  .prompt-block.red    { border-left-color: var(--red-light); }
+  .prompt-block.purple { border-left-color: var(--purple-light); }
+  .prompt-block.blue   { border-left-color: var(--blue-light); }
+  .prompt-block-header { padding: 11px 18px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; justify-content: space-between; align-items: center; }
+  .pblabel { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .prompt-block.orange .pblabel { color: var(--orange-light); }
+  .prompt-block.gold   .pblabel { color: var(--gold); }
+  .prompt-block.red    .pblabel { color: var(--red-light); }
+  .prompt-block.purple .pblabel { color: var(--purple-light); }
+  .prompt-block.blue   .pblabel { color: var(--blue-light); }
+  .copy-btn { background: none; border: 1px solid var(--border); color: var(--ink-dim); padding: 4px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .copy-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); }
+  .copy-btn.copied { border-color: var(--accent); color: var(--accent-warm); }
+  .prompt-code { padding: 18px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.85; color: var(--accent-warm); white-space: pre-wrap; word-break: break-word; }
+  .pc  { color: var(--ink-faint); }
+  .pk  { color: var(--gold); }
+  .pv  { color: var(--accent-warm); }
+  .pb  { color: var(--blue-light); }
+  .pr  { color: var(--red-light); }
+  .ppu { color: var(--purple-light); }
+  .po  { color: var(--orange-light); }
+
+  /* ── BEFORE/AFTER ── */
+  .ba-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 20px 0; }
+  .ba-cell { padding: 18px 22px; background: var(--surface); }
+  .ba-head { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .ba-head.bad  { color: var(--red-light); }
+  .ba-head.good { color: var(--accent-warm); }
+  .ba-head.bad::before  { content: '✗'; }
+  .ba-head.good::before { content: '✓'; }
+  .ba-text { font-size: 13px; line-height: 1.7; font-family: 'Noto Serif TC', serif; color: var(--ink-dim); }
+  .ba-cell.good-cell { background: var(--surface2); }
+  .ba-cell.good-cell .ba-text { color: var(--ink); }
+
+  /* ── WHY BOX ── */
+  .why-box { background: var(--surface2); border: 1px solid var(--border); border-top: 2px solid var(--gold); padding: 18px 22px; margin: 12px 0 0; }
+  .why-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .why-text { font-size: 12px; line-height: 1.7; color: var(--ink-dim); font-family: 'Noto Serif TC', serif; }
+
+  /* ── TEST RESULT ── */
+  .test-result { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--accent-warm); padding: 18px 22px; margin: 14px 0; }
+  .test-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-warm); margin-bottom: 10px; }
+  .test-text { font-family: 'Noto Serif TC', serif; font-size: 13px; line-height: 1.8; color: var(--ink); }
+  .ru { color: var(--ink-dim); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .ra { color: var(--accent-warm); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .rsys { color: var(--gold); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+
+  /* ── KEY INSIGHT ── */
+  .key-insight { background: linear-gradient(135deg, var(--surface2), var(--surface)); border: 1px solid var(--border); border-top: 3px solid var(--gold); padding: 24px 28px; margin: 24px 0; position: relative; }
+  .insight-mark { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1; opacity: 0.22; position: absolute; top: 10px; right: 18px; }
+  .insight-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .insight-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; font-style: italic; line-height: 1.5; color: var(--ink); max-width: 580px; }
+
+  /* ── PRODUCT CARDS ── */
+  .product-showcase { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 20px 0; }
+  .product-card { background: var(--surface); padding: 20px; position: relative; }
+  .product-badge { position: absolute; top: 12px; right: 12px; background: var(--red); color: var(--ink); padding: 3px 8px; font-size: 10px; letter-spacing: 0.12em; }
+  .product-badge.new { background: var(--accent); color: var(--bg); }
+  .product-badge.hot { background: var(--orange); }
+  .product-cat { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
+  .product-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+  .product-price { margin: 10px 0; }
+  .product-price .now { font-size: 18px; font-weight: 600; color: var(--accent-warm); }
+  .product-price .was { font-size: 12px; color: var(--ink-faint); text-decoration: line-through; margin-left: 6px; }
+  .product-price .save { font-size: 10px; color: var(--red-light); margin-left: 6px; }
+  .product-fit { font-size: 11px; color: var(--ink-dim); line-height: 1.5; font-family: 'Noto Serif TC', serif; }
+  .product-fit::before { content: '→ '; color: var(--accent); }
+
+  /* ── UPSELL TABLE ── */
+  .upsell-table { border: 1px solid var(--border); margin: 20px 0; overflow: hidden; }
+  .upsell-row { display: grid; grid-template-columns: 1fr 1.2fr 80px; border-bottom: 1px solid var(--border); }
+  .upsell-row:last-child { border-bottom: none; }
+  .upsell-cell { padding: 12px 16px; font-size: 12px; border-right: 1px solid var(--border); }
+  .upsell-cell:last-child { border-right: none; text-align: center; }
+  .upsell-head { background: var(--surface); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-dim); }
+  .upsell-reason { color: var(--ink-dim); font-family: 'Noto Serif TC', serif; line-height: 1.5; }
+  .upsell-rate { font-weight: 700; color: var(--accent-warm); }
+  .upsell-rate.high { color: var(--gold); }
+
+  /* ── PROMO CARDS ── */
+  .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 20px 0; }
+  .promo-card { background: var(--surface); padding: 22px; }
+  .promo-type { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange-light); margin-bottom: 8px; }
+  .promo-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .promo-mechanic { font-size: 12px; color: var(--ink-dim); line-height: 1.6; font-family: 'Noto Serif TC', serif; margin-bottom: 10px; }
+  .promo-copy { background: var(--bg); border-left: 2px solid var(--orange-light); padding: 8px 12px; font-size: 11px; color: var(--orange-light); font-style: italic; font-family: 'Noto Serif TC', serif; line-height: 1.5; }
+
+  /* ── SIMULATOR ── */
+  .simulator { background: var(--surface); border: 1px solid var(--border); overflow: hidden; margin: 24px 0; }
+  .sim-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: var(--surface2); }
+  .sim-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .sim-name { font-size: 12px; letter-spacing: 0.1em; color: var(--ink-dim); }
+  .sim-module { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; padding: 3px 10px; border: 1px solid var(--border); color: var(--ink-faint); margin-left: auto; transition: all 0.3s; }
+  .sim-module.active { border-color: var(--accent); color: var(--accent-warm); }
+  .chat-window { height: 400px; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .chat-msg { display: flex; gap: 10px; align-items: flex-start; }
+  .chat-msg.user { flex-direction: row-reverse; }
+  .chat-av { width: 28px; height: 28px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; color: var(--ink-dim); letter-spacing: 0; }
+  .chat-av.agent { border-color: var(--accent); color: var(--accent-warm); }
+  .chat-bub { max-width: 80%; background: var(--surface); border: 1px solid var(--border); padding: 10px 14px; font-size: 13px; line-height: 1.65; font-family: 'Noto Serif TC', serif; color: var(--ink); }
+  .chat-bub.user { background: var(--surface2); color: var(--ink-dim); }
+  .chat-bub.agent { border-left: 2px solid var(--accent); }
+  .ctag { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 5px; }
+  .ctag.discover { color: var(--accent-warm); }
+  .ctag.recommend { color: var(--gold); }
+  .ctag.upsell { color: var(--orange-light); }
+  .ctag.promo { color: var(--red-light); }
+  .ctag.cart { color: var(--purple-light); }
+  .ctag.objection { color: var(--blue-light); }
+  .sim-scenarios { padding: 10px 18px; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-wrap: wrap; gap: 6px; }
+  .scenario-cat { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); width: 100%; padding-top: 4px; }
+  .scenario-cat:first-child { padding-top: 0; }
+  .sbtn { background: var(--surface); border: 1px solid var(--border); color: var(--ink-dim); padding: 6px 11px; font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; }
+  .sbtn:hover { border-color: var(--accent-warm); color: var(--accent-warm); }
+  .sim-input-row { border-top: 1px solid var(--border); padding: 12px 18px; display: flex; gap: 10px; }
+  .sim-input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--ink); padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; outline: none; }
+  .sim-input:focus { border-color: var(--accent); }
+  .sim-send { background: var(--accent); border: none; color: var(--bg); padding: 10px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; cursor: pointer; text-transform: uppercase; transition: opacity 0.15s; font-weight: 700; }
+  .sim-send:hover { opacity: 0.85; }
+
+  /* ── FINAL ASSEMBLER ── */
+  .assembler { background: var(--surface); border: 1px solid var(--border); overflow: hidden; margin: 24px 0; }
+  .assembler-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); }
+  .assembler-title { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-warm); }
+  .assembler-output { padding: 20px 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.9; color: var(--accent-warm); white-space: pre-wrap; max-height: 540px; overflow-y: auto; }
+
+  /* ── SIDEBAR ── */
+  .sidebar-section { margin-bottom: 26px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+  .sidebar-section:last-child { border-bottom: none; }
+  .sb-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  .toc-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--ink-dim); transition: color 0.15s; font-size: 11px; line-height: 1.4; }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-item:hover, .toc-item.active { color: var(--accent-warm); }
+  .toc-num { font-size: 10px; color: var(--ink-faint); min-width: 16px; flex-shrink: 0; margin-top: 1px; }
+  .tracker { display: flex; flex-direction: column; gap: 0; }
+  .tr-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .tr-item:last-child { border-bottom: none; }
+  .tr-dot { width: 10px; height: 10px; border: 1px solid var(--border); flex-shrink: 0; transition: all 0.2s; }
+  .tr-dot.done { background: var(--accent); border-color: var(--accent); }
+  .tr-dot.cur { background: var(--gold); border-color: var(--gold); }
+  .tr-name { font-size: 11px; color: var(--ink-dim); flex: 1; line-height: 1.3; }
+  .tr-name.done { color: var(--accent-warm); }
+  .tr-name.cur { color: var(--gold); }
+
+  .complete-section { border-top: 1px solid var(--border); padding: 48px; text-align: center; }
+  .complete-btn { background: transparent; border: 2px solid var(--accent); color: var(--accent-warm); padding: 18px 56px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .complete-btn:hover { background: var(--accent); color: var(--bg); }
+  .complete-btn.done { background: var(--accent); color: var(--bg); }
+  .complete-sub { margin-top: 12px; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+  .lesson-nav { border-top: 1px solid var(--border); background: var(--surface); padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+  .nav-btn { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink-dim); font-size: 12px; letter-spacing: 0.1em; transition: color 0.2s; padding: 12px 20px; border: 1px solid var(--border); }
+  .nav-btn:hover { color: var(--ink); border-color: var(--ink-dim); }
+  .nav-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 700; }
+  .nav-btn.primary:hover { opacity: 0.88; }
+  .nav-center-label { text-align: center; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
 </style>
 </head>
 <body>
-<header class="header">
-<a href="index.html" class="back-link">← 回到課程總覽</a>
-<div class="header-title">Prompt Mastery</div>
-<div class="day-badge">Day 13 / 20</div>
-</header>
 
-<section class="hero">
-<div class="lesson-meta">
-<span>Week 3</span>
-<span>60 分鐘</span>
-<span>Agent 設計</span>
-</div>
-<h1 class="lesson-title">決策輔助<br>Agent 設計</h1>
-<p class="lesson-subtitle">
-人生充滿選擇，有些決策簡單（中午吃什麼），有些複雜（要不要換工作）。決策輔助 Agent 不是替你決定，而是幫你<strong>釐清思路、評估選項、看見盲點</strong>。今天學習如何設計能引導你做出更好決策的 AI 顧問，從決策框架、多角度分析、到風險評估。
-</p>
-</section>
-
-<main class="content">
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">01</div>
-<h2 class="section-title">什麼是決策輔助 Agent？</h2>
-</div>
-
-<div class="prose">
-想像你面對一個重要決定：要不要接受新工作機會？薪水高 30%，但要搬到另一個城市。你的朋友會給建議，但可能帶有偏見。<strong>決策輔助 Agent 就像一個理性的顧問</strong>，幫你系統性地分析，但最終決定權在你手上。
-</div>
-
-<div class="comparison">
-<div class="comparison-item bad">
-<div class="comparison-label">直接給建議（不好）</div>
-<div class="comparison-text">
-<strong>你：</strong>「我該不該接受新工作？」<br>
-<strong>AI：</strong>「建議你接受，薪水高 30% 是很好的機會。」<br><br>
-<em>問題：</em>AI 不了解你的處境、價值觀、考量因素，就直接給建議。這不是決策輔助，是瞎猜。
-</div>
-</div>
-<div class="comparison-item good">
-<div class="comparison-label">引導式決策輔助（好）</div>
-<div class="comparison-text">
-<strong>你：</strong>「我該不該接受新工作？」<br>
-<strong>Agent：</strong>「讓我幫你理清思路。先問幾個問題：<br>
-1. 搬到新城市對你的生活影響如何？<br>
-2. 除了薪水，這份工作還有什麼吸引你？<br>
-3. 什麼因素會讓你說不？<br><br>
-我們一起分析各種可能性。」
-</div>
-</div>
-</comparison>
-
-<div class="quote-box">
-<div class="quote-text">
-"好的決策顧問不是告訴你答案，而是幫你問對問題。"
-</div>
-<div class="quote-author">
-引導式提問的力量
-</div>
-</quote-box>
-
-<div class="step-list">
-<div class="step-item">
-<div class="step-number">01</div>
-<div class="step-content">
-<strong>釐清問題</strong><br>
-很多時候我們連問題是什麼都不清楚。「要不要換工作？」背後可能是「我對現況不滿」或「我想要更多成長」。
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">02</div>
-<div class="step-content">
-<strong>收集資訊</strong><br>
-決策需要資訊。薪資、工作內容、成長機會、生活品質、人際關係...收集所有相關因素。
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">03</div>
-<div class="step-content">
-<strong>評估選項</strong><br>
-通常不只 A 或 B，還有 C、D、E。好的決策輔助會幫你看見更多可能性。
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">04</div>
-<div class="step-content">
-<strong>分析利弊</strong><br>
-每個選項的優點、缺點、風險、機會成本。不只看眼前，還要看長期。
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">05</div>
-<div class="step-content">
-<strong>挑戰假設</strong><br>
-我們常有未經檢驗的假設（「薪水高就一定好」「大公司一定穩定」）。好的顧問會挑戰這些。
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">06</div>
-<div class="step-content">
-<strong>情境模擬</strong><br>
-「如果選 A，一年後會如何？」「如果最壞情況發生怎麼辦？」想像未來場景幫助決策。
-</div>
-</div>
-</div>
-
-<div class="highlight-box">
-<div class="highlight-title">核心洞察</div>
-<div class="prose">
-<strong>決策輔助 Agent 不是算命，而是結構化思考的工具。</strong>它的價值不在於「給答案」，而在於「幫你想得更清楚」。
-</div>
-</highlight-box>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">02</div>
-<h2 class="section-title">決策輔助的流程設計</h2>
-</div>
-
-<div class="prose">
-一個完整的決策輔助流程通常包含六個階段：
-</div>
-
-<div class="code-block-header">決策輔助流程 Prompt</div>
-<div class="code-block">你是一位決策輔助顧問，幫助使用者做出深思熟慮的決策。
-
-【決策輔助流程】
-
-階段 1：理解決策
-→ 目標：搞清楚真正的問題是什麼
-→ 提問：
-  • 這個決策背後的真正需求是什麼？
-  • 為什麼現在要做這個決定？
-  • 不做決定會怎樣？
-→ 輸出：明確的決策陳述
-
-階段 2：探索選項
-→ 目標：找出所有可能的選擇
-→ 提問：
-  • 除了你想到的，還有其他可能性嗎？
-  • 有沒有結合兩種選項的方法？
-  • 如果資源無限，你會怎麼選？
-→ 輸出：3-5 個可行選項
-
-階段 3：定義標準
-→ 目標：確定評估的依據
-→ 提問：
-  • 什麼對你最重要？（價值觀）
-  • 如何衡量「好」的決定？（標準）
-  • 什麼是絕對不能接受的？（底線）
-→ 輸出：5-7 個評估標準，並標註權重
-
-階段 4：評估分析
-→ 目標：系統化評估每個選項
-→ 方法：
-  • 用標準評分每個選項（1-10 分）
-  • 分析優缺點
-  • 評估風險與機會
-→ 輸出：評分矩陣 + 詳細分析
-
-階段 5：挑戰與反思
-→ 目標：找出盲點和未經檢驗的假設
-→ 提問：
-  • 什麼假設可能是錯的？
-  • 最壞情況是什麼？能接受嗎？
-  • 三年後回頭看，會後悔嗎？
-  • 如果建議朋友，你會說什麼？
-→ 輸出：潛在盲點與風險清單
-
-階段 6：決策建議
-→ 目標：提供清晰的建議（但不替使用者決定）
-→ 輸出格式：
-  • 基於分析，傾向選項是...
-  • 理由：...
-  • 但你應該考慮：...
-  • 如果你重視 X，選 A；如果重視 Y，選 B
-  • 最終決定權在你
-
-【重要原則】
-• 永遠不要替使用者做決定
-• 保持中立，不帶個人偏見
-• 用提問引導思考，而非直接給答案
-• 尊重使用者的價值觀和優先級
-• 如果資訊不足，要求補充而非猜測</code-block>
-
-<div class="prose">
-這個流程的關鍵是<strong>循序漸進</strong>。不要一開始就跳到評估，而是先確保問對了問題。
-</div>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">03</div>
-<h2 class="section-title">決策框架：多角度分析法</h2>
-</div>
-
-<div class="prose">
-決策輔助 Agent 可以運用多種決策框架，從不同角度分析問題。以下是四個常用框架：
-</div>
-
-<div class="step-list">
-<div class="step-item">
-<div class="step-number">01</div>
-<div class="step-content">
-<strong>利弊分析（Pros & Cons）</strong><br>
-最基本但有效的方法：列出每個選項的優點和缺點。<br><br>
-<strong>進階版：</strong>不只列出，還要評估每個利弊的重要性和可能性。
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">02</div>
-<div class="step-content">
-<strong>機會成本分析</strong><br>
-「選 A 意味著放棄什麼？」每個選擇都有代價，看見機會成本幫助做出明智決定。<br><br>
-<strong>提問：</strong>如果選這個，我會錯過什麼其他機會？
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">03</div>
-<div class="step-content">
-<strong>情境模擬（Scenario Planning）</strong><br>
-想像最好、最可能、最壞三種情況。每種情況下，選項的結果如何？<br><br>
-<strong>問題：</strong>最好情況：成功了會如何？<br>最壞情況：失敗了能承受嗎？<br>最可能：實際上會發生什麼？
-</div>
-</div>
-
-<div class="step-item">
-<div class="step-number">04</div>
-<div class="step-content">
-<strong>多重標準評分（Multi-Criteria Decision Analysis）</strong><br>
-定義 5-7 個評估標準，每個選項依標準評分，加權計算總分。<br><br>
-<strong>範例標準：</strong>薪資（權重 30%）、成長機會（25%）、工作生活平衡（20%）、地點（15%）、公司文化（10%）
-</div>
-</div>
-</div>
-
-<div class="code-block-header">多重標準評分 Prompt</div>
-<div class="code-block">【多重標準決策分析】
-
-步驟 1：定義評估標準
-請列出 5-7 個對這個決策重要的標準。
-例如：薪資、成長機會、工作生活平衡、通勤時間、公司文化...
-
-步驟 2：設定權重
-每個標準的重要性（總和 100%）
-範例：
-- 薪資：30%
-- 成長機會：25%
-- 工作生活平衡：20%
-- 地點：15%
-- 公司文化：10%
-
-步驟 3：評分
-對每個選項，依據每個標準評分（1-10 分）
-
-步驟 4：計算加權分數
-每個選項的總分 = Σ(標準分數 × 權重)
-
-步驟 5：分析結果
-• 哪個選項總分最高？
-• 哪個選項在最重要的標準上表現最好？
-• 有沒有某個選項在關鍵標準上分數太低？
-
-【範例】
-
-選項 A：現職公司升遷
-- 薪資：7 分 × 30% = 2.1
-- 成長機會：6 分 × 25% = 1.5
-- 工作生活平衡：8 分 × 20% = 1.6
-- 地點：10 分 × 15% = 1.5
-- 公司文化：8 分 × 10% = 0.8
-總分：7.5
-
-選項 B：新公司 offer
-- 薪資：9 分 × 30% = 2.7
-- 成長機會：8 分 × 25% = 2.0
-- 工作生活平衡：5 分 × 20% = 1.0
-- 地點：4 分 × 15% = 0.6
-- 公司文化：7 分 × 10% = 0.7
-總分：7.0
-
-分析：
-A 總分略高，但 B 在薪資和成長（兩個最重要標準）表現更好。
-A 的優勢在於地點和工作生活平衡。
-如果你更重視成長而非平衡，B 可能是更好選擇。</code-block>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">04</div>
-<h2 class="section-title">挑戰假設與盲點檢測</h2>
-</div>
-
-<div class="prose">
-決策輔助最有價值的部分之一是<strong>幫你看見自己看不見的盲點</strong>。
-</div>
-
-<div class="code-block-header">盲點檢測 Prompt</div>
-<div class="code-block">【挑戰假設與盲點檢測】
-
-針對使用者的決策，檢查以下常見盲點：
-
-1. 確認偏誤（Confirmation Bias）
-   → 檢查：使用者是否只看支持預設立場的資訊？
-   → 提問：「有沒有反對這個選擇的理由你還沒考慮？」
-
-2. 沉沒成本謬誤（Sunk Cost Fallacy）
-   → 檢查：是否因為已投入太多而不願放棄？
-   → 提問：「如果重新開始，你還會做同樣選擇嗎？」
-
-3. 過度樂觀（Optimism Bias）
-   → 檢查：是否低估了風險和困難？
-   → 提問：「如果進展不如預期，你有 Plan B 嗎？」
-
-4. 從眾效應（Bandwagon Effect）
-   → 檢查：是否因為「大家都這樣」而跟隨？
-   → 提問：「如果沒人這樣做，你還會選擇它嗎？」
-
-5. 現狀偏誤（Status Quo Bias）
-   → 檢查：是否只是因為習慣而不願改變？
-   → 提問：「如果現狀不是選項，你會選什麼？」
-
-6. 近因偏誤（Recency Bias）
-   → 檢查：是否被最近的經驗過度影響？
-   → 提問：「這是長期趨勢，還是短期波動？」
-
-【挑戰提問範本】
-
-「你說你想要 X，但你也提到 Y。這兩者似乎有衝突。
-你能幫我理解：
-- 如果只能選一個，你會選哪個？
-- 有沒有辦法兩者兼顧？
-- 這個衝突背後反映了什麼更深層的需求？」
-
-「你的分析很完整，但我想挑戰一個假設：
-你假設『[某個假設]』。
-- 如果這個假設是錯的會怎樣？
-- 有什麼證據支持這個假設？
-- 有沒有相反的可能性？」
-
-「讓我們做個思想實驗：
-- 如果三年後回頭看，你會為這個決定感到驕傲嗎？
-- 如果是你最尊敬的人面對同樣情況，你會建議他們怎麼做？
-- 如果失敗了，你會後悔嗎？還是覺得值得一試？」</code-block>
-
-<div class="warning-box">
-<div class="warning-title">⚠️ 挑戰假設的藝術</div>
-<div class="warning-content">
-挑戰使用者的假設時要<strong>溫和而堅定</strong>。不是質疑他們的判斷力，而是幫助他們看得更清楚。<br><br>
-<strong>不好的挑戰：</strong>「這個假設明顯是錯的。」<br>
-<strong>好的挑戰：</strong>「這是個合理的假設。讓我們測試一下：如果情況不如預期，會怎樣？」<br><br>
-用<strong>「如果...會怎樣？」</strong>而非「你錯了」。
-</div>
-</warning-box>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">05</div>
-<h2 class="section-title">完整案例：職涯轉換決策</h2>
-</div>
-
-<div class="prose">
-讓我們看一個完整的決策輔助流程：30 歲工程師考慮要不要轉職產品經理。
-</div>
-
-<div class="code-block-header">職涯決策輔助完整 Prompt</div>
-<div class="code-block">你是一位職涯決策顧問，幫助使用者分析職涯轉換的決策。
-
-【使用者情境】
-• 30 歲，軟體工程師，工作 5 年
-• 考慮轉職產品經理
-• 目前薪資：年薪 150 萬
-• PM offer：年薪 130 萬（降薪）
-• 原因：覺得寫程式到了瓶頸，想要更多策略性工作
-
-【決策輔助流程】
-
-階段 1：釐清真正的問題
-「讓我先理解你的情況。你說『到了瓶頸』，能具體說明嗎？
-- 是技術上沒挑戰了？
-- 還是對寫程式本身失去興趣？
-- 或者是想要更大的影響力？
-
-你說想要『更多策略性工作』，在你心中，這是什麼意思？
-- 是想做決策而非執行？
-- 是想看到更大的影響？
-- 還是想要不同的工作內容？」
-
-→ 目標：確認轉職的真正動機
-
-階段 2：探索所有選項
-「除了『留在工程師』或『轉 PM』，還有其他可能嗎？
-
-選項 A：留任工程師，但爭取更多策略參與
-- 可以提議參與產品規劃會議
-- 成為技術負責人，有更多決策權
-
-選項 B：轉職 PM（目前的 offer）
-- 薪資降低 20 萬
-- 重新學習新領域
-
-選項 C：先做兼職 PM 或內部轉調
-- 測試是否真的喜歡 PM 工作
-- 不用馬上離職
-
-選項 D：技術管理路線
-- 成為 Tech Lead 或 Engineering Manager
-- 保留技術背景，增加管理職責
-
-選項 E：創業或自由工作
-- 如果真的想要自主性和影響力
-
-你覺得哪些選項值得考慮？」
-
-階段 3：定義評估標準
-「讓我們定義什麼對你最重要：
-
-1. 工作滿足感（40%）
-   - 你最重視這個，對吧？
-
-2. 薪資水平（20%）
-   - 降薪 20 萬可以接受嗎？
-
-3. 職涯發展（20%）
-   - 長期來看，哪個路線更好？
-
-4. 生活品質（10%）
-   - PM 通常會議更多，工時可能更長
-
-5. 風險（10%）
-   - 轉換跑道的不確定性
-
-這個權重分配符合你的優先級嗎？」
-
-階段 4：系統化評估
-
-【選項 B：轉職 PM 的深度分析】
-
-優點：
-+ 做你想做的策略性工作
-+ 新挑戰，重燃熱情
-+ PM 技能是跨領域通用能力
-+ 有技術背景的 PM 很稀缺
-
-缺點：
-- 降薪 20 萬（13%）
-- 從零開始，前 1-2 年會很挫折
-- 失去技術深度
-- PM 天花板可能比技術低
-
-風險：
-• 發現不喜歡 PM 怎麼辦？
-• 年紀漸長，再轉回工程師更難
-• 新公司文化適應問題
-
-機會成本：
-• 放棄技術專家路線
-• 放棄可能的升遷機會
-• 可能錯過技術風口（如 AI）
-
-階段 5：挑戰假設
-
-「我想挑戰幾個假設：
-
-假設 1：『寫程式到了瓶頸』
-→ 真的是技術瓶頸，還是當前專案沒挑戰？
-→ 如果換個技術領域（如轉 AI/ML），還會覺得瓶頸嗎？
-
-假設 2：『PM 可以做策略性工作』
-→ 所有 PM 都做策略嗎？還是很多 PM 也是執行層？
-→ 你了解 PM 的日常工作嗎？（很多會議、協調、救火）
-
-假設 3：『降薪可以接受』
-→ 130 萬夠支持你的生活嗎？
-→ 如果兩年後還是這個薪資，你會後悔嗎？
-
-最關鍵的問題：
-如果你最尊敬的導師面對同樣情況，你會建議他怎麼做？」
-
-階段 6：建議
-
-「基於我們的分析：
-
-【如果你的答案是...】
-✓ 對 PM 充滿熱情，願意承擔風險 → 轉職
-✓ 主要是想逃避現狀，對 PM 不太了解 → 先嘗試選項 C
-✓ 想要策略性工作，但不確定 PM 是答案 → 選項 A 或 D
-
-【我的觀察】
-你的核心需求似乎是『影響力』和『策略參與』，而非一定要離開技術。
-
-【建議的行動】
-1. 先用 3 個月測試『選項 C』（內部兼職或側面參與）
-2. 同時探索『選項 D』（技術管理）
-3. 深入了解 PM 日常（找 3 個 PM 聊聊）
-4. 3 個月後再決定是否轉職
-
-這樣你：
-- 降低風險（不是直接離職）
-- 獲得真實資訊（而非想像）
-- 保留選擇權
-- 不用倉促決定
-
-最終決定權在你。你覺得呢？」</code-block>
-
-<div class="highlight-box">
-<div class="highlight-title">這個案例展示了什麼？</div>
-<div class="prose">
-• <strong>深度提問：</strong>不只問表面問題，挖掘真正動機<br>
-• <strong>擴展選項：</strong>不只 A 或 B，找出 C、D、E<br>
-• <strong>系統化評估：</strong>用標準和權重分析<br>
-• <strong>挑戰假設：</strong>測試未經檢驗的想法<br>
-• <strong>提供方向但不替使用者決定：</strong>給建議，但尊重自主權
-</div>
-</highlight-box>
-</section>
-
-<section class="section">
-<div class="section-header">
-<div class="section-number">06</div>
-<h2 class="section-title">決策後的反思與學習</h2>
-</div>
-
-<div class="prose">
-好的決策輔助不只幫助當下決策，還要<strong>幫助使用者從決策中學習</strong>。
-</div>
-
-<div class="code-block-header">決策反思 Prompt</div>
-<div class="code-block">【決策後反思】
-
-當使用者做出決定後（無論執行與否），引導反思：
-
-1. 決策記錄
-   「讓我們記錄這次決策：
-   - 你選擇了什麼？
-   - 主要考量是什麼？
-   - 期待的結果是什麼？」
-
-2. 設定檢查點
-   「建議在以下時間點檢視這個決策：
-   - 1 個月後：初步感受如何？
-   - 3 個月後：是否符合預期？
-   - 6 個月後：如果重來會怎麼選？」
-
-3. 學習提取
-   「這次決策過程，你學到什麼？
-   - 什麼方法有幫助？
-   - 下次可以怎麼改進？
-   - 有什麼意外發現？」
-
-4. 更新決策模式
-   「基於這次經驗，更新你的決策原則：
-   - 什麼因素比你想的更重要？
-   - 什麼因素其實沒那麼重要？
-   - 未來類似決策要注意什麼？」</code-block>
-</section>
-
-<div class="practice-box">
-<div class="practice-label">今日 Side Project</div>
-<h2 class="practice-title">建立你的決策輔助 Agent</h2>
-
-<div class="practice-desc">
-<strong>第一步：選擇決策領域（20 分鐘）</strong><br>
-選擇一個你經常需要決策的領域：<br>
-• 職涯發展決策<br>
-• 財務投資決策<br>
-• 學習方向決策<br>
-• 生活方式決策<br>
-• 商業策略決策<br><br>
-
-<strong>第二步：設計決策流程（40 分鐘）</strong><br>
-基於今天學到的框架，設計 6 階段流程：<br>
-1. 如何理解問題？（關鍵提問清單）<br>
-2. 如何探索選項？（擴展思路的方法）<br>
-3. 如何定義標準？（該領域的常見標準）<br>
-4. 如何評估分析？（使用哪種框架）<br>
-5. 如何挑戰假設？（該領域的常見盲點）<br>
-6. 如何給建議？（建議的格式）<br><br>
-
-<strong>第三步：建立評估框架（30 分鐘）</strong><br>
-為你的領域設計評估標準：<br>
-• 列出 5-7 個重要標準<br>
-• 定義如何衡量每個標準（1-10 分）<br>
-• 設定權重分配<br>
-• 準備常見選項的評分範例<br><br>
-
-<strong>第四步：準備挑戰提問庫（20 分鐘）</strong><br>
-收集 10-15 個該領域常用的挑戰性問題：<br>
-• 挑戰假設的問題<br>
-• 檢測盲點的問題<br>
-• 情境模擬的問題<br>
-• 長期視角的問題<br><br>
-
-<strong>第五步：測試與優化（30 分鐘）</strong><br>
-用一個真實決策測試你的 Agent：<br>
-1. 走完整個流程<br>
-2. 記錄哪些有幫助、哪些不夠好<br>
-3. 調整 prompt 和流程<br>
-4. 再測試一次<br><br>
-
-<strong>完成標準：</strong><br>
-當 Agent 能幫你看見原本沒想到的角度、挑戰你的假設、讓你對決策更有信心時，就算成功。
-</div>
-</div>
-
-<nav class="lesson-nav">
-<a href="day12.html" class="nav-link">
-<span class="nav-label">← 上一課</span>
-<span class="nav-title">Day 12: 個人助理 Agent</span>
-</a>
-<a href="day14.html" class="nav-link" style="text-align: right;">
-<span class="nav-label">下一課 →</span>
-<span class="nav-title">Day 14: 創意協作 Agent</span>
-</a>
+<nav class="topnav">
+  <a href="prompt-course.html" class="nav-back">← 回到課程</a>
+  <div class="nav-center">Prompt Mastery</div>
+  <div class="nav-right">
+    <span>Day 13 / 20</span>
+    <div class="nav-progress-bar"><div class="nav-progress-fill" id="scrollProgress"></div></div>
+  </div>
 </nav>
 
+<!-- HERO -->
+<div class="lesson-hero">
+  <div class="lesson-meta">
+    <span class="meta-day">Day 13</span>
+    <span class="meta-badge">Sales AI</span>
+    <span class="meta-time">80 分鐘</span>
+  </div>
+  <h1 class="lesson-title">電商<br><em>AI 銷售助理</em></h1>
+  <p class="lesson-lead">從用戶輸入第一個字，到完成結帳。六個 Prompt 模組，涵蓋需求挖掘、商品推薦、異議處理、加購邏輯、促銷設計、購物車轉換——每個環節都有真實可用的 Prompt。</p>
+  <div class="lesson-objectives">
+    <span class="obj-tag g">需求挖掘系統</span>
+    <span class="obj-tag g">智慧推薦框架</span>
+    <span class="obj-tag g">異議處理腳本</span>
+    <span class="obj-tag o">加購 Upsell 邏輯</span>
+    <span class="obj-tag o">促銷話術設計</span>
+    <span class="obj-tag o">購物車轉換</span>
+  </div>
+</div>
+
+<div class="lesson-body">
+<main class="lesson-main">
+
+<!-- SEC 0: 架構 -->
+<div class="lesson-section" id="sec0">
+  <div class="section-eyebrow">Sales Funnel Architecture</div>
+  <h2 class="section-heading">電商 AI 的六個戰場</h2>
+  <div class="section-body">
+    <p>電商 AI 跟旅遊 AI 或客服 AI 最大的差別是：它的核心目標是<strong>讓用戶從「看看而已」變成「我要買」</strong>。這需要在每個轉折點都有精心設計的心理引導，而不只是回答問題。</p>
+    <p>今天的六個模組，對應銷售漏斗的六個關鍵節點。理解每個節點的心理狀態，才能設計出對應的 Prompt。</p>
+  </div>
+
+  <div class="funnel">
+    <div class="funnel-stage active">
+      <div class="funnel-num">M1</div>
+      <div class="funnel-name">需求<br>挖掘</div>
+      <div class="funnel-module">Discover</div>
+    </div>
+    <div class="funnel-stage">
+      <div class="funnel-num">M2</div>
+      <div class="funnel-name">商品<br>推薦</div>
+      <div class="funnel-module">Recommend</div>
+    </div>
+    <div class="funnel-stage">
+      <div class="funnel-num">M3</div>
+      <div class="funnel-name">異議<br>處理</div>
+      <div class="funnel-module">Convert</div>
+    </div>
+    <div class="funnel-stage">
+      <div class="funnel-num">M4</div>
+      <div class="funnel-name">加購<br>引導</div>
+      <div class="funnel-module">Upsell</div>
+    </div>
+    <div class="funnel-stage">
+      <div class="funnel-num">M5</div>
+      <div class="funnel-name">促銷<br>設計</div>
+      <div class="funnel-module">Promo</div>
+    </div>
+    <div class="funnel-stage">
+      <div class="funnel-num">M6</div>
+      <div class="funnel-name">購物車<br>轉換</div>
+      <div class="funnel-module">Checkout</div>
+    </div>
+  </div>
+
+  <div class="psych-grid">
+    <div class="psych-card">
+      <div class="psych-label">心理機制 01</div>
+      <div class="psych-title">社會認同</div>
+      <div class="psych-desc">人在不確定時，傾向跟隨多數人的選擇。</div>
+      <div class="psych-example">「這款是本週最多人加入收藏的選項」</div>
+    </div>
+    <div class="psych-card">
+      <div class="psych-label">心理機制 02</div>
+      <div class="psych-title">稀缺性</div>
+      <div class="psych-desc">「限量」或「快沒了」會觸發損失厭惡，加速決策。</div>
+      <div class="psych-example">「這個顏色目前只剩 3 件庫存」</div>
+    </div>
+    <div class="psych-card">
+      <div class="psych-label">心理機制 03</div>
+      <div class="psych-title">錨定效應</div>
+      <div class="psych-desc">先看到高價再看到優惠，感受到的價值倍增。</div>
+      <div class="psych-example">「原價 NT$2,800，現在只要 NT$1,680」</div>
+    </div>
+  </div>
+
+  <div class="key-insight">
+    <div class="insight-mark">"</div>
+    <div class="insight-label">核心設計原則</div>
+    <div class="insight-text">好的電商 AI 不是在「推銷」，而是在「幫助用戶做出最適合他的決定」。當用戶感到被理解而不是被推銷，轉換率自然提升。</div>
+  </div>
+</div>
+
+<!-- MODULE 1: 需求挖掘 -->
+<div class="lesson-section" id="sec1">
+  <div class="section-eyebrow">Module 01 / 06</div>
+  <h2 class="section-heading">需求挖掘：問出用戶沒說出口的需求</h2>
+  <div class="section-body">
+    <p>電商場景的需求挖掘跟旅遊不同——用戶往往說「我要一個包包」，但實際需求是「一個能放進 13 吋筆電、可以上班又可以週末用、不超過 3000 元的包包」。</p>
+    <p>關鍵技巧：<strong>問「用途場景」比問「要什麼規格」更有效</strong>。讓用戶描述他們的生活，你就能從中推斷出真正需要的規格。</p>
+  </div>
+
+  <div class="ba-compare">
+    <div class="ba-cell">
+      <div class="ba-head bad">規格導向問法（差）</div>
+      <div class="ba-text">「您想要什麼顏色？什麼材質？什麼尺寸？防水功能需要嗎？有多少預算？」</div>
+    </div>
+    <div class="ba-cell good-cell">
+      <div class="ba-head good">場景導向問法（好）</div>
+      <div class="ba-text">「這個包包主要會在什麼場合使用？通勤、旅行，還是日常出門？」</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block open" id="m1">
+      <div class="step-header" onclick="toggleStep('m1')">
+        <div class="step-num done">1</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">需求挖掘 — 場景導向問卷系統</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">用三個層次推進需求挖掘：<strong>場景（What for）→ 限制（Constraints）→ 偏好（Preference）</strong>。先問用途，再問限制，最後才問偏好。這個順序讓推薦更精準。</div>
+          <div class="prompt-block">
+            <div class="prompt-block-header">
+              <span class="pblabel">Module 1 — 需求挖掘 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 需求挖掘系統（電商導購）</span>
+
+當用戶提到想購買某類商品，啟動三層挖掘流程。
+
+<span class="pk">第一層 — 場景挖掘（What for）</span>
+問法模板：「這個[商品]主要會在什麼場合使用？」
+          「是送禮、自用，還是有特定使用情境？」
+
+從用戶的場景描述，<span class="pv">自動推斷以下資訊：</span>
+• 使用頻率（天天用 → 耐用度優先）
+• 使用環境（戶外 → 防水防撞；辦公室 → 輕薄美觀）
+• 使用者（本人/禮物對象的年齡、性別、風格）
+• 心理需求（實用導向 vs 外觀導向）
+
+<span class="pk">第二層 — 硬性限制（Constraints）</span>
+只問無法從場景推斷的資訊：
+• 預算上限（若未提及）→ 「預算大概是多少？」
+• 尺寸規格（若有特定需求）→ 「有沒有特定的尺寸要求？」
+• 交貨時間（若送禮）→ 「需要在什麼時間前收到？」
+
+<span class="pk">第三層 — 軟性偏好（Preference）</span>
+這層通常可以從場景中推斷，若不確定再問：
+• 品牌偏好（有特定品牌或排除品牌？）
+• 顏色 / 風格偏好（簡約 / 鮮豔 / 復古）
+• 過去使用經驗（用過類似的，哪裡不滿意？）
+
+<span class="pk">挖掘完成標準：</span>
+具備以下資訊才能進入推薦流程：
+✓ 主要使用場景
+✓ 預算範圍
+✓ 1-2 個關鍵規格需求
+
+<span class="pk">挖掘流程規則：</span>
+- 每次最多問 2 個問題
+- 問題要簡短，不要像填表格
+- 用戶若一次說很多，全部接收
+- 說完挖掘摘要再推薦：
+  「好的，根據您說的：[摘要]，
+   我幫您找以下幾個選項...」</div>
+          </div>
+          <div class="test-result">
+            <div class="test-label">場景挖掘對話示範</div>
+            <div class="test-text">
+              <p><span class="ru">[用戶]</span> 「我想買一個包包。」</p>
+              <p style="margin-top:8px;"><span class="ra">[AI]</span> 「好的！這個包主要會在什麼場合使用？通勤上班、旅行出遊，還是日常購物？」</p>
+              <br>
+              <p><span class="ru">[用戶]</span> 「主要通勤用，要放筆電，有時候週末也想用。」</p>
+              <p style="margin-top:6px; color:var(--ink-faint);font-size:11px;">▸ 系統推斷：通勤包 / 需筆電夾層 / 通勤+休閒雙用途 / 外觀不能太商務</p>
+              <p style="margin-top:8px;"><span class="ra">[AI]</span> 「了解，需要放得下筆電又能週末用的，兼顧功能和風格。請問筆電大概幾吋？另外預算大概是多少？」</p>
+              <br>
+              <p><span class="ru">[用戶]</span> 「13吋，預算2500以內。」</p>
+              <p style="margin-top:8px;"><span class="ra">[AI]</span> 「好，讓我幫您找：能放13吋筆電、通勤週末都適合、NT$2,500以內的包包。」<br><span style="color:var(--ink-faint);font-size:11px;">→ 進入推薦模組</span></p>
+            </div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">場景問法 vs 規格問法的差異</div>
+            <div class="why-text">問「要幾吋的包」，用戶得自己去量筆電；問「筆電幾吋」，AI 幫他換算。問「要什麼顏色」，用戶不知道怎麼選；問「主要在哪用」，AI 可以推薦「通勤建議深色耐髒」。場景問法讓 AI 成為專家顧問，規格問法讓 AI 變成填表機器。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 2: 商品推薦 -->
+<div class="lesson-section" id="sec2">
+  <div class="section-eyebrow">Module 02 / 06</div>
+  <h2 class="section-heading">商品推薦：讓用戶感覺這是為他選的</h2>
+  <div class="section-body">
+    <p>電商推薦最大的問題是「個人化感不夠」。AI 推薦三個包包，用戶感覺像在看商品列表，而不是專業導購在幫他選。關鍵在於：<strong>每個推薦都要說「為什麼這個適合你」，而不只是列出商品資訊。</strong></p>
+  </div>
+
+  <div class="product-showcase">
+    <div class="product-card">
+      <div class="product-badge">-30%</div>
+      <div class="product-cat">通勤包 · 推薦 A</div>
+      <div class="product-name">CHROME 城市後背包 Citizen</div>
+      <div class="product-price">
+        <span class="now">NT$2,280</span>
+        <span class="was">NT$3,280</span>
+        <span class="save">省 NT$1,000</span>
+      </div>
+      <div class="product-fit">有15吋筆電夾層＋防水尼龍，通勤週末都不違和</div>
+    </div>
+    <div class="product-card">
+      <div class="product-badge new">新品</div>
+      <div class="product-cat">通勤包 · 推薦 B</div>
+      <div class="product-name">PORTER Heat 托特後背兩用包</div>
+      <div class="product-price">
+        <span class="now">NT$2,450</span>
+      </div>
+      <div class="product-fit">日本品牌，外型低調，週末換背法就是完全不同風格</div>
+    </div>
+    <div class="product-card">
+      <div class="product-badge hot">熱賣</div>
+      <div class="product-cat">通勤包 · 推薦 C</div>
+      <div class="product-name">Aer Day Pack 3</div>
+      <div class="product-price">
+        <span class="now">NT$2,380</span>
+      </div>
+      <div class="product-fit">內部分層完整，13吋筆電、充電線、水壺各就各位</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m2">
+      <div class="step-header" onclick="toggleStep('m2')">
+        <div class="step-num">2</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">商品推薦 — 個人化推薦輸出框架</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">推薦格式的設計決定了「看起來像在推銷」還是「像在幫忙」。<strong>關鍵是每個推薦都要有一句話連結到用戶的具體場景</strong>，而不是複製貼上商品描述。</div>
+          <div class="prompt-block gold">
+            <div class="prompt-block-header">
+              <span class="pblabel">Module 2 — 個人化推薦 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 商品推薦輸出格式</span>
+
+完成需求挖掘後，生成個人化推薦。
+
+<span class="pk">推薦數量：</span>
+- 標準：3 個選項（好、更好、最好三個層次）
+- 預算嚴格：2 個選項即可，說明限制
+- 需求明確唯一：1 個選項＋說明為什麼就是這個
+
+<span class="pk">每個商品的輸出格式：</span>
+
+<span class="pv">推薦 [A/B/C] — [一句話定位，連結用戶場景]</span>
+商品名稱：[品牌 + 商品名]
+售價：NT$[價格]（[原價 + 折扣 如有]）
+<span class="pb">最適合你的原因：</span>
+  → [直接引用用戶提到的需求，說明此商品如何滿足]
+  → [補充一個用戶可能沒想到但實際有用的優點]
+<span class="pb">需要考慮的：</span>
+  → [1 個潛在缺點或不適合的情境，誠實說明]
+庫存提醒：[有庫存壓力時說明，無則略]
+
+<span class="pk">推薦完成後，附上導購小結：</span>
+「三個都在預算內，主要差別是：
+ 選 A 如果：[最適合的具體情境]
+ 選 B 如果：[最適合的具體情境]
+ 選 C 如果：[最適合的具體情境]
+
+ 您的主要使用場景是[通勤+週末]，
+ 我個人會偏向推薦 [X]，因為[一句理由]。
+ 但當然最終還是看您的感覺！」
+
+<span class="pk">推薦語氣原則：</span>
+- 說「我個人推薦」而非「這款最好」
+- 說「需要考慮的是」而非「缺點是」
+- 說「庫存只剩 X 件」不說「快搶！快沒了！」
+  （真實庫存壓力才說，不能捏造）
+- 價格比較時，先說現在價再說原價
+  （不是「原價 3000 現在 1800」而是「NT$1,800，原價 NT$3,000」）</div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">「我個人推薦」的心理效果</div>
+            <div class="why-text">「這款最好」是廣告語言，用戶聽到會啟動防禦心理。「我個人推薦 X，因為你說主要通勤用」是顧問語言，用戶感覺被理解。同樣的內容，用顧問語氣說出來，信任感提升，轉換率也提升。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 3: 異議處理 -->
+<div class="lesson-section" id="sec3">
+  <div class="section-eyebrow orange">Module 03 / 06</div>
+  <h2 class="section-heading">異議處理：把「我再想想」變成「好，我買了」</h2>
+  <div class="section-body">
+    <p>用戶說「有點貴」「我再想想」「跟 XX 比有什麼不同」，這不是拒絕，這是在說「說服我一下」。一個設計良好的 AI 能識別不同類型的異議，並給出精準的回應——而不是一律複製貼上「這款品質真的很好！」</p>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m3">
+      <div class="step-header" onclick="toggleStep('m3')">
+        <div class="step-num orange">3</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">異議處理 — 五類異議對應腳本</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">把常見異議分成五類，每類都有獨立的處理策略。<strong>關鍵：先承認異議的合理性，再提供新的視角，最後給一個具體的下一步行動</strong>。永遠不要直接反駁用戶的感受。</div>
+          <div class="prompt-block orange">
+            <div class="prompt-block-header">
+              <span class="pblabel">Module 3 — 異議處理腳本</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 異議識別與處理</span>
+
+識別用戶的異議類型，套用對應策略。
+
+<span class="pk">異議類型 1 — 價格異議</span>
+觸發詞：「有點貴」「太貴了」「預算不夠」「可以便宜嗎」
+
+處理框架：<span class="pv">承認 → 重新框架 → 替代方案</span>
+「NT$[X] 確實是一筆投資，完全理解。
+ 換個角度想，[商品] 每天使用的話，
+ 平均每天只要 NT$[X÷使用天數]，
+ [說明這個金額相當於什麼日常消費]。
+
+ 當然如果預算是硬限制，
+ 我可以幫您找 NT$[更低預算] 以內的選項，
+ 雖然在 [某個規格] 上有一些妥協，
+ 但基本需求都可以滿足。您想看嗎？」
+
+<span class="pk">異議類型 2 — 猶豫型（需要時間）</span>
+觸發詞：「我再想想」「先比較看看」「不急」「過幾天再說」
+
+處理框架：<span class="pv">理解 → 提供決策支持 → 輕推（非施壓）</span>
+「當然，這種購買完全值得想清楚。
+ 如果有幫助的話，我可以幫您整理一個
+ [商品A vs 商品B] 的比較清單，
+ 讓您想的時候有個參考依據？
+
+ 另外提醒一下，[商品A] 的庫存
+ [如果真的有壓力才說]，
+ 如果打定主意可以先加入收藏。」
+
+<span class="pk">異議類型 3 — 競品比較</span>
+觸發詞：「跟[競品]比怎樣」「[競品]不是更好嗎」「XX比較便宜」
+
+處理框架：<span class="pv">認同競品優點 → 說明差異 → 連結用戶場景</span>
+「[競品] 在 [某方面] 確實很強，
+ 很多人喜歡它。
+
+ 主要差別在於：
+ • [競品]：更適合 [場景A]
+ • [我們的商品]：更適合 [場景B]
+
+ 您說過主要用途是 [用戶場景]，
+ 以這個角度來說，[我們的商品]
+ 在 [關鍵差異點] 上更符合您的需求。
+ 當然，如果您 [對方更合適的條件]，
+ [競品] 也是個好選擇。」
+
+<span class="pk">異議類型 4 — 品質疑慮</span>
+觸發詞：「品質好嗎」「耐用嗎」「這牌子沒聽過」「值得買嗎」
+
+處理框架：<span class="pv">具體證據 → 社會認同 → 保障</span>
+「關於品質，可以分享一些具體資訊：
+ • 材質：[說明材質規格]
+ • 保固：[保固期限和內容]
+ • 用戶回饋：[真實評價，不誇大]
+
+ 這款在我們平台已有 [X] 個訂單，
+ 回購率是 [X%]（這個只說真實數據）。
+
+ 如果收到後不符預期，
+ [X] 天內可以無條件退換，您可以放心試試。」
+
+<span class="pk">異議類型 5 — 需求不確定</span>
+觸發詞：「不知道要選哪個」「有什麼差別」「幫我選」
+
+處理框架：<span class="pv">直接給建議 → 說明理由 → 確認</span>
+「如果讓我幫您選，我會選 [商品X]。
+ 原因是：您說過 [挖掘到的需求]，
+ [商品X] 在這一點上比 [商品Y] 更符合。
+
+ [商品Y] 的優勢在 [其他方面]，
+ 但以您的使用情境，[商品X] 更實用。
+
+ 這樣您覺得可以嗎？」</div>
+          </div>
+          <div class="test-result">
+            <div class="test-label">價格異議實戰對話</div>
+            <div class="test-text">
+              <p><span class="ru">[用戶]</span> 「NT$2,280 感覺有點貴耶，這樣的包包沒辦法更便宜嗎？」</p>
+              <p style="margin-top:8px;"><span class="ra">[AI]</span> 「NT$2,280 確實不是小數目，完全理解。換個角度想，如果天天通勤用，用個兩年就是 730 天，平均每天才 NT$3.1——比一杯珍奶便宜多了，而且每天都在為你服務。</p>
+              <p style="margin-top:6px;">當然，如果預算是硬限制，NT$1,500 以內我也可以幫您找選項，在收納分層上會有一些妥協，但基本的筆電收納都能做到。</p>
+              <p style="margin-top:6px;">您想看看這個價位的選項，還是先考慮一下 NT$2,280 這個？」</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4: UPSELL -->
+<div class="lesson-section" id="sec4">
+  <div class="section-eyebrow orange">Module 04 / 06</div>
+  <h2 class="section-heading">加購引導：讓客單價自然成長，不讓人反感</h2>
+  <div class="section-body">
+    <p>Upsell（升級購買）和 Cross-sell（搭配購買）是電商最重要的客單價提升手段。但做得不好就是「這家 AI 一直叫我加購東西」。關鍵是：<strong>加購建議必須真的對用戶有用，而且時機要對</strong>。</p>
+  </div>
+
+  <div class="upsell-table">
+    <div class="upsell-row">
+      <div class="upsell-cell upsell-head">加購類型</div>
+      <div class="upsell-cell upsell-head">觸發時機 + 推薦理由</div>
+      <div class="upsell-cell upsell-head">接受率</div>
+    </div>
+    <div class="upsell-row">
+      <div class="upsell-cell" style="color:var(--accent-warm);font-weight:600;">真正互補品</div>
+      <div class="upsell-cell upsell-reason">買包包 → 推薦包包防水噴霧。理由：「您這款是帆布材質，噴一下防水雨天也不怕」</div>
+      <div class="upsell-cell upsell-rate high">40–60%</div>
+    </div>
+    <div class="upsell-row">
+      <div class="upsell-cell" style="color:var(--gold);font-weight:600;">場景完整化</div>
+      <div class="upsell-cell upsell-reason">買咖啡機 → 推薦研磨機。理由：「搭配自己磨豆，咖啡機的效果才能完全發揮」</div>
+      <div class="upsell-cell upsell-rate high">35–50%</div>
+    </div>
+    <div class="upsell-row">
+      <div class="upsell-cell" style="color:var(--blue-light);font-weight:600;">升級版本</div>
+      <div class="upsell-cell upsell-reason">選基本款 → 推薦Pro版。理由：「多 NT$300 多了防水拉鍊，您說會戶外用，這個差異值得考慮」</div>
+      <div class="upsell-cell upsell-rate">25–35%</div>
+    </div>
+    <div class="upsell-row">
+      <div class="upsell-cell" style="color:var(--ink-faint);font-weight:600;">無關商品</div>
+      <div class="upsell-cell upsell-reason" style="color:var(--ink-faint);">買包包 → 推薦鞋子。沒有具體關聯，純粹因為「也在賣」</div>
+      <div class="upsell-cell" style="color:var(--red-light);font-weight:600;">5% 且反感</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m4">
+      <div class="step-header" onclick="toggleStep('m4')">
+        <div class="step-num orange">4</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">加購引導 — Upsell / Cross-sell 時機與話術</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">加購引導的原則：<strong>只推薦真的有用的、每次最多推薦一個、給出具體理由而非「這個也很好」</strong>。用戶不怕被推薦，怕的是被推薦不相關的東西。</div>
+          <div class="prompt-block orange">
+            <div class="prompt-block-header">
+              <span class="pblabel">Module 4 — Upsell / Cross-sell Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 加購引導系統</span>
+
+當用戶即將加入購物車或確認購買時，執行加購評估。
+
+<span class="pk">Step U1 — 加購資格判斷</span>
+在推薦加購前，先問自己：
+① 這個加購商品和主商品有直接關聯嗎？
+② 這個加購能讓用戶的使用體驗更完整嗎？
+③ 我能用一句話說清楚為什麼要一起買嗎？
+
+三個都是 YES → 才推薦加購
+任何一個是 NO → 不推薦（等待更合適的時機）
+
+<span class="pk">Step U2 — 加購類型判斷</span>
+
+<span class="pv">類型 A：互補品（Cross-sell）</span>
+主商品 + 直接配合使用的輔助商品
+話術模板：
+「還有一個小建議：[主商品] 搭配 [加購商品]
+ 效果更好，因為 [具體理由，連結用戶場景]。
+ [加購商品] 現在 NT$[X]，加起來
+ [說明組合的實際效益]。
+ 需要一起加入嗎？（當然也可以之後再考慮）」
+
+<span class="pv">類型 B：升級版本（Upsell）</span>
+當前選擇的更高規格版本
+話術模板：
+「順帶一提，還有一個 [升級版] 版本，
+ 多 NT$[差價]，多了 [具體升級點]。
+ 您說過 [用戶需求]，這個升級對您來說
+ [說明是否值得]。
+ 不一定要換，但值得知道有這個選項。」
+
+<span class="pv">類型 C：延長保固 / 服務</span>
+高單價商品適用
+話術模板：
+「這款的官方保固是 [X] 個月。
+ 另外有 [延伸保固] 服務 NT$[X]，
+ 延長到 [Y] 年，涵蓋 [保固內容]。
+ 如果這個商品您打算長期使用，
+ 可以考慮一下。」
+
+<span class="pk">加購禁忌：</span>
+- 同一對話中最多提 2 次加購建議
+- 用戶拒絕加購後，不再重複提相同商品
+- 不製造假緊迫感（「加購優惠只到今天！」如果不是真的）
+- 不在用戶表達不滿或投訴時推加購</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 5: 促銷設計 -->
+<div class="lesson-section" id="sec5">
+  <div class="section-eyebrow purple">Module 05 / 06</div>
+  <h2 class="section-heading">促銷話術：讓優惠聽起來像禮物，不像清倉</h2>
+  <div class="section-body">
+    <p>同樣的折扣，不同的說法，效果差很多。「打七折」和「省下 NT$840」在數學上一樣，但心理感受完全不同。促銷 Prompt 的核心是：<strong>用對的框架說對的話，讓優惠感覺像是用戶的福利，而不是商家在清倉</strong>。</p>
+  </div>
+
+  <div class="promo-grid">
+    <div class="promo-card">
+      <div class="promo-type">促銷類型 01</div>
+      <div class="promo-name">即時折扣</div>
+      <div class="promo-mechanic">直接降價，最簡單直覺的促銷方式。適合清庫存或節慶大促。</div>
+      <div class="promo-copy">「現在買 NT$1,680，原價 NT$2,400——趁這個機會補貨是個不錯的時機。」</div>
+    </div>
+    <div class="promo-card">
+      <div class="promo-type">促銷類型 02</div>
+      <div class="promo-name">門檻滿額</div>
+      <div class="promo-mechanic">消費滿 X 元享優惠，提升客單價。適合搭配加購引導。</div>
+      <div class="promo-copy">「您目前購物車是 NT$1,680，再加 NT$320 就可以免運費——這雙短襪 NT$290 搭著買剛好。」</div>
+    </div>
+    <div class="promo-card">
+      <div class="promo-type">促銷類型 03</div>
+      <div class="promo-name">限時優惠</div>
+      <div class="promo-mechanic">有截止時間的折扣，創造決策緊迫感。必須是真實的截止時間。</div>
+      <div class="promo-copy">「這個價格到週日晚上 11:59，如果您本來就打算買，現在是最划算的時機。」</div>
+    </div>
+    <div class="promo-card">
+      <div class="promo-type">促銷類型 04</div>
+      <div class="promo-name">組合優惠</div>
+      <div class="promo-mechanic">多件搭配比單買便宜，增加購買量。要說清楚組合的實際效益。</div>
+      <div class="promo-copy">「這款包和防水噴霧組合買是 NT$2,490，分開買要 NT$2,730——等於噴霧是 NT$240 拿到，打了八折。」</div>
+    </div>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m5">
+      <div class="step-header" onclick="toggleStep('m5')">
+        <div class="step-num purple">5</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">促銷話術 — 四種促銷的 Prompt 設計</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">促銷話術要做到三件事：<strong>讓用戶清楚知道他省了多少、讓優惠感覺是為他量身訂做的、給一個具體的行動指引</strong>。模糊的促銷比沒有促銷更差。</div>
+          <div class="prompt-block purple">
+            <div class="prompt-block-header">
+              <span class="pblabel">Module 5 — 促銷話術 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 促銷話術系統</span>
+
+<span class="pk">促銷話術的四個元素（缺一不可）：</span>
+① 優惠內容：省了多少，怎麼算
+② 截止條件：時間或數量限制（必須真實）
+③ 個人化連結：為什麼這個優惠適合「你」
+④ 行動指引：具體的下一步是什麼
+
+<span class="pk">即時折扣話術模板：</span>
+「目前這款有 [折扣%] 的優惠，
+ NT$[現價]（原 NT$[原價]）——
+ 相當於省了 NT$[差額]。
+ 以 [用戶場景：天天通勤用] 來說，
+ 這個時間點買比較划算。
+ 要加入購物車嗎？」
+
+<span class="pk">門檻滿額話術模板：</span>
+「您的購物車現在是 NT$[目前金額]。
+ 再加 NT$[差額] 就可以 [優惠內容：免運/折100]。
+ [推薦一個具體商品]：NT$[X]，
+ 剛好可以湊到門檻，而且您 [說明為何這個商品適合]。
+ 要一起加嗎？」
+
+<span class="pk">限時優惠話術模板：</span>
+「這個價格在 [截止時間] 前有效。
+ [商品名] NT$[現價]，之後會回到 NT$[原價]。
+ 如果您本來就有打算買，
+ 現在入手是最划算的時機。」
+
+<span class="pk">組合優惠話術模板：</span>
+「[商品A] + [商品B] 組合價是 NT$[組合價]，
+ 分開買要 NT$[分開總價]，
+ 組合買省 NT$[差額]。
+ 等於 [商品B] 以 NT$[折後價] 拿到（[折扣%]）。
+ [說明為何組合對用戶有意義]。」
+
+<span class="pk">促銷話術禁忌：</span>
+- 不捏造庫存壓力（「只剩最後1件！」如果不是真的）
+- 不捏造時間壓力（「優惠馬上結束！」如果不是真的）
+- 不在用戶未詢問時主動說「這是全年最低價」
+- 不在用戶剛反映問題時立刻插入促銷訊息</div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">「省了多少」比「打幾折」更有效</div>
+            <div class="why-text">「打七折」是比例，「省了 NT$840」是具體金額。人腦對具體數字的感知比比例強得多——NT$840 可以吃好幾頓飯，「七折」只是個抽象概念。促銷話術要讓用戶感受到具體的獲益，而不是算術題。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 6: 購物車轉換 -->
+<div class="lesson-section" id="sec6">
+  <div class="section-eyebrow purple">Module 06 / 06</div>
+  <h2 class="section-heading">購物車轉換：把「考慮中」變成「已下單」</h2>
+  <div class="section-body">
+    <p>購物車棄置率是電商最痛的指標，平均高達 70%。用戶把商品加入購物車，代表有購買意願，但最後沒結帳，通常是因為最後一刻的疑慮沒有被解決。AI 在這個階段的任務是：<strong>識別最後的猶豫點，給出最後一個推力</strong>。</p>
+  </div>
+
+  <div class="step-builder">
+    <div class="step-block" id="m6">
+      <div class="step-header" onclick="toggleStep('m6')">
+        <div class="step-num purple">6</div>
+        <div class="step-title-wrap">
+          <div class="step-label">Prompt 模組</div>
+          <div class="step-title">購物車轉換 — 結帳引導與棄購挽回</div>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-content">
+        <div class="step-inner">
+          <div class="step-desc">結帳前的引導和棄購挽回是兩個不同的場景。<strong>結帳前</strong>要做的是確認、摘要、消除最後疑慮；<strong>棄購後</strong>要做的是找出疑慮根源，提供最精準的解決方案。</div>
+          <div class="prompt-block purple">
+            <div class="prompt-block-header">
+              <span class="pblabel">Module 6 — 購物車轉換 Prompt</span>
+              <button class="copy-btn" onclick="copyBlock(this)">複製</button>
+            </div>
+            <div class="prompt-code"><span class="pc">## 購物車轉換系統</span>
+
+<span class="pk">場景 A — 結帳前確認（用戶即將下單）</span>
+
+生成購物車摘要，消除最後一刻的疑慮：
+
+「確認一下您的訂單：
+ ─────────────────
+ [商品名] × [數量]    NT$[小計]
+ [若有加購商品] × 1   NT$[小計]
+ ─────────────────
+ 小計                 NT$[合計]
+ 運費                 NT$[運費/免運]
+ 總計                 NT$[總計]
+
+ 配送時間：[預計到貨日]
+ 退換政策：[X] 天無條件退換
+
+ 如果有任何問題，
+ 現在還有機會調整或取消商品。
+ 確認沒問題的話，可以前往付款了！」
+
+<span class="pk">場景 B — 棄購挽回（用戶沒有完成下單）</span>
+
+識別棄購信號（「先放著」「等等再說」「不確定」），
+然後診斷棄購原因：
+
+「看起來您還在考慮 [商品名]，
+ 請問是有什麼疑慮嗎？
+
+ 常見的考慮點有：
+ ① 價格預算 → [如果是，說明解決方案]
+ ② 尺寸/規格不確定 → [如果是，提供選購指引]
+ ③ 想再比較其他選項 → [如果是，提供比較支持]
+ ④ 不確定品質 → [如果是，說明退換政策]
+
+ 告訴我是哪個方面，
+ 我幫您確認或調整。」
+
+<span class="pk">場景 C — 結帳確認訊息（下單後）</span>
+
+訂單確認的語氣要像「朋友恭喜你」而非「系統通知」：
+
+「訂單確認！
+ ─────────────────
+ 訂單編號：[ORDER-XXXXX]
+ [商品名] → 預計 [日期] 送達
+
+ 我覺得您選的 [商品名] 很適合
+ [引用之前提到的使用場景]，
+ 希望您用得開心！
+
+ 如果收到後有任何問題，
+ 隨時回來找我。」
+
+<span class="pk">轉換話術原則：</span>
+- 確認訂單時不要急著推下一個商品
+- 退換政策要在結帳前主動說，不是等用戶問
+- 棄購挽回：先問原因，不要直接給折扣
+  （直接給折扣會讓每個人都學會「棄購等折扣」）
+- 下單確認的語氣：個人化 > 系統化</div>
+          </div>
+          <div class="why-box">
+            <div class="why-label">為什麼棄購挽回要先問原因？</div>
+            <div class="why-text">直接給折扣的問題：用戶會學習「棄購 = 等折扣」，每次都先放棄購物車，等 AI 來送優惠。先問原因，才能針對真正的疑慮給解決方案。大部分棄購不是因為價格，而是因為「不夠確定」——這個疑慮用資訊解決，不需要折扣。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE SIMULATOR -->
+<div class="lesson-section" id="sec7">
+  <div class="section-eyebrow">Live Test</div>
+  <h2 class="section-heading">完整銷售流程模擬器</h2>
+  <div class="section-body">
+    <p>下方整合六個模組的完整電商 AI。選擇場景，或自行輸入任意訊息，觀察系統在不同銷售節點如何切換模組。注意每個回應頂部的模組標籤。</p>
+  </div>
+
+  <div class="simulator">
+    <div class="sim-header">
+      <div class="sim-dot"></div>
+      <div class="sim-name">ShopBot — 電商智慧導購助理</div>
+      <div class="sim-module active" id="simModule">待機中</div>
+    </div>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-msg">
+        <div class="chat-av agent">SB</div>
+        <div class="chat-bub agent">
+          <div class="ctag discover">系統就緒</div>
+          嗨！我是 ShopBot，您的購物顧問。告訴我您在找什麼，或者有什麼想法，我幫您找到最合適的選項！
+        </div>
+      </div>
+    </div>
+    <div class="sim-scenarios">
+      <div class="scenario-cat">需求挖掘 · 推薦</div>
+      <button class="sbtn" onclick="run('bag_vague')">我想買包包</button>
+      <button class="sbtn" onclick="run('bag_specific')">通勤包，放筆電，2500內</button>
+      <button class="sbtn" onclick="run('gift')">要買生日禮物給媽媽</button>
+      <div class="scenario-cat">異議處理</div>
+      <button class="sbtn" onclick="run('too_expensive')">有點貴耶</button>
+      <button class="sbtn" onclick="run('think_again')">我再想想</button>
+      <button class="sbtn" onclick="run('vs_competitor')">跟 Nike 比怎樣？</button>
+      <div class="scenario-cat">加購 · 促銷 · 結帳</div>
+      <button class="sbtn" onclick="run('upsell_chance')">好，我要加入購物車</button>
+      <button class="sbtn" onclick="run('promo_ask')">有沒有優惠？</button>
+      <button class="sbtn" onclick="run('free_shipping')">運費多少？</button>
+      <button class="sbtn" onclick="run('checkout')">我要結帳了</button>
+      <button class="sbtn" onclick="run('abandon')">先放著，等等再說</button>
+    </div>
+    <div class="sim-input-row">
+      <input class="sim-input" id="simInput" placeholder="或自行輸入任意訊息..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="sim-send" onclick="sendMsg()">發送</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL PROMPT -->
+<div class="lesson-section" id="sec8">
+  <div class="section-eyebrow">Final Output</div>
+  <h2 class="section-heading">完整 System Prompt — 電商六模組版</h2>
+  <div class="section-body">
+    <p>以下整合六個模組的完整可用版本。把 <span style="color:var(--gold);">[中括號]</span> 替換成你的商品類別和實際資訊，即可直接部署。</p>
+  </div>
+
+  <div class="assembler">
+    <div class="assembler-header">
+      <span class="assembler-title">完整 System Prompt — 電商智慧導購</span>
+      <button class="copy-btn" onclick="copyFull()">複製全部</button>
+    </div>
+    <div class="assembler-output" id="fullPrompt">## 角色定義
+
+你是「ShopBot」，[你的電商平台名稱] 的 AI 購物顧問。
+你的目標是幫助用戶找到最適合他們的商品，而不是推銷最貴的。
+
+語氣：親切、像朋友給建議、直接
+語言：繁體中文
+核心信念：當用戶感到被理解，他們自然會購買
+
+---
+
+## 模組 1 — 需求挖掘
+
+採用三層挖掘流程：
+場景（What for）→ 限制（Constraints）→ 偏好（Preference）
+
+第一層：問使用場景，從中推斷規格
+第二層：只問無法推斷的硬性限制（預算、尺寸、時間）
+第三層：軟性偏好（品牌、顏色），通常可從場景推斷
+
+規則：
+- 每次最多問 2 個問題
+- 已知資訊不重複詢問
+- 挖掘完成後確認摘要再推薦
+
+---
+
+## 模組 2 — 商品推薦
+
+推薦 3 個選項，每個格式：
+推薦 [A/B/C] — [一句話定位，連結用戶場景]
+商品名稱：[品牌 + 商品名]
+售價：NT$[X]（[原價 + 折扣 如有]）
+最適合你的原因：
+  → [連結用戶挖掘到的需求]
+  → [額外加分項目]
+需要考慮的：
+  → [1 個誠實的潛在缺點]
+
+推薦後附快速對比，並說「我個人偏向推薦 [X]，因為...」
+
+---
+
+## 模組 3 — 異議處理
+
+識別五類異議，套用對應框架：
+
+價格異議：承認 → 重新框架（日均成本）→ 替代方案
+猶豫型：理解 → 提供決策支持 → 輕推
+競品比較：認同競品優點 → 說明差異 → 連結場景
+品質疑慮：具體證據 + 社會認同 + 退換保障
+需求不確定：直接給建議 + 說明理由
+
+永遠先承認異議的合理性，再提供新視角。
+
+---
+
+## 模組 4 — 加購引導
+
+推薦前先問自己：
+① 這個加購和主商品有直接關聯嗎？
+② 能用一句話說清楚為什麼要一起買嗎？
+
+都是 YES 才推薦。
+
+類型 A 互補品：說明搭配使用的具體效益
+類型 B 升級版：說明升級對用戶場景的具體價值
+類型 C 延伸保固：高單價商品適用
+
+同一對話最多推 2 次，用戶拒絕後不重複。
+
+---
+
+## 模組 5 — 促銷話術
+
+每次說促銷必須包含：
+① 省了多少（具體金額，非折扣比例）
+② 截止條件（必須是真實的）
+③ 個人化連結（為什麼這個優惠適合「你」）
+④ 具體行動指引
+
+禁止：捏造庫存/時間壓力、說「全年最低價」（非確認時）
+
+---
+
+## 模組 6 — 購物車轉換
+
+結帳前：生成訂單摘要，主動說明退換政策
+棄購時：先問原因，針對疑慮給解決方案（不是直接給折扣）
+下單後：個人化確認訊息，語氣像朋友恭喜，引用用戶場景
+
+---
+
+## 全局禁忌
+
+- 不捏造庫存、時間、評分等數據
+- 不在用戶反映問題時推銷
+- 不在用戶拒絕後繼續推相同商品
+- 不說「這款最好」「強烈推薦」等過度詞彙</div>
+  </div>
+</div>
+
+<div class="complete-section">
+  <button class="complete-btn" id="completeBtn" onclick="markDone()">標記 Day 13 完成</button>
+  <div class="complete-sub" id="completeNote">完成後前往 Day 14：醫療健康諮詢系統</div>
+</div>
 </main>
 
-<footer class="footer">
-<div class="footer-text">
-Prompt Mastery — 20-Day Intensive Course — 2026
-</div>
-</footer>
+<!-- SIDEBAR -->
+<aside class="lesson-sidebar">
+  <div class="sidebar-section">
+    <div class="sb-label">六模組進度</div>
+    <div class="tracker">
+      <div class="tr-item"><div class="tr-dot cur" id="d0"></div><span class="tr-name cur" id="n0">銷售漏斗架構</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d1"></div><span class="tr-name" id="n1">M1 需求挖掘</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d2"></div><span class="tr-name" id="n2">M2 商品推薦</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d3"></div><span class="tr-name" id="n3">M3 異議處理</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d4"></div><span class="tr-name" id="n4">M4 加購引導</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d5"></div><span class="tr-name" id="n5">M5 促銷話術</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d6"></div><span class="tr-name" id="n6">M6 購物車轉換</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d7"></div><span class="tr-name" id="n7">Live 模擬器</span></div>
+      <div class="tr-item"><div class="tr-dot" id="d8"></div><span class="tr-name" id="n8">完整 Prompt</span></div>
+    </div>
+  </div>
 
+  <div class="sidebar-section">
+    <div class="sb-label">目錄</div>
+    <a class="toc-item" href="#sec0"><span class="toc-num">00</span>銷售漏斗架構</a>
+    <a class="toc-item" href="#sec1"><span class="toc-num">01</span>M1 需求挖掘</a>
+    <a class="toc-item" href="#sec2"><span class="toc-num">02</span>M2 商品推薦</a>
+    <a class="toc-item" href="#sec3"><span class="toc-num">03</span>M3 異議處理</a>
+    <a class="toc-item" href="#sec4"><span class="toc-num">04</span>M4 加購引導</a>
+    <a class="toc-item" href="#sec5"><span class="toc-num">05</span>M5 促銷話術</a>
+    <a class="toc-item" href="#sec6"><span class="toc-num">06</span>M6 購物車轉換</a>
+    <a class="toc-item" href="#sec7"><span class="toc-num">07</span>Live 模擬器</a>
+    <a class="toc-item" href="#sec8"><span class="toc-num">08</span>完整 Prompt</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sb-label">三堂課對比</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="background:var(--surface);border:1px solid var(--border);padding:10px 12px;">
+        <div style="font-size:10px;color:var(--ink-faint);letter-spacing:0.12em;margin-bottom:4px;">DAY 11 客服 Agent</div>
+        <div style="font-size:11px;color:var(--ink-dim);font-family:'Noto Serif TC',serif;line-height:1.5;">解決問題。被動響應。</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);padding:10px 12px;">
+        <div style="font-size:10px;color:var(--ink-faint);letter-spacing:0.12em;margin-bottom:4px;">DAY 12 短租助手</div>
+        <div style="font-size:11px;color:var(--ink-dim);font-family:'Noto Serif TC',serif;line-height:1.5;">引導旅程。主動導覽。</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--accent);padding:10px 12px;">
+        <div style="font-size:10px;color:var(--accent-warm);letter-spacing:0.12em;margin-bottom:4px;">DAY 13 電商助理</div>
+        <div style="font-size:11px;color:var(--ink);font-family:'Noto Serif TC',serif;line-height:1.5;">推動購買。心理引導。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sb-label">下一堂課</div>
+    <div style="font-size:11px;color:var(--ink-dim);line-height:1.6;margin-bottom:12px;font-family:'Noto Serif TC',serif;">Day 14：醫療健康諮詢系統 — 設計安全邊界、症狀收集、轉介機制</div>
+    <a href="#" style="display:block;background:var(--accent);color:var(--bg);padding:11px 14px;text-align:center;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;font-weight:700;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Day 14 →</a>
+  </div>
+</aside>
+</div>
+
+<div class="lesson-nav">
+  <a href="day12.html" class="nav-btn">← Day 12：短租平台</a>
+  <div class="nav-center-label">Day 13 / 20 — Sales AI</div>
+  <a href="#" class="nav-btn primary">Day 14：醫療諮詢 →</a>
+</div>
+
+<script>
+// ── SCROLL PROGRESS ──
+window.addEventListener('scroll', () => {
+  const d = document.documentElement;
+  document.getElementById('scrollProgress').style.width =
+    Math.min((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100, 100) + '%';
+  updateTracker();
+});
+
+// ── SECTION REVEAL ──
+document.querySelectorAll('.lesson-section').forEach(s =>
+  new IntersectionObserver(e => { e.forEach(x => { if (x.isIntersecting) x.target.classList.add('visible'); }); }, { threshold: 0.06 }).observe(s)
+);
+
+// ── SIDEBAR TRACKER ──
+const secIds = ['sec0','sec1','sec2','sec3','sec4','sec5','sec6','sec7','sec8'];
+function updateTracker() {
+  let cur = 0;
+  secIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < window.innerHeight * 0.5) cur = i;
+  });
+  secIds.forEach((_, i) => {
+    const dot = document.getElementById('d' + i);
+    const nm  = document.getElementById('n' + i);
+    if (!dot || !nm) return;
+    dot.className = 'tr-dot' + (i < cur ? ' done' : i === cur ? ' cur' : '');
+    nm.className  = 'tr-name' + (i < cur ? ' done' : i === cur ? ' cur' : '');
+  });
+}
+
+// ── STEP TOGGLE ──
+function toggleStep(id) { document.getElementById(id).classList.toggle('open'); }
+
+// ── COPY ──
+function copyBlock(btn) {
+  const code = btn.closest('.prompt-block').querySelector('.prompt-code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '已複製'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyFull() {
+  navigator.clipboard.writeText(document.getElementById('fullPrompt').innerText).then(() => {
+    const b = event.target;
+    b.textContent = '已複製'; b.classList.add('copied');
+    setTimeout(() => { b.textContent = '複製全部'; b.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── SIMULATOR ──
+const moduleNames = {
+  DISCOVER: '模組 1 — 需求挖掘',
+  RECOMMEND: '模組 2 — 商品推薦',
+  OBJECTION: '模組 3 — 異議處理',
+  UPSELL: '模組 4 — 加購引導',
+  PROMO: '模組 5 — 促銷話術',
+  CART: '模組 6 — 購物車',
+};
+
+const scripts = {
+  bag_vague: {
+    user: '我想買包包',
+    mod: 'DISCOVER', ctag: 'discover', ctagText: '模組 1 — 需求挖掘',
+    reply: '包包可以找到超多款！讓我幫您找最適合的。\n\n這個包主要會在什麼場合使用呢？通勤上班、旅行出遊，還是日常出門？'
+  },
+  bag_specific: {
+    user: '我要找通勤包，要能放筆電，預算 2500 以內',
+    mod: 'RECOMMEND', ctag: 'recommend', ctagText: '模組 2 — 商品推薦',
+    reply: '收到！通勤包、放筆電、NT$2,500 內。請問筆電大概幾吋？（這樣才能確認夾層尺寸夠不夠）'
+  },
+  gift: {
+    user: '我要買生日禮物給媽媽',
+    mod: 'DISCOVER', ctag: 'discover', ctagText: '模組 1 — 需求挖掘',
+    reply: '好溫馨的事！幫媽媽選禮物的話，想了解一下：\n\n她平常生活風格是偏居家舒適，還是喜歡出門走走？另外預算大概是多少？\n\n這兩個資訊可以讓我幫您找到最有心意的選項！'
+  },
+  too_expensive: {
+    user: '有點貴耶，沒辦法便宜一點嗎？',
+    mod: 'OBJECTION', ctag: 'objection', ctagText: '模組 3 — 異議處理：價格',
+    reply: 'NT$2,280 確實不是小數目，這個感受完全合理。\n\n換個角度想：如果天天通勤用，用兩年就是 730 天，平均每天只要 NT$3.1——比一杯珍奶還便宜，而且每天都在為您服務。\n\n當然，如果預算是硬限制，NT$1,500 以內也有選項，在收納分層上會有一些妥協，但放筆電的基本需求都能滿足。\n\n您想了解看看較低預算的選項，還是先考慮一下原本那個？'
+  },
+  think_again: {
+    user: '嗯，我再想想好了',
+    mod: 'OBJECTION', ctag: 'objection', ctagText: '模組 3 — 異議處理：猶豫',
+    reply: '完全沒問題，這種購買值得想清楚！\n\n如果有幫助的話，我可以幫您整理一個三款包包的比較清單，讓您想的時候有個參考依據？\n\n另外提醒一下，CHROME Citizen 那款目前是特價，原價 NT$3,280，現在 NT$2,280。如果您考慮好了，現在入手比較划算——不過不急，先想清楚比較重要！'
+  },
+  vs_competitor: {
+    user: '這個跟 Nike 的包比怎樣？',
+    mod: 'OBJECTION', ctag: 'objection', ctagText: '模組 3 — 異議處理：競品比較',
+    reply: 'Nike 的包在運動風格和品牌知名度上很強，很多人喜歡它。\n\n主要差別在於：\n• Nike：更偏向運動/休閒風，品牌標誌明顯\n• CHROME Citizen：更適合通勤上班場合，外型低調商務\n\n您說過主要是通勤上班用，以這個場景來說，CHROME 的設計更適合辦公室環境，不會顯得太「運動感」。\n\n當然，如果您公司環境比較輕鬆、或想要一個包通勤和運動都用，Nike 也完全是個好選擇！'
+  },
+  upsell_chance: {
+    user: '好，我決定要買了，加入購物車',
+    mod: 'UPSELL', ctag: 'upsell', ctagText: '模組 4 — 加購引導',
+    reply: '好選擇！CHROME Citizen 已加入購物車。\n\n順帶一個小建議：這款是帆布材質，搭配防水噴霧效果會更好——下雨天或潑到飲料完全不怕。\n\n防水噴霧目前 NT$290，加起來 NT$2,570（兩件合計還是在您 NT$2,500 以內的預算附近）。\n\n需要一起加入嗎？當然也可以之後再考慮！'
+  },
+  promo_ask: {
+    user: '現在有什麼優惠嗎？',
+    mod: 'PROMO', ctag: 'promo', ctagText: '模組 5 — 促銷話術',
+    reply: '有幾個可以告訴您：\n\n① 【即時折扣】CHROME Citizen 目前 NT$2,280，原價 NT$3,280，省了 NT$1,000，這個折扣到週日 11:59。\n\n② 【滿額免運】購物車滿 NT$2,000 免運費（您這一件已經達標了！）\n\n③ 【新用戶】如果是第一次在我們平台購買，結帳時輸入 NEW100 可以再折 NT$100。\n\n以您現在選的 CHROME Citizen 來說，趁這個週日前特價入手最划算，省 NT$1,000 不是小數目。'
+  },
+  free_shipping: {
+    user: '運費多少？',
+    mod: 'PROMO', ctag: 'promo', ctagText: '模組 5 — 促銷 + 門檻引導',
+    reply: '運費是 NT$60，但滿 NT$2,000 免運費。\n\n您購物車現在是 NT$2,280，已經超過門檻，所以這筆訂單是免運費的！\n\n（如果有要加那瓶防水噴霧的話，也一樣免運，合計 NT$2,570）'
+  },
+  checkout: {
+    user: '好，我準備結帳了',
+    mod: 'CART', ctag: 'cart', ctagText: '模組 6 — 購物車結帳確認',
+    reply: '確認一下您的訂單：\n─────────────────\nCHROME Citizen 後背包  NT$2,280\n防水噴霧（如已加購）    NT$290\n─────────────────\n小計                   NT$2,570\n運費                   免運費\n總計                   NT$2,570\n\n配送時間：下訂後 3-5 個工作天\n退換政策：收到後 30 天內無條件退換\n\n如果有任何問題，現在還可以調整。\n確認沒問題的話，可以前往付款了！'
+  },
+  abandon: {
+    user: '先放著，等等再說',
+    mod: 'CART', ctag: 'cart', ctagText: '模組 6 — 棄購挽回診斷',
+    reply: '沒問題，商品會留在購物車，隨時可以回來！\n\n不過想多了解一下：是有什麼地方還在考慮嗎？\n\n常見的考慮點：\n① 預算？→ 我可以幫您看看其他價位\n② 尺寸不確定？→ 我可以幫您確認規格\n③ 想多比較？→ 我幫您整理比較清單\n④ 不確定品質？→ 30 天免費退換，可以放心試\n\n告訴我是哪個方面，我幫您解決！'
+  }
+};
+
+function appendMsg(role, text, ctag, ctagClass) {
+  const win = document.getElementById('chatWindow');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg' + (role === 'user' ? ' user' : '');
+  const av = document.createElement('div');
+  av.className = 'chat-av' + (role === 'agent' ? ' agent' : '');
+  av.textContent = role === 'agent' ? 'SB' : 'Me';
+  const bub = document.createElement('div');
+  bub.className = 'chat-bub ' + role;
+  if (ctag) {
+    const tag = document.createElement('div');
+    tag.className = 'ctag ' + (ctagClass || '');
+    tag.textContent = ctag;
+    bub.appendChild(tag);
+  }
+  const txt = document.createElement('div');
+  txt.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  bub.appendChild(txt);
+  msg.appendChild(av); msg.appendChild(bub);
+  win.appendChild(msg);
+  win.scrollTop = win.scrollHeight;
+}
+
+function showTyping() {
+  const win = document.getElementById('chatWindow');
+  const t = document.createElement('div');
+  t.className = 'chat-msg'; t.id = 'typing';
+  t.innerHTML = '<div class="chat-av agent">SB</div><div class="chat-bub agent" style="color:var(--ink-faint);font-size:12px;">分析中...</div>';
+  win.appendChild(t); win.scrollTop = win.scrollHeight;
+}
+function rmTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+function setMod(m) {
+  const el = document.getElementById('simModule');
+  el.textContent = moduleNames[m] || m;
+  el.classList.add('active');
+}
+
+function run(key) {
+  const s = scripts[key]; if (!s) return;
+  appendMsg('user', s.user);
+  showTyping();
+  setTimeout(() => {
+    rmTyping(); setMod(s.mod);
+    appendMsg('agent', s.reply, s.ctagText, s.ctag);
+  }, 800);
+}
+
+function sendMsg() {
+  const input = document.getElementById('simInput');
+  const msg = input.value.trim(); if (!msg) return;
+  input.value = '';
+  appendMsg('user', msg);
+  showTyping();
+  setTimeout(() => {
+    rmTyping();
+    const m = msg.toLowerCase();
+    let key = 'bag_vague';
+    if (/貴|便宜|預算/.test(m)) key = 'too_expensive';
+    else if (/想想|考慮|不確定|猶豫/.test(m)) key = 'think_again';
+    else if (/優惠|折扣|促銷|特價/.test(m)) key = 'promo_ask';
+    else if (/運費|免運/.test(m)) key = 'free_shipping';
+    else if (/購物車|加入|要買|決定/.test(m)) key = 'upsell_chance';
+    else if (/結帳|付款|下訂/.test(m)) key = 'checkout';
+    else if (/等等|先放|不急|再說/.test(m)) key = 'abandon';
+    else if (/nike|adidas|竟品|比較|怎樣/.test(m)) key = 'vs_competitor';
+    else if (/禮物|送|媽媽|朋友|生日/.test(m)) key = 'gift';
+    else if (/包|背包|皮夾|錢包/.test(m) && /通勤|筆電|上班/.test(m)) key = 'bag_specific';
+    const s = scripts[key];
+    setMod(s.mod);
+    appendMsg('agent', s.reply, s.ctagText, s.ctag);
+  }, 900);
+}
+
+function markDone() {
+  const btn = document.getElementById('completeBtn');
+  btn.classList.add('done'); btn.textContent = 'Day 13 完成！';
+  document.getElementById('completeNote').textContent = '繼續前往 Day 14：醫療健康諮詢系統 →';
+}
+</script>
 </body>
 </html>
